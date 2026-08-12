@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Reports | SDN Campus Network</title>
 
 <style>
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -56,6 +59,10 @@ header {
     z-index: 20;
 }
 
+.menu-btn:hover {
+    background: #14304b;
+}
+
 .sidebar {
     position: fixed;
     top: 0;
@@ -103,11 +110,20 @@ header {
 .hero {
     padding: 43px;
     border-radius: 0 25px 25px 25px;
+
     background:
-        radial-gradient(circle at 88% 20%, #123c58, transparent 32%),
-        linear-gradient(135deg, #0b1324, #111d31);
+        radial-gradient(
+            circle at 88% 20%,
+            #123c58,
+            transparent 32%
+        ),
+        linear-gradient(
+            135deg,
+            #0b1324,
+            #111d31
+        );
+
     border: 1px solid #293c55;
-    animation: fadeUp .7s ease;
 }
 
 .hero h1 {
@@ -321,6 +337,7 @@ button:hover {
 }
 
 @keyframes fadeUp {
+
     from {
         opacity: 0;
         transform: translateY(18px);
@@ -330,9 +347,11 @@ button:hover {
         opacity: 1;
         transform: translateY(0);
     }
+
 }
 
 @media(max-width: 1000px) {
+
     .metrics {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -340,9 +359,11 @@ button:hover {
     .links {
         grid-template-columns: 1fr;
     }
+
 }
 
 @media(max-width: 600px) {
+
     .metrics {
         grid-template-columns: 1fr;
     }
@@ -358,46 +379,92 @@ button:hover {
     .hero h1 {
         font-size: 30px;
     }
+
+    .actions {
+        flex-direction: column;
+    }
+
+    button {
+        width: 100%;
+    }
+
 }
+
 </style>
+
 </head>
 
 <body>
 
 <header>
+
     <div class="logo">
         📄 NETWORK REPORTS
         <span>SDN Campus Network</span>
     </div>
+
 </header>
 
-<button class="menu-btn" onclick="toggleMenu()">☰</button>
 
-<div class="sidebar" id="sidebar">
+<button
+    class="menu-btn"
+    onclick="toggleMenu()">
 
-    <h3>SDN CAMPUS NETWORK</h3>
+    ☰
 
-    <a href="index.html">🏠 Dashboard</a>
+</button>
 
-    <a href="topology.html">🌐 Network Topology</a>
 
-    <a href="monitoring.html">📊 Live Monitoring</a>
+<div
+    class="sidebar"
+    id="sidebar">
 
-    <a href="qos.html">⚡ QoS & Load Balancing</a>
+    <h3>
+        SDN CAMPUS NETWORK
+    </h3>
 
-    <a href="security.html">🛡️ Security Center</a>
+    <a href="index.html">
+        🏠 Dashboard
+    </a>
 
-    <a href="reports.html" class="active">📄 Reports</a>
+    <a href="topology.html">
+        🌐 Network Topology
+    </a>
 
-    <a href="admin.html">⚙️ Admin Control Center</a>
+    <a href="monitoring.html">
+        📊 Live Monitoring
+    </a>
+
+    <a href="qos.html">
+        ⚡ QoS & Load Balancing
+    </a>
+
+    <a href="security.html">
+        🛡️ Security Center
+    </a>
+
+    <a
+        href="reports.html"
+        class="active">
+
+        📄 Reports
+
+    </a>
+
+    <a href="admin.html">
+        ⚙️ Admin Control Center
+    </a>
 
 </div>
+
 
 <main class="container">
 
     <section class="hero">
 
-        <h1>Network Performance Reports</h1>
+        <h1>
+            Network Performance Reports
+        </h1>
 
         <p>
             Generate a professional report containing the
@@ -414,54 +481,89 @@ button:hover {
 
     <section class="panel">
 
-        <h2>📊 Current Network Summary</h2>
+        <h2>
+            📊 Current Network Summary
+        </h2>
 
         <div class="metrics">
 
             <div class="metric">
+
                 <div class="metric-title">
                     Throughput
                 </div>
 
                 <div class="metric-value">
-                    <span id="throughput">--</span>
-                    <span class="metric-unit">Mbps</span>
+
+                    <span id="throughput">
+                        --
+                    </span>
+
+                    <span class="metric-unit">
+                        Mbps
+                    </span>
+
                 </div>
+
             </div>
 
 
             <div class="metric">
+
                 <div class="metric-title">
                     Latency
                 </div>
 
                 <div class="metric-value">
-                    <span id="latency">--</span>
-                    <span class="metric-unit">ms</span>
+
+                    <span id="latency">
+                        --
+                    </span>
+
+                    <span class="metric-unit">
+                        ms
+                    </span>
+
                 </div>
+
             </div>
 
 
             <div class="metric">
+
                 <div class="metric-title">
                     Packet Loss
                 </div>
 
                 <div class="metric-value">
-                    <span id="packetLoss">--</span>
-                    <span class="metric-unit">%</span>
+
+                    <span id="packetLoss">
+                        --
+                    </span>
+
+                    <span class="metric-unit">
+                        %
+                    </span>
+
                 </div>
+
             </div>
 
 
             <div class="metric">
+
                 <div class="metric-title">
                     Connections
                 </div>
 
                 <div class="metric-value">
-                    <span id="connections">--</span>
+
+                    <span id="connections">
+                        --
+                    </span>
+
                 </div>
+
             </div>
 
         </div>
@@ -471,20 +573,34 @@ button:hover {
 
     <section class="panel">
 
-        <h2>🌐 Link Utilization</h2>
+        <h2>
+            🌐 Link Utilization
+        </h2>
 
         <div class="links">
 
+
             <div class="link-card">
 
-                <h3>S1 → S2</h3>
+                <h3>
+                    S1 → S2
+                </h3>
 
                 <div class="link-value">
-                    <span id="link12">--</span>%
+
+                    <span id="link12">
+                        --
+                    </span>%
+
                 </div>
 
                 <div class="progress">
-                    <div class="bar" id="bar12"></div>
+
+                    <div
+                        class="bar"
+                        id="bar12">
+                    </div>
+
                 </div>
 
             </div>
@@ -492,14 +608,25 @@ button:hover {
 
             <div class="link-card">
 
-                <h3>S1 → S3</h3>
+                <h3>
+                    S1 → S3
+                </h3>
 
                 <div class="link-value">
-                    <span id="link13">--</span>%
+
+                    <span id="link13">
+                        --
+                    </span>%
+
                 </div>
 
                 <div class="progress">
-                    <div class="bar" id="bar13"></div>
+
+                    <div
+                        class="bar"
+                        id="bar13">
+                    </div>
+
                 </div>
 
             </div>
@@ -507,14 +634,25 @@ button:hover {
 
             <div class="link-card">
 
-                <h3>S2 → S3</h3>
+                <h3>
+                    S2 → S3
+                </h3>
 
                 <div class="link-value">
-                    <span id="link23">--</span>%
+
+                    <span id="link23">
+                        --
+                    </span>%
+
                 </div>
 
                 <div class="progress">
-                    <div class="bar" id="bar23"></div>
+
+                    <div
+                        class="bar"
+                        id="bar23">
+                    </div>
+
                 </div>
 
             </div>
@@ -526,23 +664,36 @@ button:hover {
 
     <section class="panel">
 
-        <h2>🛡️ Network Health Assessment</h2>
+        <h2>
+            🛡️ Network Health Assessment
+        </h2>
 
         <p class="summary">
 
             Current Network Status:
-            <strong id="networkStatus">CHECKING</strong>
+
+            <strong id="networkStatus">
+                CHECKING
+            </strong>
 
             <br>
 
             Recommended Path:
-            <strong id="path">CHECKING</strong>
+
+            <strong id="path">
+                CHECKING
+            </strong>
 
             <br>
 
             Report Status:
-            <span class="status" id="reportStatus">
+
+            <span
+                class="status"
+                id="reportStatus">
+
                 ANALYZING
+
             </span>
 
         </p>
@@ -552,7 +703,9 @@ button:hover {
 
     <section class="panel">
 
-        <h2>📑 Report Generation</h2>
+        <h2>
+            📑 Report Generation
+        </h2>
 
         <p class="summary">
 
@@ -565,9 +718,13 @@ button:hover {
 
         <div class="actions">
 
-            <button onclick="downloadReport()">
+            <button
+                onclick="downloadReport()">
+
                 ⬇️ Download PDF Report
+
             </button>
+
 
             <button
                 class="secondary"
@@ -584,7 +741,9 @@ button:hover {
 </main>
 
 
-<div class="notification" id="notification">
+<div
+    class="notification"
+    id="notification">
 
     <strong id="notificationTitle">
         Report System
@@ -599,9 +758,20 @@ button:hover {
 
 <script>
 
-const API_URL =
-    "http://127.0.0.1:5000/api/network";
+/* =========================
+   API URL
+========================= */
 
+const API_URL =
+    window.location.origin + "/api/network";
+
+const REPORT_URL =
+    window.location.origin + "/api/report";
+
+
+/* =========================
+   SIDEBAR
+========================= */
 
 function toggleMenu() {
 
@@ -613,7 +783,14 @@ function toggleMenu() {
 }
 
 
-function showNotification(title, message) {
+/* =========================
+   NOTIFICATION
+========================= */
+
+function showNotification(
+    title,
+    message
+) {
 
     document.getElementById(
         "notificationTitle"
@@ -640,12 +817,20 @@ function showNotification(title, message) {
 }
 
 
-function updateBar(id, value) {
+/* =========================
+   UPDATE BAR
+========================= */
+
+function updateBar(
+    id,
+    value
+) {
 
     const bar =
         document.getElementById(id);
 
-    bar.style.width = value + "%";
+    bar.style.width =
+        value + "%";
 
     bar.classList.remove(
         "warning",
@@ -654,36 +839,55 @@ function updateBar(id, value) {
 
     if (value >= 85) {
 
-        bar.classList.add("danger");
+        bar.classList.add(
+            "danger"
+        );
 
     }
     else if (value >= 60) {
 
-        bar.classList.add("warning");
+        bar.classList.add(
+            "warning"
+        );
 
     }
 
 }
 
 
+/* =========================
+   LOAD NETWORK DATA
+========================= */
+
 async function loadData() {
 
     try {
 
         const response =
-            await fetch(API_URL);
+            await fetch(
+                API_URL,
+                {
+                    method: "GET",
+                    cache: "no-cache"
+                }
+            );
+
 
         if (!response.ok) {
 
             throw new Error(
-                "Backend error"
+                "Backend error: " +
+                response.status
             );
 
         }
 
+
         const data =
             await response.json();
 
+
+        /* METRICS */
 
         document.getElementById(
             "throughput"
@@ -709,6 +913,8 @@ async function loadData() {
             data.connections;
 
 
+        /* LINKS */
+
         document.getElementById(
             "link12"
         ).innerText =
@@ -726,6 +932,8 @@ async function loadData() {
         ).innerText =
             data.link23;
 
+
+        /* PROGRESS BARS */
 
         updateBar(
             "bar12",
@@ -745,17 +953,23 @@ async function loadData() {
         );
 
 
+        /* STATUS */
+
         document.getElementById(
             "networkStatus"
         ).innerText =
             data.status;
 
 
+        /* PATH */
+
         document.getElementById(
             "path"
         ).innerText =
             data.path;
 
+
+        /* REPORT STATUS */
 
         const reportStatus =
             document.getElementById(
@@ -775,6 +989,7 @@ async function loadData() {
                 "status danger";
 
         }
+
         else if (
             data.packet_loss >= 4.5
         ) {
@@ -786,6 +1001,7 @@ async function loadData() {
                 "status warning";
 
         }
+
         else {
 
             reportStatus.innerText =
@@ -797,9 +1013,13 @@ async function loadData() {
         }
 
     }
+
     catch(error) {
 
-        console.error(error);
+        console.error(
+            "Report API error:",
+            error
+        );
 
         showNotification(
             "Backend Offline",
@@ -810,6 +1030,10 @@ async function loadData() {
 
 }
 
+
+/* =========================
+   REFRESH DATA
+========================= */
 
 async function refreshData() {
 
@@ -823,6 +1047,10 @@ async function refreshData() {
 }
 
 
+/* =========================
+   DOWNLOAD PDF
+========================= */
+
 function downloadReport() {
 
     showNotification(
@@ -830,13 +1058,28 @@ function downloadReport() {
         "Creating your PDF report..."
     );
 
+
+    /*
+     * Open the deployed Flask
+     * report endpoint.
+     */
+
     window.location.href =
-        "http://127.0.0.1:5000/api/report";
+        REPORT_URL;
 
 }
 
 
+/* =========================
+   INITIAL LOAD
+========================= */
+
 loadData();
+
+
+/* =========================
+   AUTO REFRESH
+========================= */
 
 setInterval(
     loadData,
@@ -846,4 +1089,5 @@ setInterval(
 </script>
 
 </body>
+
 </html>
