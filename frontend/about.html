@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>About | SDN Campus Network</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f7fa;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #087ea4;
+            color: white;
+            padding: 18px 35px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            font-size: 22px;
+        }
+
+        .header span {
+            font-size: 13px;
+            opacity: 0.9;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
+
+        .hero {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+        }
+
+        .hero h2 {
+            color: #087ea4;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .hero p {
+            color: #64748b;
+            font-size: 15px;
+        }
+
+        .student-card {
+            background: #eaf4f8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .student-card p {
+            margin: 8px 0;
+            font-size: 14px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+        }
+
+        .card h3 {
+            color: #087ea4;
+            margin-bottom: 12px;
+            font-size: 18px;
+        }
+
+        .card p {
+            color: #475569;
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        .card ul {
+            padding-left: 20px;
+        }
+
+        .card li {
+            margin: 8px 0;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        .tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tech span {
+            background: #eaf4f8;
+            color: #087ea4;
+            padding: 8px 13px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 25px;
+            margin-top: 30px;
+            color: #64748b;
+            font-size: 13px;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                padding: 15px 20px;
+            }
+
+            .container {
+                width: 94%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+        <h1>SDN Campus Network</h1>
+        <span>Network Monitoring & Security System</span>
+    </div>
+
+
+    <div class="container">
+
+        <!-- PROJECT TITLE -->
+
+        <div class="hero">
+
+            <h2>
+                SDN Campus Network Monitoring & Security
+            </h2>
+
+            <p>
+                Software Defined Networking based system for
+                real-time network monitoring, QoS management,
+                congestion detection and security awareness.
+            </p>
+
+
+            <div class="student-card">
+
+                <p>
+                    <strong>College:</strong>
+                    SAVEETHA SCHOOL OF ENGINEERING
+                </p>
+
+                <p>
+                    <strong>Name:</strong>
+                    POTHURAJU SAI CHARAN TEJ
+                </p>
+
+                <p>
+                    <strong>Register Number:</strong>
+                    192465048
+                </p>
+
+                <p>
+                    <strong>Department:</strong>
+                    BE.CSE.CYBER SECURITY
+                </p>
+
+                <p>
+                    <strong>Academic Year:</strong>
+                    3RD
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <!-- MAIN CARDS -->
+
+        <div class="grid">
+
+            <!-- ABOUT PROJECT -->
+
+            <div class="card">
+
+                <h3>📌 About the Project</h3>
+
+                <p>
+                    This project provides a centralized SDN-based
+                    campus network monitoring system. It allows
+                    network administrators to observe network
+                    performance, monitor link utilization, detect
+                    congestion and identify the recommended
+                    traffic path.
+                </p>
+
+            </div>
+
+
+            <!-- OBJECTIVES -->
+
+            <div class="card">
+
+                <h3>🎯 Project Objectives</h3>
+
+                <ul>
+
+                    <li>
+                        Monitor network performance in real time.
+                    </li>
+
+                    <li>
+                        Track throughput, latency and packet loss.
+                    </li>
+
+                    <li>
+                        Monitor active network connections.
+                    </li>
+
+                    <li>
+                        Detect high link utilization.
+                    </li>
+
+                    <li>
+                        Support QoS and traffic prioritization.
+                    </li>
+
+                    <li>
+                        Provide dynamic path selection.
+                    </li>
+
+                </ul>
+
+            </div>
+
+
+            <!-- NETWORK MONITORING -->
+
+            <div class="card">
+
+                <h3>📊 Network Monitoring</h3>
+
+                <p>
+                    The monitoring module continuously receives
+                    network information from the Flask backend.
+                    The dashboard displays throughput, latency,
+                    packet loss, active connections and link
+                    utilization.
+                </p>
+
+            </div>
+
+
+            <!-- QoS -->
+
+            <div class="card">
+
+                <h3>⚡ QoS & Load Balancing</h3>
+
+                <p>
+                    Quality of Service is used to prioritize
+                    important traffic such as VoIP and video.
+                    When a primary link becomes congested,
+                    the system can select an alternate path
+                    to improve traffic distribution.
+                </p>
+
+            </div>
+
+
+            <!-- SECURITY -->
+
+            <div class="card">
+
+                <h3>🔐 Cybersecurity</h3>
+
+                <p>
+                    The system improves security visibility by
+                    continuously monitoring network conditions,
+                    detecting abnormal utilization and providing
+                    security-oriented network status information.
+                </p>
+
+            </div>
+
+
+            <!-- TOPOLOGY -->
+
+            <div class="card">
+
+                <h3>🌐 SDN Network Topology</h3>
+
+                <p>
+                    The simulated campus network contains
+                    multiple switches and communication paths.
+                    The SDN approach allows network traffic
+                    decisions to be centrally managed.
+                </p>
+
+            </div>
+
+
+            <!-- TECHNOLOGIES -->
+
+            <div class="card">
+
+                <h3>🛠 Technologies Used</h3>
+
+                <div class="tech">
+
+                    <span>HTML</span>
+
+                    <span>CSS</span>
+
+                    <span>JavaScript</span>
+
+                    <span>Python</span>
+
+                    <span>Flask</span>
+
+                    <span>REST API</span>
+
+                    <span>SDN</span>
+
+                    <span>ReportLab</span>
+
+                </div>
+
+            </div>
+
+
+            <!-- REPORT -->
+
+            <div class="card">
+
+                <h3>📄 Reporting System</h3>
+
+                <p>
+                    The system generates a detailed five-page
+                    PDF report containing network performance,
+                    topology, link utilization, QoS,
+                    cybersecurity assessment, recommendations
+                    and conclusion.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="footer">
+
+        SDN Campus Network Monitoring & Security System
+
+        <br>
+
+        SAVEETHA SCHOOL OF ENGINEERING
+
+        <br><br>
+
+        POTHURAJU SAI CHARAN TEJ | 192465048
+
+    </div>
+
+</body>
+</html>

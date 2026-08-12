@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>SDN Campus Network Dashboard</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #e5e7eb;
+
+            background:
+                radial-gradient(circle at 15% 20%, #082f49, transparent 30%),
+                radial-gradient(circle at 85% 80%, #052e16, transparent 30%),
+                #020617;
+
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+
+            background-image:
+                linear-gradient(rgba(34,211,238,.025) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34,211,238,.025) 1px, transparent 1px);
+
+            background-size: 45px 45px;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+
+        /* MENU */
+
+        .menu-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+
+            width: 48px;
+            height: 48px;
+
+            border-radius: 12px;
+            border: 1px solid #0e7490;
+
+            background: #07141d;
+            color: #22d3ee;
+
+            font-size: 22px;
+            cursor: pointer;
+
+            z-index: 1001;
+            transition: .3s;
+        }
+
+        .menu-btn:hover {
+            background: #0c2633;
+            transform: scale(1.05);
+        }
+
+
+        /* SIDEBAR */
+
+        .sidebar {
+            position: fixed;
+
+            top: 0;
+            left: -280px;
+
+            width: 280px;
+            height: 100vh;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    #07141d,
+                    #020617
+                );
+
+            border-right: 1px solid #164e63;
+
+            padding-top: 90px;
+
+            z-index: 1000;
+
+            transition: .35s;
+
+            box-shadow:
+                8px 0 30px rgba(0,0,0,.6);
+        }
+
+        .sidebar.open {
+            left: 0;
+        }
+
+        .sidebar-title {
+            text-align: center;
+
+            color: #22d3ee;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+            margin-bottom: 30px;
+        }
+
+        .sidebar a {
+            display: block;
+
+            padding: 17px 25px;
+
+            text-decoration: none;
+
+            color: #94a3b8;
+
+            border-left: 3px solid transparent;
+
+            transition: .25s;
+        }
+
+        .sidebar a:hover {
+            color: #67e8f9;
+
+            background:
+                rgba(34,211,238,.07);
+
+            border-left-color: #22d3ee;
+
+            padding-left: 32px;
+        }
+
+
+        /* MAIN */
+
+        .container {
+            width: 94%;
+            max-width: 1450px;
+
+            margin: auto;
+
+            padding:
+                30px 0 50px;
+        }
+
+
+        /* HEADER */
+
+        .header {
+            padding: 30px;
+
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(7,47,65,.96),
+                    rgba(3,7,18,.97)
+                );
+
+            border: 1px solid #155e75;
+
+            animation:
+                fadeDown .7s ease;
+        }
+
+        @keyframes fadeDown {
+
+            from {
+                opacity: 0;
+                transform: translateY(-15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        .header-top {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            flex-wrap: wrap;
+
+            gap: 20px;
+        }
+
+        .header h1 {
+            margin: 0;
+
+            font-size: 32px;
+        }
+
+        .header h1 span {
+            color: #22d3ee;
+        }
+
+        .header p {
+            color: #64748b;
+
+            margin-bottom: 0;
+        }
+
+
+        /* LIVE STATUS */
+
+        .live-status {
+            display: flex;
+
+            align-items: center;
+
+            gap: 9px;
+
+            padding: 10px 16px;
+
+            border-radius: 25px;
+
+            background: #052e16;
+
+            border: 1px solid #166534;
+
+            color: #4ade80;
+
+            font-weight: bold;
+
+            font-size: 13px;
+        }
+
+        .live-dot {
+            width: 9px;
+            height: 9px;
+
+            background: #22c55e;
+
+            border-radius: 50%;
+
+            animation:
+                pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+
+            0% {
+                box-shadow:
+                    0 0 0 0
+                    rgba(34,197,94,.7);
+            }
+
+            70% {
+                box-shadow:
+                    0 0 0 10px
+                    rgba(34,197,94,0);
+            }
+
+            100% {
+                box-shadow:
+                    0 0 0 0
+                    rgba(34,197,94,0);
+            }
+
+        }
+
+
+        /* CARDS */
+
+        .cards {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, 1fr);
+
+            gap: 16px;
+
+            margin-top: 20px;
+        }
+
+        .card {
+            background: #07111c;
+
+            border: 1px solid #164e63;
+
+            border-radius: 15px;
+
+            padding: 22px;
+
+            transition: .3s;
+
+            animation:
+                cardIn .7s ease;
+        }
+
+        @keyframes cardIn {
+
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+
+            border-color: #22d3ee;
+
+            box-shadow:
+                0 10px 30px
+                rgba(34,211,238,.12);
+        }
+
+        .card-title {
+            color: #64748b;
+
+            text-transform: uppercase;
+
+            font-size: 11px;
+
+            letter-spacing: 1px;
+        }
+
+        .value {
+            font-size: 31px;
+
+            font-weight: bold;
+
+            color: #22d3ee;
+
+            margin-top: 10px;
+        }
+
+
+        /* SECTIONS */
+
+        .section {
+            margin-top: 20px;
+
+            padding: 25px;
+
+            background:
+                rgba(5,10,20,.97);
+
+            border: 1px solid #1e293b;
+
+            border-radius: 16px;
+
+            animation:
+                fadeUp .8s ease;
+        }
+
+        @keyframes fadeUp {
+
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+        }
+
+        .section h2 {
+            margin-top: 0;
+
+            color: #f1f5f9;
+        }
+
+        .subtitle {
+            color: #64748b;
+
+            font-size: 13px;
+
+            margin-bottom: 20px;
+        }
+
+
+        /* NETWORK LINKS */
+
+        .links {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            gap: 15px;
+        }
+
+        .link-card {
+            padding: 20px;
+
+            background: #08131f;
+
+            border: 1px solid #1e3a4a;
+
+            border-radius: 12px;
+
+            transition: .3s;
+        }
+
+        .link-card:hover {
+            transform: translateY(-3px);
+
+            border-color: #22d3ee;
+        }
+
+        .link-name {
+            color: #94a3b8;
+
+            font-size: 13px;
+        }
+
+        .link-value {
+            font-size: 27px;
+
+            font-weight: bold;
+
+            margin-top: 8px;
+        }
+
+        .normal {
+            color: #4ade80;
+        }
+
+        .warning {
+            color: #fbbf24;
+        }
+
+        .danger {
+            color: #f87171;
+        }
+
+
+        /* LOAD BALANCING */
+
+        .path-box {
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 18px;
+
+            flex-wrap: wrap;
+
+            margin-top: 20px;
+        }
+
+        .node {
+            padding: 16px 28px;
+
+            background: #071c27;
+
+            border: 1px solid #0e7490;
+
+            border-radius: 10px;
+
+            color: #67e8f9;
+
+            font-weight: bold;
+        }
+
+        .arrow {
+            color: #22d3ee;
+
+            font-size: 24px;
+        }
+
+        .reason {
+            margin-top: 20px;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            background: #071c27;
+
+            border: 1px solid #164e63;
+
+            color: #94a3b8;
+        }
+
+
+        /* CONTROL */
+
+        .controls {
+            display: flex;
+
+            gap: 12px;
+
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 13px 18px;
+
+            border-radius: 9px;
+
+            border: 1px solid #0e7490;
+
+            background: #071c27;
+
+            color: #67e8f9;
+
+            font-weight: bold;
+
+            cursor: pointer;
+
+            transition: .25s;
+        }
+
+        .control-btn:hover {
+            background: #155e75;
+
+            color: white;
+
+            transform: translateY(-2px);
+        }
+
+
+        /* UPDATE */
+
+        .update {
+            margin-top: 15px;
+
+            color: #64748b;
+
+            font-size: 12px;
+        }
+
+
+        /* RESPONSIVE */
+
+        @media(max-width:1000px) {
+
+            .cards {
+                grid-template-columns:
+                    repeat(2, 1fr);
+            }
+
+            .links {
+                grid-template-columns: 1fr;
+            }
+
+        }
+
+        @media(max-width:600px) {
+
+            .cards {
+                grid-template-columns: 1fr;
+            }
+
+            .container {
+                width: 92%;
+            }
+
+            .header h1 {
+                font-size: 25px;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <!-- MENU BUTTON -->
+
+    <button
+        class="menu-btn"
+        onclick="toggleMenu()">
+
+        ☰
+
+    </button>
+
+
+    <!-- SIDEBAR -->
+
+    <div
+        class="sidebar"
+        id="sidebar">
+
+        <div class="sidebar-title">
+
+            🛡️ SDN COMMAND CENTER
+
+        </div>
+
+
+        <a href="index.html">
+            🏠 Dashboard
+        </a>
+
+
+        <a href="topology.html">
+            🌐 Network Topology
+        </a>
+
+
+        <a href="monitoring.html">
+            📊 Live Monitoring
+        </a>
+
+
+        <a href="qos.html">
+            ⚡ QoS & Load Balancing
+        </a>
+
+
+        <a href="reports.html">
+            📄 Security Reports
+        </a>
+
+
+        <!-- NEW ABOUT PAGE -->
+
+        <a href="about.html">
+            ℹ️ About Project
+        </a>
+
+    </div>
+
+
+    <!-- MAIN -->
+
+    <div class="container">
+
+
+        <!-- HEADER -->
+
+        <div class="header">
+
+            <div class="header-top">
+
+                <div>
+
+                    <h1>
+
+                        🛡️ SDN Campus
+                        <span>Network Dashboard</span>
+
+                    </h1>
+
+
+                    <p>
+
+                        Intelligent network monitoring,
+                        traffic engineering and
+                        automated load balancing.
+
+                    </p>
+
+                </div>
+
+
+                <div class="live-status">
+
+                    <div class="live-dot"></div>
+
+                    LIVE BACKEND
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- METRICS -->
+
+        <div class="cards">
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Throughput
+                </div>
+
+                <div
+                    class="value"
+                    id="throughput">
+
+                    -- Mbps
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Latency
+                </div>
+
+                <div
+                    class="value"
+                    id="latency">
+
+                    -- ms
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Packet Loss
+                </div>
+
+                <div
+                    class="value"
+                    id="packetLoss">
+
+                    -- %
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-title">
+                    Active Connections
+                </div>
+
+                <div
+                    class="value"
+                    id="connections">
+
+                    --
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- LINK UTILIZATION -->
+
+        <div class="section">
+
+            <h2>
+                🔗 Live Link Utilization
+            </h2>
+
+            <div class="subtitle">
+
+                Current traffic distribution across
+                campus switches.
+
+            </div>
+
+
+            <div class="links">
+
+
+                <div class="link-card">
+
+                    <div class="link-name">
+                        S1 → S2
+                    </div>
+
+                    <div
+                        class="link-value"
+                        id="link12">
+
+                        --%
+
+                    </div>
+
+                </div>
+
+
+                <div class="link-card">
+
+                    <div class="link-name">
+                        S1 → S3
+                    </div>
+
+                    <div
+                        class="link-value"
+                        id="link13">
+
+                        --%
+
+                    </div>
+
+                </div>
+
+
+                <div class="link-card">
+
+                    <div class="link-name">
+                        S2 → S3
+                    </div>
+
+                    <div
+                        class="link-value"
+                        id="link23">
+
+                        --%
+
+                    </div>
+
+                </div>
+
+
+            </div>
+
+        </div>
+
+
+        <!-- LOAD BALANCING -->
+
+        <div class="section">
+
+            <h2>
+                ⚡ Dynamic Load Balancing
+            </h2>
+
+            <div class="subtitle">
+
+                The SDN controller automatically selects
+                a less congested network path.
+
+            </div>
+
+
+            <div class="path-box">
+
+                <div class="node">
+                    S1
+                </div>
+
+                <div class="arrow">
+                    →
+                </div>
+
+                <div
+                    class="node"
+                    id="pathNode">
+
+                    S2
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="reason"
+                id="reason">
+
+                Waiting for network analysis...
+
+            </div>
+
+        </div>
+
+
+        <!-- NETWORK STATUS -->
+
+        <div class="section">
+
+            <h2>
+                🧠 Network Intelligence
+            </h2>
+
+            <div
+                id="status"
+                style="
+                    font-size:24px;
+                    font-weight:bold;
+                    color:#4ade80;
+                ">
+
+                Connecting to backend...
+
+            </div>
+
+
+            <div
+                class="update"
+                id="updateTime">
+
+                Waiting for live data...
+
+            </div>
+
+        </div>
+
+
+        <!-- CONTROLS -->
+
+        <div class="section">
+
+            <h2>
+                🎛️ Network Control
+            </h2>
+
+            <div class="subtitle">
+
+                Control the dashboard simulation.
+
+            </div>
+
+
+            <div class="controls">
+
+                <button
+                    class="control-btn"
+                    onclick="getNetworkData()">
+
+                    🔄 Refresh Data
+
+                </button>
+
+
+                <button
+                    class="control-btn"
+                    onclick="simulateCongestion()">
+
+                    🔴 Simulate Congestion
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <script>
+
+
+        /* =========================
+           SIDEBAR
+        ========================= */
+
+        function toggleMenu() {
+
+            document
+                .getElementById("sidebar")
+                .classList.toggle("open");
+
+        }
+
+
+        /* =========================
+           LINK COLORS
+        ========================= */
+
+        function setLinkColor(element, value) {
+
+            element.classList.remove(
+                "normal",
+                "warning",
+                "danger"
+            );
+
+
+            if (value >= 80) {
+
+                element.classList.add("danger");
+
+            }
+
+            else if (value >= 50) {
+
+                element.classList.add("warning");
+
+            }
+
+            else {
+
+                element.classList.add("normal");
+
+            }
+
+        }
+
+
+        /* =========================
+           GET NETWORK DATA
+        ========================= */
+
+        async function getNetworkData() {
+
+            try {
+
+                const response =
+                    await fetch(
+                        "/api/network"
+                    );
+
+
+                if (!response.ok) {
+
+                    throw new Error(
+                        "Backend error"
+                    );
+
+                }
+
+
+                const data =
+                    await response.json();
+
+
+                /* METRICS */
+
+                document
+                    .getElementById("throughput")
+                    .innerText =
+                    data.throughput + " Mbps";
+
+
+                document
+                    .getElementById("latency")
+                    .innerText =
+                    data.latency + " ms";
+
+
+                document
+                    .getElementById("packetLoss")
+                    .innerText =
+                    data.packet_loss + " %";
+
+
+                document
+                    .getElementById("connections")
+                    .innerText =
+                    data.connections;
+
+
+                /* LINKS */
+
+                const l12 =
+                    document.getElementById("link12");
+
+                const l13 =
+                    document.getElementById("link13");
+
+                const l23 =
+                    document.getElementById("link23");
+
+
+                l12.innerText =
+                    data.link12 + "%";
+
+                l13.innerText =
+                    data.link13 + "%";
+
+                l23.innerText =
+                    data.link23 + "%";
+
+
+                setLinkColor(
+                    l12,
+                    data.link12
+                );
+
+                setLinkColor(
+                    l13,
+                    data.link13
+                );
+
+                setLinkColor(
+                    l23,
+                    data.link23
+                );
+
+
+                /* PATH */
+
+                const pathNode =
+                    document.getElementById(
+                        "pathNode"
+                    );
+
+
+                if (
+                    data.path.includes("S3")
+                ) {
+
+                    pathNode.innerText =
+                        "S3";
+
+
+                    document
+                        .getElementById("reason")
+                        .innerText =
+                        "⚠️ S1 → S2 is congested. Traffic redirected to S1 → S3.";
+
+                }
+
+                else {
+
+                    pathNode.innerText =
+                        "S2";
+
+
+                    document
+                        .getElementById("reason")
+                        .innerText =
+                        "🟢 S1 → S2 is currently operating within normal limits.";
+
+                }
+
+
+                /* STATUS */
+
+                const status =
+                    document.getElementById(
+                        "status"
+                    );
+
+
+                status.innerText =
+                    data.status;
+
+
+                if (
+                    data.status ===
+                    "CONGESTION DETECTED"
+                ) {
+
+                    status.style.color =
+                        "#f87171";
+
+                }
+
+                else {
+
+                    status.style.color =
+                        "#4ade80";
+
+                }
+
+
+                /* TIME */
+
+                document
+                    .getElementById("updateTime")
+                    .innerText =
+                    "Last backend update: " +
+                    new Date()
+                        .toLocaleTimeString();
+
+            }
+
+
+            catch(error) {
+
+                document
+                    .getElementById("status")
+                    .innerText =
+                    "⚠️ BACKEND OFFLINE";
+
+
+                document
+                    .getElementById("status")
+                    .style.color =
+                    "#f87171";
+
+
+                document
+                    .getElementById("updateTime")
+                    .innerText =
+                    "Cannot connect to Python backend.";
+
+
+                console.error(error);
+
+            }
+
+        }
+
+
+        /* =========================
+           SIMULATE CONGESTION
+        ========================= */
+
+        async function simulateCongestion() {
+
+            await getNetworkData();
+
+        }
+
+
+        /* =========================
+           FIRST LOAD
+        ========================= */
+
+        getNetworkData();
+
+
+        /* =========================
+           AUTO UPDATE
+        ========================= */
+
+        setInterval(
+            getNetworkData,
+            3000
+        );
+
+
+    </script>
+
+
+</body>
+
+</html>

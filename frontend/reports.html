@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Reports | SDN Campus Network</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #050914;
+    color: #f5f7fb;
+    min-height: 100vh;
+}
+
+header {
+    height: 90px;
+    background: #080f1e;
+    border-bottom: 1px solid #26344b;
+    display: flex;
+    align-items: center;
+    padding: 0 42px;
+}
+
+.logo {
+    color: #36d7ff;
+    font-size: 27px;
+    font-weight: bold;
+}
+
+.logo span {
+    color: white;
+    font-size: 15px;
+    margin-left: 18px;
+}
+
+.menu-btn {
+    position: fixed;
+    top: 115px;
+    left: 18px;
+    width: 55px;
+    height: 55px;
+    border-radius: 13px;
+    border: 1px solid #33445e;
+    background: #101a2d;
+    color: #36d7ff;
+    font-size: 27px;
+    cursor: pointer;
+    z-index: 20;
+}
+
+.sidebar {
+    position: fixed;
+    top: 0;
+    left: -265px;
+    width: 265px;
+    height: 100vh;
+    background: #080f1e;
+    border-right: 1px solid #25344b;
+    padding: 100px 20px 20px;
+    transition: .3s;
+    z-index: 30;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar h3 {
+    color: #36d7ff;
+    margin-bottom: 25px;
+}
+
+.sidebar a {
+    display: block;
+    text-decoration: none;
+    color: #b7c7dc;
+    padding: 13px 15px;
+    margin-bottom: 7px;
+    border-radius: 9px;
+    transition: .2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    color: #36d7ff;
+    background: #102b44;
+}
+
+.container {
+    width: calc(100% - 60px);
+    max-width: 1450px;
+    margin: 55px auto;
+}
+
+.hero {
+    padding: 43px;
+    border-radius: 0 25px 25px 25px;
+    background:
+        radial-gradient(circle at 88% 20%, #123c58, transparent 32%),
+        linear-gradient(135deg, #0b1324, #111d31);
+    border: 1px solid #293c55;
+    animation: fadeUp .7s ease;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #a4b3c9;
+    font-size: 18px;
+}
+
+.report-badge {
+    display: inline-block;
+    margin-top: 22px;
+    padding: 10px 18px;
+    border-radius: 25px;
+    background: #092d43;
+    border: 1px solid #17688d;
+    color: #36d7ff;
+    font-weight: bold;
+}
+
+.panel {
+    margin-top: 25px;
+    padding: 28px;
+    background: #091121;
+    border: 1px solid #25344b;
+    border-radius: 17px;
+}
+
+.panel h2 {
+    margin-bottom: 22px;
+    font-size: 21px;
+}
+
+.metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+}
+
+.metric {
+    background: #101a2b;
+    border: 1px solid #263851;
+    border-radius: 13px;
+    padding: 22px;
+    transition: .25s;
+}
+
+.metric:hover {
+    transform: translateY(-4px);
+    border-color: #287b9e;
+}
+
+.metric-title {
+    color: #8195b1;
+    font-size: 13px;
+    text-transform: uppercase;
+}
+
+.metric-value {
+    margin-top: 10px;
+    font-size: 29px;
+    font-weight: bold;
+    color: #36d7ff;
+}
+
+.metric-unit {
+    color: #7f91aa;
+    font-size: 13px;
+}
+
+.status {
+    display: inline-block;
+    margin-top: 8px;
+    padding: 7px 13px;
+    border-radius: 20px;
+    background: #07331f;
+    color: #42e77e;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status.warning {
+    background: #3b2d08;
+    color: #f4c842;
+}
+
+.status.danger {
+    background: #430e15;
+    color: #ff5965;
+}
+
+.links {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+}
+
+.link-card {
+    background: #101a2b;
+    border: 1px solid #263851;
+    border-radius: 12px;
+    padding: 20px;
+}
+
+.link-card h3 {
+    color: #91a6c4;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.link-value {
+    font-size: 28px;
+    color: #36d7ff;
+    font-weight: bold;
+}
+
+.progress {
+    height: 7px;
+    background: #202d42;
+    border-radius: 10px;
+    margin-top: 12px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    width: 0;
+    background: #36d7ff;
+    transition: width .5s;
+}
+
+.bar.warning {
+    background: #f4c842;
+}
+
+.bar.danger {
+    background: #ff5965;
+}
+
+.summary {
+    color: #9db0c9;
+    line-height: 1.8;
+}
+
+.summary strong {
+    color: #36d7ff;
+}
+
+.actions {
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    margin-top: 25px;
+}
+
+button {
+    padding: 14px 25px;
+    border-radius: 10px;
+    border: 1px solid #087eaf;
+    background: #07577d;
+    color: white;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: .25s;
+}
+
+button:hover {
+    background: #08709c;
+    transform: translateY(-2px);
+}
+
+.secondary {
+    background: #111d30;
+    border-color: #344962;
+}
+
+.secondary:hover {
+    background: #172941;
+}
+
+.notification {
+    position: fixed;
+    right: 25px;
+    bottom: 25px;
+    width: 350px;
+    padding: 19px;
+    border-radius: 14px;
+    background: #101b2d;
+    border: 1px solid #304763;
+    box-shadow: 0 15px 40px rgba(0,0,0,.4);
+    transform: translateX(420px);
+    transition: .4s;
+    z-index: 100;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification strong {
+    color: #36d7ff;
+}
+
+.notification p {
+    margin-top: 7px;
+    color: #9db0c9;
+}
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media(max-width: 1000px) {
+    .metrics {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .links {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width: 600px) {
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+        width: calc(100% - 30px);
+    }
+
+    .hero {
+        padding: 30px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+    <div class="logo">
+        📄 NETWORK REPORTS
+        <span>SDN Campus Network</span>
+    </div>
+</header>
+
+<button class="menu-btn" onclick="toggleMenu()">☰</button>
+
+<div class="sidebar" id="sidebar">
+
+    <h3>SDN CAMPUS NETWORK</h3>
+
+    <a href="index.html">🏠 Dashboard</a>
+
+    <a href="topology.html">🌐 Network Topology</a>
+
+    <a href="monitoring.html">📊 Live Monitoring</a>
+
+    <a href="qos.html">⚡ QoS & Load Balancing</a>
+
+    <a href="security.html">🛡️ Security Center</a>
+
+    <a href="reports.html" class="active">📄 Reports</a>
+
+    <a href="admin.html">⚙️ Admin Control Center</a>
+
+</div>
+
+<main class="container">
+
+    <section class="hero">
+
+        <h1>Network Performance Reports</h1>
+
+        <p>
+            Generate a professional report containing the
+            current SDN campus network performance,
+            utilization and security status.
+        </p>
+
+        <div class="report-badge">
+            ● LIVE REPORT DATA
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h2>📊 Current Network Summary</h2>
+
+        <div class="metrics">
+
+            <div class="metric">
+                <div class="metric-title">
+                    Throughput
+                </div>
+
+                <div class="metric-value">
+                    <span id="throughput">--</span>
+                    <span class="metric-unit">Mbps</span>
+                </div>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Latency
+                </div>
+
+                <div class="metric-value">
+                    <span id="latency">--</span>
+                    <span class="metric-unit">ms</span>
+                </div>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Packet Loss
+                </div>
+
+                <div class="metric-value">
+                    <span id="packetLoss">--</span>
+                    <span class="metric-unit">%</span>
+                </div>
+            </div>
+
+
+            <div class="metric">
+                <div class="metric-title">
+                    Connections
+                </div>
+
+                <div class="metric-value">
+                    <span id="connections">--</span>
+                </div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h2>🌐 Link Utilization</h2>
+
+        <div class="links">
+
+            <div class="link-card">
+
+                <h3>S1 → S2</h3>
+
+                <div class="link-value">
+                    <span id="link12">--</span>%
+                </div>
+
+                <div class="progress">
+                    <div class="bar" id="bar12"></div>
+                </div>
+
+            </div>
+
+
+            <div class="link-card">
+
+                <h3>S1 → S3</h3>
+
+                <div class="link-value">
+                    <span id="link13">--</span>%
+                </div>
+
+                <div class="progress">
+                    <div class="bar" id="bar13"></div>
+                </div>
+
+            </div>
+
+
+            <div class="link-card">
+
+                <h3>S2 → S3</h3>
+
+                <div class="link-value">
+                    <span id="link23">--</span>%
+                </div>
+
+                <div class="progress">
+                    <div class="bar" id="bar23"></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h2>🛡️ Network Health Assessment</h2>
+
+        <p class="summary">
+
+            Current Network Status:
+            <strong id="networkStatus">CHECKING</strong>
+
+            <br>
+
+            Recommended Path:
+            <strong id="path">CHECKING</strong>
+
+            <br>
+
+            Report Status:
+            <span class="status" id="reportStatus">
+                ANALYZING
+            </span>
+
+        </p>
+
+    </section>
+
+
+    <section class="panel">
+
+        <h2>📑 Report Generation</h2>
+
+        <p class="summary">
+
+            The generated PDF contains the latest network
+            performance values, link utilization, network
+            status, recommended routing path and report
+            generation timestamp.
+
+        </p>
+
+        <div class="actions">
+
+            <button onclick="downloadReport()">
+                ⬇️ Download PDF Report
+            </button>
+
+            <button
+                class="secondary"
+                onclick="refreshData()">
+
+                🔄 Refresh Data
+
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<div class="notification" id="notification">
+
+    <strong id="notificationTitle">
+        Report System
+    </strong>
+
+    <p id="notificationMessage">
+        Ready.
+    </p>
+
+</div>
+
+
+<script>
+
+const API_URL =
+    "http://127.0.0.1:5000/api/network";
+
+
+function toggleMenu() {
+
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("open");
+
+}
+
+
+function showNotification(title, message) {
+
+    document.getElementById(
+        "notificationTitle"
+    ).innerText = title;
+
+    document.getElementById(
+        "notificationMessage"
+    ).innerText = message;
+
+    document
+        .getElementById("notification")
+        .classList
+        .add("show");
+
+    setTimeout(() => {
+
+        document
+            .getElementById("notification")
+            .classList
+            .remove("show");
+
+    }, 3000);
+
+}
+
+
+function updateBar(id, value) {
+
+    const bar =
+        document.getElementById(id);
+
+    bar.style.width = value + "%";
+
+    bar.classList.remove(
+        "warning",
+        "danger"
+    );
+
+    if (value >= 85) {
+
+        bar.classList.add("danger");
+
+    }
+    else if (value >= 60) {
+
+        bar.classList.add("warning");
+
+    }
+
+}
+
+
+async function loadData() {
+
+    try {
+
+        const response =
+            await fetch(API_URL);
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Backend error"
+            );
+
+        }
+
+        const data =
+            await response.json();
+
+
+        document.getElementById(
+            "throughput"
+        ).innerText =
+            data.throughput;
+
+
+        document.getElementById(
+            "latency"
+        ).innerText =
+            data.latency;
+
+
+        document.getElementById(
+            "packetLoss"
+        ).innerText =
+            data.packet_loss;
+
+
+        document.getElementById(
+            "connections"
+        ).innerText =
+            data.connections;
+
+
+        document.getElementById(
+            "link12"
+        ).innerText =
+            data.link12;
+
+
+        document.getElementById(
+            "link13"
+        ).innerText =
+            data.link13;
+
+
+        document.getElementById(
+            "link23"
+        ).innerText =
+            data.link23;
+
+
+        updateBar(
+            "bar12",
+            data.link12
+        );
+
+
+        updateBar(
+            "bar13",
+            data.link13
+        );
+
+
+        updateBar(
+            "bar23",
+            data.link23
+        );
+
+
+        document.getElementById(
+            "networkStatus"
+        ).innerText =
+            data.status;
+
+
+        document.getElementById(
+            "path"
+        ).innerText =
+            data.path;
+
+
+        const reportStatus =
+            document.getElementById(
+                "reportStatus"
+            );
+
+
+        if (
+            data.status ===
+            "CONGESTION DETECTED"
+        ) {
+
+            reportStatus.innerText =
+                "ATTENTION REQUIRED";
+
+            reportStatus.className =
+                "status danger";
+
+        }
+        else if (
+            data.packet_loss >= 4.5
+        ) {
+
+            reportStatus.innerText =
+                "MONITOR";
+
+            reportStatus.className =
+                "status warning";
+
+        }
+        else {
+
+            reportStatus.innerText =
+                "HEALTHY";
+
+            reportStatus.className =
+                "status";
+
+        }
+
+    }
+    catch(error) {
+
+        console.error(error);
+
+        showNotification(
+            "Backend Offline",
+            "Unable to retrieve network data."
+        );
+
+    }
+
+}
+
+
+async function refreshData() {
+
+    await loadData();
+
+    showNotification(
+        "Data Updated",
+        "Latest network information loaded."
+    );
+
+}
+
+
+function downloadReport() {
+
+    showNotification(
+        "Generating Report",
+        "Creating your PDF report..."
+    );
+
+    window.location.href =
+        "http://127.0.0.1:5000/api/report";
+
+}
+
+
+loadData();
+
+setInterval(
+    loadData,
+    5000
+);
+
+</script>
+
+</body>
+</html>

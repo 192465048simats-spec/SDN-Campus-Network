@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>SDN QoS & Load Balancing</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #e5e7eb;
+
+    background:
+        radial-gradient(circle at 15% 20%, #172554, transparent 32%),
+        radial-gradient(circle at 85% 75%, #312e81, transparent 30%),
+        #020617;
+
+    min-height: 100vh;
+}
+
+
+/* GRID BACKGROUND */
+
+body::before {
+
+    content: "";
+
+    position: fixed;
+
+    inset: 0;
+
+    background-image:
+        linear-gradient(
+            rgba(99,102,241,.025) 1px,
+            transparent 1px
+        ),
+        linear-gradient(
+            90deg,
+            rgba(99,102,241,.025) 1px,
+            transparent 1px
+        );
+
+    background-size: 45px 45px;
+
+    pointer-events: none;
+
+    z-index: -1;
+}
+
+
+/* MENU */
+
+.menu-btn {
+
+    position: fixed;
+
+    top: 20px;
+    left: 20px;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 12px;
+
+    border: 1px solid #6366f1;
+
+    background: #080d20;
+
+    color: #a5b4fc;
+
+    font-size: 22px;
+
+    cursor: pointer;
+
+    z-index: 1001;
+
+    transition: .3s;
+}
+
+.menu-btn:hover {
+
+    background: #111936;
+
+    transform: scale(1.05);
+}
+
+
+/* SIDEBAR */
+
+.sidebar {
+
+    position: fixed;
+
+    top: 0;
+    left: -280px;
+
+    width: 280px;
+    height: 100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            #080d20,
+            #020617
+        );
+
+    border-right: 1px solid #312e81;
+
+    padding-top: 90px;
+
+    z-index: 1000;
+
+    transition: .35s;
+
+    box-shadow: 8px 0 30px rgba(0,0,0,.65);
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-title {
+
+    text-align: center;
+
+    color: #a5b4fc;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 30px;
+}
+
+.sidebar a {
+
+    display: block;
+
+    padding: 17px 25px;
+
+    text-decoration: none;
+
+    color: #94a3b8;
+
+    border-left: 3px solid transparent;
+
+    transition: .25s;
+}
+
+.sidebar a:hover {
+
+    color: #c7d2fe;
+
+    background: rgba(99,102,241,.08);
+
+    border-left-color: #6366f1;
+
+    padding-left: 32px;
+}
+
+
+/* MAIN */
+
+.container {
+
+    width: 94%;
+
+    max-width: 1450px;
+
+    margin: auto;
+
+    padding: 30px 0 50px;
+}
+
+
+/* HEADER */
+
+.header {
+
+    padding: 30px;
+
+    border-radius: 18px;
+
+    background:
+        linear-gradient(
+            135deg,
+            rgba(30,27,75,.96),
+            rgba(3,7,18,.97)
+        );
+
+    border: 1px solid #4338ca;
+
+    animation: fadeDown .7s ease;
+}
+
+@keyframes fadeDown {
+
+    from {
+        opacity: 0;
+        transform: translateY(-15px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.header-top {
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    flex-wrap: wrap;
+
+    gap: 20px;
+}
+
+.header h1 {
+
+    margin: 0;
+
+    font-size: 32px;
+}
+
+.header h1 span {
+
+    color: #a5b4fc;
+}
+
+.header p {
+
+    color: #64748b;
+
+    margin-bottom: 0;
+}
+
+
+/* LIVE STATUS */
+
+.live-status {
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 9px;
+
+    padding: 10px 16px;
+
+    border-radius: 25px;
+
+    background: #052e16;
+
+    border: 1px solid #166534;
+
+    color: #4ade80;
+
+    font-weight: bold;
+
+    font-size: 13px;
+}
+
+.live-dot {
+
+    width: 9px;
+    height: 9px;
+
+    background: #22c55e;
+
+    border-radius: 50%;
+
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+
+    0% {
+        box-shadow: 0 0 0 0 rgba(34,197,94,.7);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(34,197,94,0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(34,197,94,0);
+    }
+}
+
+
+/* SECTION */
+
+.section {
+
+    margin-top: 20px;
+
+    padding: 25px;
+
+    background: rgba(5,10,20,.97);
+
+    border: 1px solid #1e293b;
+
+    border-radius: 16px;
+
+    animation: fadeUp .8s ease;
+}
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.section h2 {
+
+    margin-top: 0;
+
+    color: #f1f5f9;
+}
+
+.subtitle {
+
+    color: #64748b;
+
+    font-size: 13px;
+
+    margin-bottom: 20px;
+}
+
+
+/* TRAFFIC CARDS */
+
+.traffic-grid {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 15px;
+}
+
+.traffic-card {
+
+    padding: 22px;
+
+    border-radius: 13px;
+
+    background: #080d20;
+
+    border: 1px solid #312e81;
+
+    transition: .3s;
+}
+
+.traffic-card:hover {
+
+    transform: translateY(-5px);
+
+    border-color: #6366f1;
+
+    box-shadow:
+        0 10px 30px rgba(99,102,241,.12);
+}
+
+.icon {
+
+    font-size: 30px;
+
+    margin-bottom: 10px;
+}
+
+.traffic-card h3 {
+
+    margin: 5px 0;
+
+}
+
+.priority {
+
+    font-size: 12px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-top: 10px;
+}
+
+.high {
+
+    color: #f87171;
+}
+
+.medium {
+
+    color: #fbbf24;
+}
+
+.low {
+
+    color: #4ade80;
+}
+
+
+/* PATH */
+
+.path-container {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    gap: 18px;
+
+    flex-wrap: wrap;
+
+    margin: 25px 0;
+}
+
+.node {
+
+    padding: 18px 30px;
+
+    border-radius: 11px;
+
+    background: #0c1230;
+
+    border: 1px solid #6366f1;
+
+    color: #c7d2fe;
+
+    font-weight: bold;
+
+    font-size: 18px;
+}
+
+.arrow {
+
+    color: #818cf8;
+
+    font-size: 28px;
+}
+
+
+/* DECISION */
+
+.decision {
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    background: #080d20;
+
+    border: 1px solid #312e81;
+
+}
+
+.decision-title {
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    text-transform: uppercase;
+
+    letter-spacing: 1px;
+}
+
+.decision-value {
+
+    font-size: 23px;
+
+    font-weight: bold;
+
+    margin-top: 8px;
+
+    color: #a5b4fc;
+}
+
+
+/* UTILIZATION */
+
+.utilization {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.util-card {
+
+    background: #080d20;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #1e293b;
+}
+
+.util-name {
+
+    color: #94a3b8;
+
+    font-size: 13px;
+}
+
+.util-value {
+
+    font-size: 28px;
+
+    font-weight: bold;
+
+    margin-top: 8px;
+}
+
+
+/* BUTTON */
+
+.refresh-btn {
+
+    padding: 13px 20px;
+
+    border-radius: 9px;
+
+    border: 1px solid #6366f1;
+
+    background: #111936;
+
+    color: #c7d2fe;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.refresh-btn:hover {
+
+    background: #4338ca;
+
+    color: white;
+
+    transform: translateY(-2px);
+}
+
+
+/* UPDATE */
+
+.update {
+
+    color: #64748b;
+
+    font-size: 12px;
+
+    margin-top: 12px;
+}
+
+
+/* RESPONSIVE */
+
+@media(max-width:1000px) {
+
+    .traffic-grid {
+
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .utilization {
+
+        grid-template-columns: 1fr;
+    }
+}
+
+@media(max-width:600px) {
+
+    .traffic-grid {
+
+        grid-template-columns: 1fr;
+    }
+
+    .container {
+
+        width: 92%;
+    }
+
+    .header h1 {
+
+        font-size: 25px;
+    }
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- MENU -->
+
+<button
+    class="menu-btn"
+    onclick="toggleMenu()">
+
+    ☰
+
+</button>
+
+
+<!-- SIDEBAR -->
+
+<div
+    class="sidebar"
+    id="sidebar">
+
+    <div class="sidebar-title">
+
+        🛡️ SDN COMMAND CENTER
+
+    </div>
+
+    <a href="index.html">
+        🏠 Dashboard
+    </a>
+
+    <a href="topology.html">
+        🌐 Network Topology
+    </a>
+
+    <a href="monitoring.html">
+        📊 Live Monitoring
+    </a>
+
+    <a href="qos.html">
+        ⚡ QoS & Load Balancing
+    </a>
+
+    <a href="reports.html">
+        📄 Security Reports
+    </a>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="container">
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="header-top">
+
+        <div>
+
+            <h1>
+
+                ⚡ QoS &
+                <span>Load Balancing</span>
+
+            </h1>
+
+            <p>
+
+                Intelligent traffic prioritization
+                and dynamic SDN path optimization.
+
+            </p>
+
+        </div>
+
+
+        <div class="live-status">
+
+            <div class="live-dot"></div>
+
+            CONTROLLER ONLINE
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- TRAFFIC PRIORITY -->
+
+<div class="section">
+
+    <h2>
+        🎯 QoS Traffic Classification
+    </h2>
+
+    <div class="subtitle">
+
+        Network traffic is classified according
+        to application priority.
+
+    </div>
+
+
+    <div class="traffic-grid">
+
+
+        <div class="traffic-card">
+
+            <div class="icon">
+                📞
+            </div>
+
+            <h3>
+                VoIP
+            </h3>
+
+            <div class="priority high">
+                🔴 HIGH PRIORITY
+            </div>
+
+        </div>
+
+
+        <div class="traffic-card">
+
+            <div class="icon">
+                🎥
+            </div>
+
+            <h3>
+                Video
+            </h3>
+
+            <div class="priority high">
+                🔴 HIGH PRIORITY
+            </div>
+
+        </div>
+
+
+        <div class="traffic-card">
+
+            <div class="icon">
+                🌐
+            </div>
+
+            <h3>
+                Web
+            </h3>
+
+            <div class="priority medium">
+                🟡 NORMAL PRIORITY
+            </div>
+
+        </div>
+
+
+        <div class="traffic-card">
+
+            <div class="icon">
+                📥
+            </div>
+
+            <h3>
+                Download
+            </h3>
+
+            <div class="priority low">
+                🟢 LOW PRIORITY
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- LINK UTILIZATION -->
+
+<div class="section">
+
+    <h2>
+        📡 Current Network Utilization
+    </h2>
+
+    <div class="subtitle">
+
+        QoS decisions are based on current
+        link congestion levels.
+
+    </div>
+
+
+    <div class="utilization">
+
+
+        <div class="util-card">
+
+            <div class="util-name">
+                S1 → S2
+            </div>
+
+            <div
+                class="util-value"
+                id="link12">
+
+                --%
+
+            </div>
+
+        </div>
+
+
+        <div class="util-card">
+
+            <div class="util-name">
+                S1 → S3
+            </div>
+
+            <div
+                class="util-value"
+                id="link13">
+
+                --%
+
+            </div>
+
+        </div>
+
+
+        <div class="util-card">
+
+            <div class="util-name">
+                S2 → S3
+            </div>
+
+            <div
+                class="util-value"
+                id="link23">
+
+                --%
+
+            </div>
+
+        </div>
+
+
+    </div>
+
+</div>
+
+
+<!-- LOAD BALANCING -->
+
+<div class="section">
+
+    <h2>
+        🔄 Dynamic Traffic Path
+    </h2>
+
+    <div class="subtitle">
+
+        The controller selects the optimal
+        route according to network conditions.
+
+    </div>
+
+
+    <div class="path-container">
+
+        <div class="node">
+            S1
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div
+            class="node"
+            id="path">
+
+            S2
+
+        </div>
+
+    </div>
+
+
+    <div class="decision">
+
+        <div class="decision-title">
+
+            Controller Decision
+
+        </div>
+
+        <div
+            class="decision-value"
+            id="decision">
+
+            Analyzing network...
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- NETWORK STATUS -->
+
+<div class="section">
+
+    <h2>
+        🧠 SDN Controller Status
+    </h2>
+
+
+    <div
+        id="status"
+        style="
+            font-size:23px;
+            font-weight:bold;
+            color:#4ade80;
+        ">
+
+        Connecting...
+
+    </div>
+
+
+    <div
+        class="update"
+        id="update">
+
+        Waiting for backend data...
+
+    </div>
+
+
+    <br>
+
+
+    <button
+        class="refresh-btn"
+        onclick="loadQoS()">
+
+        🔄 Refresh QoS Data
+
+    </button>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* MENU */
+
+function toggleMenu() {
+
+    document
+        .getElementById("sidebar")
+        .classList.toggle("open");
+
+}
+
+
+/* COLOR */
+
+function colorUtil(element, value) {
+
+    element.style.color = "";
+
+    if (value >= 80) {
+
+        element.style.color = "#f87171";
+
+    }
+
+    else if (value >= 50) {
+
+        element.style.color = "#fbbf24";
+
+    }
+
+    else {
+
+        element.style.color = "#4ade80";
+
+    }
+
+}
+
+
+/* BACKEND */
+
+async function loadQoS() {
+
+    try {
+
+        const response =
+            await fetch(
+                "http://127.0.0.1:5000/api/network"
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Backend unavailable"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /* LINKS */
+
+        const l12 =
+            document.getElementById("link12");
+
+        const l13 =
+            document.getElementById("link13");
+
+        const l23 =
+            document.getElementById("link23");
+
+
+        l12.innerText =
+            data.link12 + "%";
+
+        l13.innerText =
+            data.link13 + "%";
+
+        l23.innerText =
+            data.link23 + "%";
+
+
+        colorUtil(l12, data.link12);
+
+        colorUtil(l13, data.link13);
+
+        colorUtil(l23, data.link23);
+
+
+        /* PATH */
+
+        const path =
+            document.getElementById("path");
+
+
+        const decision =
+            document.getElementById(
+                "decision"
+            );
+
+
+        if (
+            data.path.includes("S3")
+        ) {
+
+            path.innerText = "S3";
+
+            decision.innerText =
+                "⚠️ S1 → S2 congested. Traffic redirected through S1 → S3.";
+
+            decision.style.color =
+                "#fbbf24";
+
+        }
+
+        else {
+
+            path.innerText = "S2";
+
+            decision.innerText =
+                "🟢 S1 → S2 selected. Network path operating normally.";
+
+            decision.style.color =
+                "#4ade80";
+
+        }
+
+
+        /* STATUS */
+
+        const status =
+            document.getElementById(
+                "status"
+            );
+
+
+        status.innerText =
+            data.status;
+
+
+        if (
+            data.status ===
+            "CONGESTION DETECTED"
+        ) {
+
+            status.style.color =
+                "#f87171";
+
+        }
+
+        else {
+
+            status.style.color =
+                "#4ade80";
+
+        }
+
+
+        /* TIME */
+
+        document
+            .getElementById("update")
+            .innerText =
+            "Last controller update: " +
+            new Date()
+            .toLocaleTimeString();
+
+
+    }
+
+    catch(error) {
+
+        document
+            .getElementById("status")
+            .innerText =
+            "⚠️ BACKEND OFFLINE";
+
+        document
+            .getElementById("status")
+            .style.color =
+            "#f87171";
+
+
+        document
+            .getElementById("update")
+            .innerText =
+            "Unable to connect to Flask backend.";
+
+        console.error(error);
+
+    }
+
+}
+
+
+/* FIRST LOAD */
+
+loadQoS();
+
+
+/* AUTO UPDATE */
+
+setInterval(
+    loadQoS,
+    3000
+);
+
+</script>
+
+
+</body>
+
+</html>

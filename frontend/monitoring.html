@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Live Monitoring | SDN Campus Network</title>
+
+<style>
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background: #050b17;
+    color: #f5f7fb;
+    min-height: 100vh;
+}
+
+/* HEADER */
+
+header {
+    height: 90px;
+    background: #091121;
+    border-bottom: 1px solid #20304a;
+
+    display: flex;
+    align-items: center;
+
+    padding: 0 42px;
+}
+
+.logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #29bfff;
+}
+
+.logo span {
+    color: white;
+    font-size: 16px;
+    margin-left: 18px;
+}
+
+/* MENU */
+
+.menu-btn {
+    position: fixed;
+    top: 115px;
+    left: 18px;
+
+    width: 55px;
+    height: 55px;
+
+    border-radius: 13px;
+
+    border: 1px solid #33445d;
+
+    background: #101b2d;
+
+    color: #29bfff;
+
+    font-size: 27px;
+
+    cursor: pointer;
+
+    z-index: 10;
+
+    transition: .25s;
+}
+
+.menu-btn:hover {
+    background: #14314b;
+    transform: translateY(-2px);
+}
+
+/* SIDEBAR */
+
+.sidebar {
+    position: fixed;
+
+    top: 0;
+    left: -260px;
+
+    width: 260px;
+    height: 100vh;
+
+    background: #08101f;
+
+    border-right: 1px solid #23344e;
+
+    padding: 100px 20px 20px;
+
+    transition: .3s;
+
+    z-index: 20;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar h3 {
+    color: #29bfff;
+    margin-bottom: 25px;
+}
+
+.sidebar a {
+    display: block;
+
+    padding: 13px 15px;
+
+    margin-bottom: 7px;
+
+    border-radius: 9px;
+
+    color: #b9c8dd;
+
+    text-decoration: none;
+
+    transition: .2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+    background: #102b44;
+    color: #29bfff;
+}
+
+/* MAIN */
+
+.container {
+    width: calc(100% - 60px);
+
+    max-width: 1450px;
+
+    margin: 55px auto;
+}
+
+/* HERO */
+
+.hero {
+    padding: 42px;
+
+    border-radius: 0 25px 25px 25px;
+
+    background:
+        radial-gradient(
+            circle at 90% 20%,
+            #10496a,
+            transparent 35%
+        ),
+        linear-gradient(
+            135deg,
+            #0b1527,
+            #102238
+        );
+
+    border: 1px solid #263a54;
+
+    animation: fadeUp .7s ease;
+}
+
+.hero h1 {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.hero p {
+    color: #9db0c9;
+    font-size: 18px;
+}
+
+.live {
+    display: inline-flex;
+
+    align-items: center;
+
+    gap: 10px;
+
+    margin-top: 22px;
+
+    padding: 10px 18px;
+
+    border-radius: 25px;
+
+    background: #052b1b;
+
+    border: 1px solid #116b3c;
+
+    color: #39e87c;
+
+    font-weight: bold;
+}
+
+.live-dot {
+    width: 10px;
+    height: 10px;
+
+    border-radius: 50%;
+
+    background: #31e876;
+
+    box-shadow: 0 0 12px #31e876;
+
+    animation: pulse 1.5s infinite;
+}
+
+/* METRICS */
+
+.metrics {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 18px;
+
+    margin-top: 25px;
+}
+
+.metric {
+    background: #091121;
+
+    border: 1px solid #23344c;
+
+    border-radius: 17px;
+
+    padding: 25px;
+
+    transition: .25s;
+
+    animation: fadeUp .8s ease;
+}
+
+.metric:hover {
+    transform: translateY(-4px);
+
+    border-color: #269dcc;
+}
+
+.metric-title {
+    color: #7891b3;
+
+    font-size: 13px;
+
+    text-transform: uppercase;
+}
+
+.metric-value {
+    font-size: 32px;
+
+    font-weight: bold;
+
+    margin-top: 10px;
+
+    color: #29bfff;
+}
+
+.metric-unit {
+    color: #7287a5;
+
+    font-size: 13px;
+
+    margin-left: 4px;
+}
+
+/* NETWORK STATUS */
+
+.status-panel {
+    margin-top: 25px;
+
+    padding: 28px;
+
+    background: #091121;
+
+    border: 1px solid #23344c;
+
+    border-radius: 17px;
+}
+
+.status-header {
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    margin-bottom: 22px;
+}
+
+.status-header h2 {
+    font-size: 21px;
+}
+
+.network-status {
+    padding: 8px 15px;
+
+    border-radius: 20px;
+
+    background: #06351f;
+
+    color: #40e67d;
+
+    font-size: 13px;
+
+    font-weight: bold;
+}
+
+.network-status.danger {
+    background: #420d13;
+
+    color: #ff6570;
+}
+
+/* LINKS */
+
+.links {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 15px;
+}
+
+.link-card {
+    background: #111b2d;
+
+    padding: 20px;
+
+    border-radius: 12px;
+
+    border: 1px solid #22344e;
+}
+
+.link-name {
+    color: #9bb0ca;
+
+    font-size: 14px;
+
+    margin-bottom: 12px;
+}
+
+.link-value {
+    font-size: 26px;
+
+    font-weight: bold;
+}
+
+.progress {
+    width: 100%;
+
+    height: 7px;
+
+    background: #202d42;
+
+    border-radius: 10px;
+
+    overflow: hidden;
+
+    margin-top: 13px;
+}
+
+.progress-bar {
+    height: 100%;
+
+    width: 0%;
+
+    border-radius: 10px;
+
+    background: #29bfff;
+
+    transition: width .5s;
+}
+
+.progress-bar.warning {
+    background: #f5c542;
+}
+
+.progress-bar.danger {
+    background: #ff4f5e;
+}
+
+/* PATH */
+
+.path-box {
+    margin-top: 22px;
+
+    padding: 18px;
+
+    background: #0d192b;
+
+    border-left: 4px solid #29bfff;
+
+    border-radius: 9px;
+
+    color: #b8c9df;
+}
+
+.path-box strong {
+    color: #29bfff;
+}
+
+/* REFRESH */
+
+.refresh-area {
+    display: flex;
+
+    justify-content: center;
+
+    margin-top: 25px;
+}
+
+.refresh-btn {
+    border: 1px solid #087db5;
+
+    background: #07567e;
+
+    color: white;
+
+    padding: 14px 28px;
+
+    border-radius: 10px;
+
+    font-size: 16px;
+
+    font-weight: bold;
+
+    cursor: pointer;
+
+    transition: .25s;
+}
+
+.refresh-btn:hover {
+    background: #08719f;
+
+    transform: translateY(-2px);
+}
+
+/* NOTIFICATION */
+
+.notification {
+    position: fixed;
+
+    right: 25px;
+    bottom: 25px;
+
+    padding: 18px 22px;
+
+    width: 330px;
+
+    background: #101c2f;
+
+    border: 1px solid #304763;
+
+    border-radius: 13px;
+
+    box-shadow: 0 15px 40px rgba(0,0,0,.4);
+
+    transform: translateX(400px);
+
+    transition: .4s;
+
+    z-index: 50;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification strong {
+    color: #39e87c;
+}
+
+.notification p {
+    color: #9eb0c8;
+
+    margin-top: 7px;
+
+    line-height: 1.4;
+}
+
+/* ANIMATIONS */
+
+@keyframes fadeUp {
+
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+}
+
+@keyframes pulse {
+
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    50% {
+        transform: scale(1.4);
+        opacity: .6;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 1000px) {
+
+    .metrics {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
+
+    .links {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+@media(max-width: 600px) {
+
+    header {
+        padding: 0 20px;
+    }
+
+    .logo {
+        font-size: 22px;
+    }
+
+    .logo span {
+        display: none;
+    }
+
+    .container {
+        width: calc(100% - 30px);
+    }
+
+    .hero {
+        padding: 30px;
+    }
+
+    .hero h1 {
+        font-size: 30px;
+    }
+
+    .metrics {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+
+    <div class="logo">
+        📊 LIVE NETWORK MONITORING
+        <span>SDN Campus Network</span>
+    </div>
+
+</header>
+
+
+<!-- MENU -->
+
+<button
+    class="menu-btn"
+    onclick="toggleMenu()">
+
+    ☰
+
+</button>
+
+
+<!-- SIDEBAR -->
+
+<div
+    class="sidebar"
+    id="sidebar">
+
+    <h3>
+        SDN CAMPUS NETWORK
+    </h3>
+
+    <a href="index.html">
+        🏠 Dashboard
+    </a>
+
+    <a href="topology.html">
+        🌐 Network Topology
+    </a>
+
+    <a
+        href="monitoring.html"
+        class="active">
+
+        📊 Live Monitoring
+
+    </a>
+
+    <a href="qos.html">
+        ⚡ QoS & Load Balancing
+    </a>
+
+    <a href="security.html">
+        🛡️ Security Center
+    </a>
+
+    <a href="reports.html">
+        📄 Reports
+    </a>
+
+    <a href="admin.html">
+        ⚙️ Admin Control Center
+    </a>
+
+</div>
+
+
+<main class="container">
+
+
+    <!-- HERO -->
+
+    <section class="hero">
+
+        <h1>
+            Real-Time Network Metrics
+        </h1>
+
+        <p>
+            Continuous monitoring of SDN campus
+            network performance and traffic conditions.
+        </p>
+
+        <div class="live">
+
+            <span class="live-dot"></span>
+
+            LIVE DATA STREAM
+
+        </div>
+
+    </section>
+
+
+    <!-- METRICS -->
+
+    <section class="metrics">
+
+
+        <div class="metric">
+
+            <div class="metric-title">
+                Throughput
+            </div>
+
+            <div class="metric-value">
+
+                <span id="throughput">
+                    --
+                </span>
+
+                <span class="metric-unit">
+                    Mbps
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-title">
+                Latency
+            </div>
+
+            <div class="metric-value">
+
+                <span id="latency">
+                    --
+                </span>
+
+                <span class="metric-unit">
+                    ms
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-title">
+                Packet Loss
+            </div>
+
+            <div class="metric-value">
+
+                <span id="packetLoss">
+                    --
+                </span>
+
+                <span class="metric-unit">
+                    %
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="metric">
+
+            <div class="metric-title">
+                Active Connections
+            </div>
+
+            <div class="metric-value">
+
+                <span id="connections">
+                    --
+                </span>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- LINK UTILIZATION -->
+
+    <section class="status-panel">
+
+        <div class="status-header">
+
+            <h2>
+                📡 Link Utilization
+            </h2>
+
+            <div
+                class="network-status"
+                id="networkStatus">
+
+                ● NORMAL
+
+            </div>
+
+        </div>
+
+
+        <div class="links">
+
+
+            <div class="link-card">
+
+                <div class="link-name">
+                    S1 → S2
+                </div>
+
+                <div class="link-value">
+                    <span id="link12">
+                        --
+                    </span>%
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar12">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="link-card">
+
+                <div class="link-name">
+                    S1 → S3
+                </div>
+
+                <div class="link-value">
+                    <span id="link13">
+                        --
+                    </span>%
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar13">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="link-card">
+
+                <div class="link-name">
+                    S2 → S3
+                </div>
+
+                <div class="link-value">
+                    <span id="link23">
+                        --
+                    </span>%
+                </div>
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar23">
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- PATH -->
+
+        <div class="path-box">
+
+            Current Recommended Path:
+
+            <strong id="path">
+                Loading...
+            </strong>
+
+        </div>
+
+
+        <!-- REFRESH -->
+
+        <div class="refresh-area">
+
+            <button
+                class="refresh-btn"
+                onclick="manualRefresh()">
+
+                🔄 Refresh Now
+
+            </button>
+
+        </div>
+
+    </section>
+
+</main>
+
+
+<!-- NOTIFICATION -->
+
+<div
+    class="notification"
+    id="notification">
+
+    <strong id="notificationTitle">
+        Network Updated
+    </strong>
+
+    <p id="notificationMessage">
+        Latest network data received.
+    </p>
+
+</div>
+
+
+<script>
+
+const API_URL =
+    "http://127.0.0.1:5000/api/network";
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+function toggleMenu() {
+
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("open");
+
+}
+
+
+/* =========================
+   NOTIFICATION
+========================= */
+
+function showNotification(title, message) {
+
+    const box =
+        document.getElementById("notification");
+
+    document.getElementById(
+        "notificationTitle"
+    ).innerText = title;
+
+    document.getElementById(
+        "notificationMessage"
+    ).innerText = message;
+
+    box.classList.add("show");
+
+    setTimeout(() => {
+
+        box.classList.remove("show");
+
+    }, 3000);
+
+}
+
+
+/* =========================
+   UPDATE PROGRESS BAR
+========================= */
+
+function updateBar(id, value) {
+
+    const bar =
+        document.getElementById(id);
+
+    bar.style.width =
+        value + "%";
+
+
+    bar.classList.remove(
+        "warning",
+        "danger"
+    );
+
+
+    if (value >= 85) {
+
+        bar.classList.add("danger");
+
+    }
+    else if (value >= 60) {
+
+        bar.classList.add("warning");
+
+    }
+
+}
+
+
+/* =========================
+   LOAD NETWORK DATA
+========================= */
+
+async function loadNetwork() {
+
+    try {
+
+        const response =
+            await fetch(API_URL);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "API response error"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        /* METRICS */
+
+        document.getElementById(
+            "throughput"
+        ).innerText =
+            data.throughput;
+
+
+        document.getElementById(
+            "latency"
+        ).innerText =
+            data.latency;
+
+
+        document.getElementById(
+            "packetLoss"
+        ).innerText =
+            data.packet_loss;
+
+
+        document.getElementById(
+            "connections"
+        ).innerText =
+            data.connections;
+
+
+        /* LINKS */
+
+        document.getElementById(
+            "link12"
+        ).innerText =
+            data.link12;
+
+
+        document.getElementById(
+            "link13"
+        ).innerText =
+            data.link13;
+
+
+        document.getElementById(
+            "link23"
+        ).innerText =
+            data.link23;
+
+
+        /* BARS */
+
+        updateBar(
+            "bar12",
+            data.link12
+        );
+
+
+        updateBar(
+            "bar13",
+            data.link13
+        );
+
+
+        updateBar(
+            "bar23",
+            data.link23
+        );
+
+
+        /* PATH */
+
+        document.getElementById(
+            "path"
+        ).innerText =
+            data.path;
+
+
+        /* NETWORK STATUS */
+
+        const status =
+            document.getElementById(
+                "networkStatus"
+            );
+
+
+        if (
+            data.status ===
+            "CONGESTION DETECTED"
+        ) {
+
+            status.innerText =
+                "● CONGESTION DETECTED";
+
+            status.classList.add(
+                "danger"
+            );
+
+        }
+        else {
+
+            status.innerText =
+                "● NORMAL";
+
+            status.classList.remove(
+                "danger"
+            );
+
+        }
+
+    }
+
+    catch(error) {
+
+        console.error(error);
+
+        showNotification(
+            "Backend Offline",
+            "Unable to connect to Flask API."
+        );
+
+    }
+
+}
+
+
+/* =========================
+   MANUAL REFRESH
+========================= */
+
+async function manualRefresh() {
+
+    await loadNetwork();
+
+    showNotification(
+        "Network Updated",
+        "Latest network metrics received from Flask backend."
+    );
+
+}
+
+
+/* =========================
+   INITIAL LOAD
+========================= */
+
+loadNetwork();
+
+
+/* =========================
+   AUTO REFRESH
+========================= */
+
+setInterval(
+    loadNetwork,
+    3000
+);
+
+</script>
+
+</body>
+</html>
