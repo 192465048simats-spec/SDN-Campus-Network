@@ -967,282 +967,284 @@
     </div>
 
 
-    <script>
+ <script>
+
+/* =========================
+   SIDEBAR
+========================= */
+
+function toggleMenu() {
+    document.getElementById("sidebar").classList.toggle("open");
+}
 
 
-        /* =========================
-           SIDEBAR
-        ========================= */
+/* =========================
+   LINK COLORS
+========================= */
 
-        function toggleMenu() {
+function setLinkColor(element, value) {
 
-            document
-                .getElementById("sidebar")
-                .classList.toggle("open");
+    element.classList.remove(
+        "normal",
+        "warning",
+        "danger"
+    );
 
-        }
+    if (value >= 80) {
+        element.classList.add("danger");
+    }
+    else if (value >= 50) {
+        element.classList.add("warning");
+    }
+    else {
+        element.classList.add("normal");
+    }
+}
 
 
-        /* =========================
-           LINK COLORS
-        ========================= */
+/* =========================
+   GET NETWORK DATA
+========================= */
 
-        function setLinkColor(element, value) {
+async function getNetworkData() {
 
-            element.classList.remove(
-                "normal",
-                "warning",
-                "danger"
+    try {
+
+        /*
+         * Use the same Render domain
+         * where the dashboard is running.
+         */
+        const apiURL =
+            window.location.origin + "/api/network";
+
+        console.log("Connecting to:", apiURL);
+
+
+        /* Timeout after 10 seconds */
+
+        const controller =
+            new AbortController();
+
+        const timeout =
+            setTimeout(
+                () => controller.abort(),
+                10000
             );
 
 
-            if (value >= 80) {
+        const response =
+            await fetch(apiURL, {
+                method: "GET",
+                cache: "no-cache",
+                signal: controller.signal
+            });
 
-                element.classList.add("danger");
 
-            }
+        clearTimeout(timeout);
 
-            else if (value >= 50) {
 
-                element.classList.add("warning");
+        if (!response.ok) {
 
-            }
-
-            else {
-
-                element.classList.add("normal");
-
-            }
+            throw new Error(
+                "HTTP Error: " +
+                response.status
+            );
 
         }
 
 
-        /* =========================
-           GET NETWORK DATA
-        ========================= */
+        const data =
+            await response.json();
 
-        async function getNetworkData() {
 
-            try {
-
-                const response =
-                    await fetch(
-                        "/api/network"
-                    );
-
-
-                if (!response.ok) {
-
-                    throw new Error(
-                        "Backend error"
-                    );
-
-                }
-
-
-                const data =
-                    await response.json();
-
-
-                /* METRICS */
-
-                document
-                    .getElementById("throughput")
-                    .innerText =
-                    data.throughput + " Mbps";
-
-
-                document
-                    .getElementById("latency")
-                    .innerText =
-                    data.latency + " ms";
-
-
-                document
-                    .getElementById("packetLoss")
-                    .innerText =
-                    data.packet_loss + " %";
-
-
-                document
-                    .getElementById("connections")
-                    .innerText =
-                    data.connections;
-
-
-                /* LINKS */
-
-                const l12 =
-                    document.getElementById("link12");
-
-                const l13 =
-                    document.getElementById("link13");
-
-                const l23 =
-                    document.getElementById("link23");
-
-
-                l12.innerText =
-                    data.link12 + "%";
-
-                l13.innerText =
-                    data.link13 + "%";
-
-                l23.innerText =
-                    data.link23 + "%";
-
-
-                setLinkColor(
-                    l12,
-                    data.link12
-                );
-
-                setLinkColor(
-                    l13,
-                    data.link13
-                );
-
-                setLinkColor(
-                    l23,
-                    data.link23
-                );
-
-
-                /* PATH */
-
-                const pathNode =
-                    document.getElementById(
-                        "pathNode"
-                    );
-
-
-                if (
-                    data.path.includes("S3")
-                ) {
-
-                    pathNode.innerText =
-                        "S3";
-
-
-                    document
-                        .getElementById("reason")
-                        .innerText =
-                        "⚠️ S1 → S2 is congested. Traffic redirected to S1 → S3.";
-
-                }
-
-                else {
-
-                    pathNode.innerText =
-                        "S2";
-
-
-                    document
-                        .getElementById("reason")
-                        .innerText =
-                        "🟢 S1 → S2 is currently operating within normal limits.";
-
-                }
-
-
-                /* STATUS */
-
-                const status =
-                    document.getElementById(
-                        "status"
-                    );
-
-
-                status.innerText =
-                    data.status;
-
-
-                if (
-                    data.status ===
-                    "CONGESTION DETECTED"
-                ) {
-
-                    status.style.color =
-                        "#f87171";
-
-                }
-
-                else {
-
-                    status.style.color =
-                        "#4ade80";
-
-                }
-
-
-                /* TIME */
-
-                document
-                    .getElementById("updateTime")
-                    .innerText =
-                    "Last backend update: " +
-                    new Date()
-                        .toLocaleTimeString();
-
-            }
-
-
-            catch(error) {
-
-                document
-                    .getElementById("status")
-                    .innerText =
-                    "⚠️ BACKEND OFFLINE";
-
-
-                document
-                    .getElementById("status")
-                    .style.color =
-                    "#f87171";
-
-
-                document
-                    .getElementById("updateTime")
-                    .innerText =
-                    "Cannot connect to Python backend.";
-
-
-                console.error(error);
-
-            }
-
-        }
+        console.log("Network data:", data);
 
 
         /* =========================
-           SIMULATE CONGESTION
+           METRICS
         ========================= */
 
-        async function simulateCongestion() {
+        document.getElementById("throughput").innerText =
+            data.throughput + " Mbps";
 
-            await getNetworkData();
 
-        }
+        document.getElementById("latency").innerText =
+            data.latency + " ms";
+
+
+        document.getElementById("packetLoss").innerText =
+            data.packet_loss + " %";
+
+
+        document.getElementById("connections").innerText =
+            data.connections;
 
 
         /* =========================
-           FIRST LOAD
+           LINKS
         ========================= */
 
-        getNetworkData();
+        const l12 =
+            document.getElementById("link12");
+
+        const l13 =
+            document.getElementById("link13");
+
+        const l23 =
+            document.getElementById("link23");
 
 
-        /* =========================
-           AUTO UPDATE
-        ========================= */
+        l12.innerText =
+            data.link12 + "%";
 
-        setInterval(
-            getNetworkData,
-            3000
+        l13.innerText =
+            data.link13 + "%";
+
+        l23.innerText =
+            data.link23 + "%";
+
+
+        setLinkColor(
+            l12,
+            data.link12
+        );
+
+        setLinkColor(
+            l13,
+            data.link13
+        );
+
+        setLinkColor(
+            l23,
+            data.link23
         );
 
 
-    </script>
+        /* =========================
+           PATH
+        ========================= */
+
+        const pathNode =
+            document.getElementById("pathNode");
+
+        const reason =
+            document.getElementById("reason");
+
+
+        if (
+            data.path &&
+            data.path.includes("S3")
+        ) {
+
+            pathNode.innerText =
+                "S3";
+
+            reason.innerText =
+                "⚠️ S1 → S2 is congested. Traffic redirected to S1 → S3.";
+
+        }
+        else {
+
+            pathNode.innerText =
+                "S2";
+
+            reason.innerText =
+                "🟢 S1 → S2 is currently operating within normal limits.";
+
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        const status =
+            document.getElementById("status");
+
+
+        status.innerText =
+            data.status;
+
+
+        if (
+            data.status ===
+            "CONGESTION DETECTED"
+        ) {
+
+            status.style.color =
+                "#f87171";
+
+        }
+        else {
+
+            status.style.color =
+                "#4ade80";
+
+        }
+
+
+        /* =========================
+           TIME
+        ========================= */
+
+        document.getElementById("updateTime").innerText =
+            "Last backend update: " +
+            new Date().toLocaleTimeString();
+
+
+    }
+    catch (error) {
+
+        console.error(
+            "API CONNECTION ERROR:",
+            error
+        );
+
+
+        document.getElementById("status").innerText =
+            "⚠️ BACKEND OFFLINE";
+
+
+        document.getElementById("status").style.color =
+            "#f87171";
+
+
+        document.getElementById("updateTime").innerText =
+            "Cannot connect to Python backend.";
+
+    }
+
+}
+
+
+/* =========================
+   SIMULATE CONGESTION
+========================= */
+
+async function simulateCongestion() {
+
+    await getNetworkData();
+
+}
+
+
+/* =========================
+   FIRST LOAD
+========================= */
+
+getNetworkData();
+
+
+/* =========================
+   AUTO UPDATE
+========================= */
+
+setInterval(
+    getNetworkData,
+    3000
+);
+
+</script>
 
 
 </body>
