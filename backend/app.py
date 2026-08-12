@@ -28,7 +28,10 @@ network = {
 }
 
 
-# Serve dashboard
+# =========================
+# HOME / DASHBOARD
+# =========================
+
 @app.route("/")
 def home():
     return send_from_directory(
@@ -37,16 +40,23 @@ def home():
     )
 
 
-# Serve other frontend pages
+# =========================
+# FRONTEND PAGES
+# =========================
+
 @app.route("/<path:filename>")
 def frontend_files(filename):
+
     return send_from_directory(
         FRONTEND_FOLDER,
         filename
     )
 
 
-# Network API
+# =========================
+# NETWORK API
+# =========================
+
 @app.route("/api/network")
 def network_data():
 
@@ -96,6 +106,10 @@ def network_data():
 
     return jsonify(network)
 
+
+# =========================
+# RUN SERVER
+# =========================
 
 if __name__ == "__main__":
 
