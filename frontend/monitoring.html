@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -581,7 +582,6 @@ header {
 
 </header>
 
-
 <!-- MENU -->
 
 <button
@@ -591,7 +591,6 @@ header {
     ☰
 
 </button>
-
 
 <!-- SIDEBAR -->
 
@@ -637,9 +636,7 @@ header {
 
 </div>
 
-
 <main class="container">
-
 
     <!-- HERO -->
 
@@ -664,11 +661,9 @@ header {
 
     </section>
 
-
     <!-- METRICS -->
 
     <section class="metrics">
-
 
         <div class="metric">
 
@@ -690,7 +685,6 @@ header {
 
         </div>
 
-
         <div class="metric">
 
             <div class="metric-title">
@@ -710,7 +704,6 @@ header {
             </div>
 
         </div>
-
 
         <div class="metric">
 
@@ -732,7 +725,6 @@ header {
 
         </div>
 
-
         <div class="metric">
 
             <div class="metric-title">
@@ -750,7 +742,6 @@ header {
         </div>
 
     </section>
-
 
     <!-- LINK UTILIZATION -->
 
@@ -772,9 +763,7 @@ header {
 
         </div>
 
-
         <div class="links">
-
 
             <div class="link-card">
 
@@ -799,7 +788,6 @@ header {
 
             </div>
 
-
             <div class="link-card">
 
                 <div class="link-name">
@@ -822,7 +810,6 @@ header {
                 </div>
 
             </div>
-
 
             <div class="link-card">
 
@@ -849,7 +836,6 @@ header {
 
         </div>
 
-
         <!-- PATH -->
 
         <div class="path-box">
@@ -861,7 +847,6 @@ header {
             </strong>
 
         </div>
-
 
         <!-- REFRESH -->
 
@@ -881,7 +866,6 @@ header {
 
 </main>
 
-
 <!-- NOTIFICATION -->
 
 <div
@@ -898,11 +882,14 @@ header {
 
 </div>
 
-
 <script>
 
+/* =========================
+   API URL
+========================= */
+
 const API_URL =
-    "http://127.0.0.1:5000/api/network";
+    window.location.origin + "/api/network";
 
 
 /* =========================
@@ -959,18 +946,17 @@ function updateBar(id, value) {
     bar.style.width =
         value + "%";
 
-
     bar.classList.remove(
         "warning",
         "danger"
     );
-
 
     if (value >= 85) {
 
         bar.classList.add("danger");
 
     }
+
     else if (value >= 60) {
 
         bar.classList.add("warning");
@@ -989,17 +975,19 @@ async function loadNetwork() {
     try {
 
         const response =
-            await fetch(API_URL);
-
+            await fetch(API_URL, {
+                method: "GET",
+                cache: "no-cache"
+            });
 
         if (!response.ok) {
 
             throw new Error(
-                "API response error"
+                "API response error: " +
+                response.status
             );
 
         }
-
 
         const data =
             await response.json();
@@ -1012,18 +1000,15 @@ async function loadNetwork() {
         ).innerText =
             data.throughput;
 
-
         document.getElementById(
             "latency"
         ).innerText =
             data.latency;
 
-
         document.getElementById(
             "packetLoss"
         ).innerText =
             data.packet_loss;
-
 
         document.getElementById(
             "connections"
@@ -1038,12 +1023,10 @@ async function loadNetwork() {
         ).innerText =
             data.link12;
 
-
         document.getElementById(
             "link13"
         ).innerText =
             data.link13;
-
 
         document.getElementById(
             "link23"
@@ -1058,12 +1041,10 @@ async function loadNetwork() {
             data.link12
         );
 
-
         updateBar(
             "bar13",
             data.link13
         );
-
 
         updateBar(
             "bar23",
@@ -1086,7 +1067,6 @@ async function loadNetwork() {
                 "networkStatus"
             );
 
-
         if (
             data.status ===
             "CONGESTION DETECTED"
@@ -1100,6 +1080,7 @@ async function loadNetwork() {
             );
 
         }
+
         else {
 
             status.innerText =
@@ -1111,11 +1092,22 @@ async function loadNetwork() {
 
         }
 
+
+        /* SUCCESS NOTIFICATION */
+
+        console.log(
+            "Network data updated:",
+            data
+        );
+
     }
 
     catch(error) {
 
-        console.error(error);
+        console.error(
+            "Network API error:",
+            error
+        );
 
         showNotification(
             "Backend Offline",
@@ -1134,11 +1126,6 @@ async function loadNetwork() {
 async function manualRefresh() {
 
     await loadNetwork();
-
-    showNotification(
-        "Network Updated",
-        "Latest network metrics received from Flask backend."
-    );
 
 }
 
