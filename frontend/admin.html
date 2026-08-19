@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>Admin Control Center | SDN Campus</title>
 
 <style>
+
 * {
     box-sizing: border-box;
     margin: 0;
@@ -15,528 +18,1191 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #050b17;
+
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            #082f49,
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 80%,
+            #052e16,
+            transparent 30%
+        ),
+        #050b17;
+
     color: #f4f7ff;
+
     min-height: 100vh;
 }
 
-/* HEADER */
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 header {
+
     height: 92px;
+
     display: flex;
+
     align-items: center;
-    padding: 0 42px;
-    background: #091121;
-    border-bottom: 1px solid #1d2a40;
+
+    padding: 0 42px 0 85px;
+
+    background:
+        #091121;
+
+    border-bottom:
+        1px solid #1d2a40;
 }
 
 .logo {
-    font-size: 30px;
-    font-weight: bold;
-    color: #25baff;
+
+    font-size:
+        30px;
+
+    font-weight:
+        bold;
+
+    color:
+        #25baff;
 }
 
 .logo span {
-    color: #ffffff;
-    font-size: 17px;
-    margin-left: 18px;
+
+    color:
+        #ffffff;
+
+    font-size:
+        17px;
+
+    margin-left:
+        18px;
 }
 
-/* MENU BUTTON */
+
+/* =====================================================
+   MENU BUTTON
+===================================================== */
 
 .menu-btn {
-    position: fixed;
-    top: 208px;
-    left: 15px;
-    width: 68px;
-    height: 68px;
-    border-radius: 16px;
-    border: 1px solid #31445f;
-    background: #101b2e;
-    color: #25baff;
-    font-size: 34px;
-    cursor: pointer;
-    z-index: 10;
-    transition: 0.3s;
+
+    position:
+        absolute;
+
+    top:
+        20px;
+
+    left:
+        20px;
+
+    width:
+        48px;
+
+    height:
+        48px;
+
+    border-radius:
+        12px;
+
+    border:
+        1px solid #31445f;
+
+    background:
+        #101b2e;
+
+    color:
+        #25baff;
+
+    font-size:
+        24px;
+
+    cursor:
+        pointer;
+
+    z-index:
+        1001;
+
+    transition:
+        .25s;
 }
 
 .menu-btn:hover {
-    background: #12304c;
-    transform: translateY(-2px);
+
+    background:
+        #12304c;
+
+    transform:
+        scale(1.05);
 }
 
-/* MAIN */
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+.sidebar {
+
+    position:
+        absolute;
+
+    top:
+        0;
+
+    left:
+        -280px;
+
+    width:
+        280px;
+
+    min-height:
+        100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            #08101f,
+            #030914
+        );
+
+    border-right:
+        1px solid #25344b;
+
+    padding:
+        90px 20px 25px;
+
+    transition:
+        .3s;
+
+    z-index:
+        1000;
+
+    box-shadow:
+        8px 0 30px rgba(0,0,0,.55);
+}
+
+.sidebar.open {
+
+    left:
+        0;
+}
+
+.sidebar-title {
+
+    text-align:
+        center;
+
+    color:
+        #25baff;
+
+    font-weight:
+        bold;
+
+    letter-spacing:
+        1px;
+
+    margin-bottom:
+        30px;
+
+    font-size:
+        15px;
+}
+
+.sidebar a {
+
+    display:
+        block;
+
+    text-decoration:
+        none;
+
+    color:
+        #b7c7dc;
+
+    padding:
+        14px 15px;
+
+    margin-bottom:
+        7px;
+
+    border-radius:
+        9px;
+
+    border-left:
+        3px solid transparent;
+
+    transition:
+        .2s;
+}
+
+.sidebar a:hover,
+.sidebar a.active {
+
+    color:
+        #25baff;
+
+    background:
+        rgba(37,186,255,.08);
+
+    border-left-color:
+        #25baff;
+
+    padding-left:
+        22px;
+}
+
+
+/* =====================================================
+   MAIN
+===================================================== */
 
 .container {
-    width: calc(100% - 60px);
-    margin: 60px auto;
-    max-width: 1450px;
+
+    width:
+        calc(100% - 60px);
+
+    margin:
+        60px auto;
+
+    max-width:
+        1450px;
 }
 
-/* HERO */
+
+/* =====================================================
+   HERO
+===================================================== */
 
 .hero {
-    padding: 55px;
-    border-radius: 0 28px 28px 28px;
+
+    padding:
+        55px;
+
+    border-radius:
+        0 28px 28px 28px;
+
     background:
-        linear-gradient(135deg, #0c1527, #102f49);
-    border: 1px solid #263952;
-    animation: fadeUp 0.7s ease;
+        linear-gradient(
+            135deg,
+            #0c1527,
+            #102f49
+        );
+
+    border:
+        1px solid #263952;
 }
 
 .hero h1 {
-    font-size: 48px;
-    margin-bottom: 20px;
+
+    font-size:
+        48px;
+
+    margin-bottom:
+        20px;
 }
 
 .hero p {
-    color: #9eb3d2;
-    font-size: 23px;
-    max-width: 850px;
-    line-height: 1.5;
+
+    color:
+        #9eb3d2;
+
+    font-size:
+        23px;
+
+    max-width:
+        850px;
+
+    line-height:
+        1.5;
 }
 
 .backend-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 30px;
-    padding: 13px 24px;
-    border-radius: 30px;
-    background: #062b1b;
-    border: 1px solid #08783f;
-    color: #35e77b;
-    font-size: 18px;
-    font-weight: bold;
+
+    display:
+        inline-flex;
+
+    align-items:
+        center;
+
+    gap:
+        12px;
+
+    margin-top:
+        30px;
+
+    padding:
+        13px 24px;
+
+    border-radius:
+        30px;
+
+    background:
+        #062b1b;
+
+    border:
+        1px solid #08783f;
+
+    color:
+        #35e77b;
+
+    font-size:
+        18px;
+
+    font-weight:
+        bold;
 }
 
 .dot {
-    width: 13px;
-    height: 13px;
-    border-radius: 50%;
-    background: #28df70;
-    box-shadow: 0 0 12px #28df70;
+
+    width:
+        13px;
+
+    height:
+        13px;
+
+    border-radius:
+        50%;
+
+    background:
+        #28df70;
+
+    box-shadow:
+        0 0 12px #28df70;
 }
 
-/* STATUS GRID */
+
+/* =====================================================
+   STATUS GRID
+===================================================== */
 
 .status-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
-    margin-top: 38px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(2,1fr);
+
+    gap:
+        28px;
+
+    margin-top:
+        38px;
 }
 
 .card {
-    background: #091121;
-    border: 1px solid #26354c;
-    border-radius: 22px;
-    padding: 32px;
-    transition: 0.3s;
-    animation: fadeUp 0.8s ease;
+
+    background:
+        #091121;
+
+    border:
+        1px solid #26354c;
+
+    border-radius:
+        22px;
+
+    padding:
+        32px;
+
+    transition:
+        .3s;
 }
 
 .card:hover {
-    transform: translateY(-4px);
-    border-color: #267fb2;
+
+    transform:
+        translateY(-4px);
+
+    border-color:
+        #267fb2;
 }
 
 .card-title {
-    color: #7892b8;
-    font-size: 18px;
-    margin-bottom: 15px;
+
+    color:
+        #7892b8;
+
+    font-size:
+        18px;
+
+    margin-bottom:
+        15px;
 }
 
 .status {
-    font-size: 42px;
-    font-weight: bold;
-    color: #3de57b;
+
+    font-size:
+        42px;
+
+    font-weight:
+        bold;
+
+    color:
+        #3de57b;
 }
 
-/* INFORMATION */
+
+/* =====================================================
+   INFORMATION
+===================================================== */
 
 .info-card {
-    margin-top: 30px;
+
+    margin-top:
+        30px;
 }
 
 .info-title {
-    font-size: 25px;
-    margin-bottom: 22px;
+
+    font-size:
+        25px;
+
+    margin-bottom:
+        22px;
 }
 
 .info-row {
-    display: flex;
-    justify-content: space-between;
-    padding: 18px 4px;
-    border-bottom: 1px solid #1c293d;
-    color: #8ea6c9;
-    font-size: 18px;
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    padding:
+        18px 4px;
+
+    border-bottom:
+        1px solid #1c293d;
+
+    color:
+        #8ea6c9;
+
+    font-size:
+        18px;
+
+    gap:
+        20px;
 }
 
 .info-row strong {
-    color: #ffffff;
+
+    color:
+        #ffffff;
+
+    text-align:
+        right;
 }
 
-/* API BOX */
+
+/* =====================================================
+   API BOX
+===================================================== */
 
 .api-box {
-    margin-top: 25px;
-    padding: 20px;
-    border-radius: 14px;
-    background: #111b2d;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+    margin-top:
+        25px;
+
+    padding:
+        20px;
+
+    border-radius:
+        14px;
+
+    background:
+        #111b2d;
+
+    display:
+        flex;
+
+    justify-content:
+        space-between;
+
+    align-items:
+        center;
+
+    gap:
+        15px;
 }
 
 .api-url {
-    color: #83a4cf;
-    font-family: monospace;
+
+    color:
+        #83a4cf;
+
+    font-family:
+        monospace;
+
+    word-break:
+        break-all;
 }
 
 .online {
-    color: #38e878;
-    font-weight: bold;
+
+    color:
+        #38e878;
+
+    font-weight:
+        bold;
 }
 
-/* NETWORK CONTROL */
+
+/* =====================================================
+   NETWORK CONTROL
+===================================================== */
 
 .control-card {
-    margin-top: 30px;
+
+    margin-top:
+        30px;
 }
 
 .control-title {
-    font-size: 25px;
-    margin-bottom: 25px;
+
+    font-size:
+        25px;
+
+    margin-bottom:
+        25px;
 }
 
 .button-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
+
+    display:
+        grid;
+
+    grid-template-columns:
+        repeat(3,1fr);
+
+    gap:
+        14px;
 }
 
 button.action {
-    border: 1px solid #30445f;
-    background: #0e192c;
-    color: #edf4ff;
-    padding: 17px 15px;
-    border-radius: 13px;
-    font-size: 17px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.25s;
+
+    border:
+        1px solid #30445f;
+
+    background:
+        #0e192c;
+
+    color:
+        #edf4ff;
+
+    padding:
+        17px 15px;
+
+    border-radius:
+        13px;
+
+    font-size:
+        17px;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+
+    transition:
+        .25s;
 }
 
 button.action:hover {
-    background: #12314d;
-    border-color: #26baff;
-    transform: translateY(-2px);
+
+    background:
+        #12314d;
+
+    border-color:
+        #26baff;
+
+    transform:
+        translateY(-2px);
 }
 
 button.refresh {
-    background: #07547c;
-    border-color: #0787c5;
+
+    background:
+        #07547c;
+
+    border-color:
+        #0787c5;
 }
 
 button.alert {
-    background: #4a0b10;
-    border-color: #9d1b25;
+
+    background:
+        #4a0b10;
+
+    border-color:
+        #9d1b25;
 }
 
 button.alert:hover {
-    background: #71121a;
-    border-color: #ff3948;
+
+    background:
+        #71121a;
+
+    border-color:
+        #ff3948;
 }
 
-/* NOTIFICATION */
+
+/* =====================================================
+   NOTIFICATION
+===================================================== */
 
 .notification {
-    position: fixed;
-    right: 25px;
-    bottom: 25px;
-    width: 350px;
-    padding: 20px;
-    border-radius: 15px;
-    background: #101b2c;
-    border: 1px solid #2b425f;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.4);
-    transform: translateX(420px);
-    transition: 0.4s;
-    z-index: 100;
+
+    position:
+        fixed;
+
+    right:
+        25px;
+
+    bottom:
+        25px;
+
+    width:
+        350px;
+
+    padding:
+        20px;
+
+    border-radius:
+        15px;
+
+    background:
+        #101b2c;
+
+    border:
+        1px solid #2b425f;
+
+    box-shadow:
+        0 15px 40px rgba(0,0,0,.4);
+
+    transform:
+        translateX(420px);
+
+    transition:
+        .4s;
+
+    z-index:
+        1100;
 }
 
 .notification.show {
-    transform: translateX(0);
+
+    transform:
+        translateX(0);
 }
 
 .notification h3 {
-    margin-bottom: 8px;
-    color: #35e77b;
+
+    margin-bottom:
+        8px;
+
+    color:
+        #35e77b;
 }
 
 .notification p {
-    color: #9bb0ce;
-    line-height: 1.5;
+
+    color:
+        #9bb0ce;
+
+    line-height:
+        1.5;
 }
 
-/* LOADING */
+
+/* =====================================================
+   LOADING
+===================================================== */
 
 .loading {
-    opacity: 0.6;
-    pointer-events: none;
+
+    opacity:
+        .65;
+
+    pointer-events:
+        none;
 }
 
-/* ANIMATION */
 
-@keyframes fadeUp {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* RESPONSIVE */
-
-@media(max-width: 900px) {
+@media(max-width:900px) {
 
     .status-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
     }
 
     .button-grid {
-        grid-template-columns: repeat(2, 1fr);
+
+        grid-template-columns:
+            repeat(2,1fr);
     }
 
     .hero h1 {
-        font-size: 36px;
+
+        font-size:
+            36px;
     }
 
     .container {
-        width: calc(100% - 30px);
+
+        width:
+            calc(100% - 30px);
     }
+
 }
 
-@media(max-width: 600px) {
+@media(max-width:600px) {
 
     header {
-        padding: 0 20px;
+
+        padding:
+            0 20px 0 80px;
     }
 
     .logo {
-        font-size: 23px;
+
+        font-size:
+            23px;
     }
 
     .logo span {
-        display: none;
+
+        display:
+            none;
     }
 
     .hero {
-        padding: 30px;
+
+        padding:
+            30px;
     }
 
     .hero h1 {
-        font-size: 30px;
+
+        font-size:
+            30px;
     }
 
     .hero p {
-        font-size: 17px;
+
+        font-size:
+            17px;
     }
 
     .button-grid {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
     }
 
     .api-box {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+
+        flex-direction:
+            column;
+
+        align-items:
+            flex-start;
     }
+
 }
+
 </style>
+
 </head>
+
 
 <body>
 
-<header>
-    <div class="logo">
-        ⚙ SDN CONTROL CENTER
-        <span>Administrative Network Management</span>
+
+<!-- =====================================================
+     MENU BUTTON
+===================================================== -->
+
+<button
+    class="menu-btn"
+    onclick="toggleMenu()">
+
+    ☰
+
+</button>
+
+
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<div
+    class="sidebar"
+    id="sidebar">
+
+    <div class="sidebar-title">
+
+        🛡️ SDN CAMPUS NETWORK
+
     </div>
+
+
+    <a href="index.html">
+
+        🏠 Dashboard
+
+    </a>
+
+
+    <a href="topology.html">
+
+        🌐 Network Topology
+
+    </a>
+
+
+    <a href="monitoring.html">
+
+        📊 Live Monitoring
+
+    </a>
+
+
+    <a href="qos.html">
+
+        ⚡ QoS & Load Balancing
+
+    </a>
+
+
+    <a href="security.html">
+
+        🛡️ Security Center
+
+    </a>
+
+
+    <a href="reports.html">
+
+        📄 Reports
+
+    </a>
+
+
+    <a
+        href="admin.html"
+        class="active">
+
+        ⚙️ Admin Control Center
+
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header>
+
+    <div class="logo">
+
+        ⚙ SDN CONTROL CENTER
+
+        <span>
+            Administrative Network Management
+        </span>
+
+    </div>
+
 </header>
 
-<button class="menu-btn" onclick="goHome()">☰</button>
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
 
 <main class="container">
 
-    <!-- HERO -->
 
-    <section class="hero">
+<!-- =====================================================
+     HERO
+===================================================== -->
 
-        <h1>Network Administration Center</h1>
+<section class="hero">
 
-        <p>
-            Centralized control and operational status of the
-            SDN Campus Network.
-        </p>
+    <h1>
+        Network Administration Center
+    </h1>
 
-        <div class="backend-badge">
-            <span class="dot"></span>
-            <span id="backendText">CHECKING BACKEND...</span>
+    <p>
+        Centralized control and operational status of the
+        SDN Campus Network.
+    </p>
+
+
+    <div class="backend-badge">
+
+        <span class="dot"></span>
+
+        <span id="backendText">
+            CHECKING BACKEND...
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     STATUS
+===================================================== -->
+
+<section class="status-grid">
+
+
+    <div class="card">
+
+        <div class="card-title">
+            BACKEND
         </div>
 
-    </section>
+        <div
+            class="status"
+            id="backendStatus">
 
-
-    <!-- STATUS -->
-
-    <section class="status-grid">
-
-        <div class="card">
-
-            <div class="card-title">
-                BACKEND
-            </div>
-
-            <div class="status" id="backendStatus">
-                CHECKING
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
-                API STATUS
-            </div>
-
-            <div class="status" id="apiStatus">
-                CHECKING
-            </div>
-
-        </div>
-
-    </section>
-
-
-    <!-- SYSTEM INFORMATION -->
-
-    <section class="card info-card">
-
-        <div class="info-title">
-            🖥 System Information
-        </div>
-
-        <div class="info-row">
-            <span>Backend</span>
-            <strong>Flask</strong>
-        </div>
-
-        <div class="info-row">
-            <span>API</span>
-            <strong>REST</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Monitoring</span>
-            <strong>Real-Time</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Security</span>
-            <strong>Active</strong>
-        </div>
-
-        <div class="info-row">
-            <span>Refresh Interval</span>
-            <strong>3 Seconds</strong>
-        </div>
-
-        <div class="api-box">
-
-            <span class="api-url">
-                http://127.0.0.1:5000/api/network
-            </span>
-
-            <span class="online" id="apiIndicator">
-                ● CHECKING
-            </span>
+            CHECKING
 
         </div>
 
-    </section>
+    </div>
 
 
-    <!-- NETWORK CONTROL -->
+    <div class="card">
 
-    <section class="card control-card">
-
-        <div class="control-title">
-            🎛️ Network Control
+        <div class="card-title">
+            API STATUS
         </div>
 
-        <div class="button-grid">
+        <div
+            class="status"
+            id="apiStatus">
 
-            <button
-                class="action refresh"
-                onclick="refreshNetwork()">
-                🔄 Refresh Network
-            </button>
-
-            <button
-                class="action"
-                onclick="openSecurity()">
-                🛡️ Security Check
-            </button>
-
-            <button
-                class="action"
-                onclick="openTopology()">
-                🌐 View Topology
-            </button>
-
-            <button
-                class="action"
-                onclick="openMonitoring()">
-                📊 Open Monitoring
-            </button>
-
-            <button
-                class="action"
-                onclick="openQoS()">
-                ⚡ Manage QoS
-            </button>
-
-            <button
-                class="action alert"
-                onclick="testAlert()">
-                🚨 Test Alert
-            </button>
+            CHECKING
 
         </div>
 
-    </section>
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SYSTEM INFORMATION
+===================================================== -->
+
+<section class="card info-card">
+
+    <div class="info-title">
+
+        🖥 System Information
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            Backend
+        </span>
+
+        <strong>
+            Flask
+        </strong>
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            API
+        </span>
+
+        <strong>
+            REST
+        </strong>
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            Monitoring
+        </span>
+
+        <strong>
+            Real-Time
+        </strong>
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            Security
+        </span>
+
+        <strong>
+            Active
+        </strong>
+
+    </div>
+
+
+    <div class="info-row">
+
+        <span>
+            Refresh Interval
+        </span>
+
+        <strong>
+            3 Seconds
+        </strong>
+
+    </div>
+
+
+    <div class="api-box">
+
+        <span class="api-url">
+
+            http://127.0.0.1:5000/api/network
+
+        </span>
+
+
+        <span
+            class="online"
+            id="apiIndicator">
+
+            ● CHECKING
+
+        </span>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     NETWORK CONTROL
+===================================================== -->
+
+<section class="card control-card">
+
+    <div class="control-title">
+
+        🎛️ Network Control
+
+    </div>
+
+
+    <div class="button-grid">
+
+
+        <button
+            class="action refresh"
+            onclick="refreshNetwork()">
+
+            🔄 Refresh Network
+
+        </button>
+
+
+        <button
+            class="action"
+            onclick="openSecurity()">
+
+            🛡️ Security Check
+
+        </button>
+
+
+        <button
+            class="action"
+            onclick="openTopology()">
+
+            🌐 View Topology
+
+        </button>
+
+
+        <button
+            class="action"
+            onclick="openMonitoring()">
+
+            📊 Open Monitoring
+
+        </button>
+
+
+        <button
+            class="action"
+            onclick="openQoS()">
+
+            ⚡ Manage QoS
+
+        </button>
+
+
+        <button
+            class="action alert"
+            onclick="testAlert()">
+
+            🚨 Test Alert
+
+        </button>
+
+    </div>
+
+</section>
+
 
 </main>
 
 
-<!-- NOTIFICATION -->
+<!-- =====================================================
+     NOTIFICATION
+===================================================== -->
 
-<div class="notification" id="notification">
+<div
+    class="notification"
+    id="notification">
 
     <h3 id="notificationTitle">
+
         System Notification
+
     </h3>
 
     <p id="notificationMessage">
+
         Notification message
+
     </p>
 
 </div>
@@ -544,128 +1210,257 @@ button.alert:hover {
 
 <script>
 
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
+function toggleMenu() {
+
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("open");
+
+}
+
+
+/* =====================================================
+   API
+===================================================== */
+
 const API_URL =
     "http://127.0.0.1:5000/api/network";
 
 
-/* =========================
+/* =====================================================
    NOTIFICATION
-========================= */
+===================================================== */
 
-function showNotification(title, message, success = true) {
+function showNotification(
+    title,
+    message,
+    success = true
+) {
 
     const box =
-        document.getElementById("notification");
+        document.getElementById(
+            "notification"
+        );
+
 
     const titleElement =
-        document.getElementById("notificationTitle");
+        document.getElementById(
+            "notificationTitle"
+        );
+
 
     const messageElement =
-        document.getElementById("notificationMessage");
+        document.getElementById(
+            "notificationMessage"
+        );
 
-    titleElement.innerText = title;
 
-    messageElement.innerText = message;
+    titleElement.innerText =
+        title;
+
+
+    messageElement.innerText =
+        message;
+
 
     titleElement.style.color =
-        success ? "#35e77b" : "#ff5964";
+        success
+            ? "#35e77b"
+            : "#ff5964";
 
-    box.classList.add("show");
 
-    setTimeout(() => {
+    box.classList.add(
+        "show"
+    );
 
-        box.classList.remove("show");
 
-    }, 3500);
+    setTimeout(
+        function() {
+
+            box.classList.remove(
+                "show"
+            );
+
+        },
+        3500
+    );
+
 }
 
 
-/* =========================
+/* =====================================================
    CHECK BACKEND
-========================= */
+===================================================== */
 
 async function checkBackend() {
 
     try {
 
         const response =
-            await fetch(API_URL);
+            await fetch(
+                API_URL,
+                {
+                    method: "GET",
+                    cache: "no-cache"
+                }
+            );
+
 
         if (!response.ok) {
-            throw new Error("API Error");
+
+            throw new Error(
+                "API Error"
+            );
+
         }
+
 
         const data =
             await response.json();
 
+
         document.getElementById(
             "backendStatus"
-        ).innerText = "ONLINE";
+        ).innerText =
+            "ONLINE";
+
+
+        document.getElementById(
+            "backendStatus"
+        ).style.color =
+            "#3de57b";
+
 
         document.getElementById(
             "apiStatus"
-        ).innerText = "ONLINE";
+        ).innerText =
+            "ONLINE";
+
+
+        document.getElementById(
+            "apiStatus"
+        ).style.color =
+            "#3de57b";
+
 
         document.getElementById(
             "backendText"
-        ).innerText = "BACKEND CONNECTED";
+        ).innerText =
+            "BACKEND CONNECTED";
+
 
         document.getElementById(
             "apiIndicator"
-        ).innerText = "● ONLINE";
+        ).innerText =
+            "● ONLINE";
+
+
+        document.getElementById(
+            "apiIndicator"
+        ).style.color =
+            "#38e878";
+
 
         return data;
 
-    } catch (error) {
+    }
+
+    catch(error) {
+
+        console.error(
+            "Backend check failed:",
+            error
+        );
+
 
         document.getElementById(
             "backendStatus"
-        ).innerText = "OFFLINE";
+        ).innerText =
+            "OFFLINE";
+
+
+        document.getElementById(
+            "backendStatus"
+        ).style.color =
+            "#ff5964";
+
 
         document.getElementById(
             "apiStatus"
-        ).innerText = "OFFLINE";
+        ).innerText =
+            "OFFLINE";
+
+
+        document.getElementById(
+            "apiStatus"
+        ).style.color =
+            "#ff5964";
+
 
         document.getElementById(
             "backendText"
-        ).innerText = "BACKEND OFFLINE";
+        ).innerText =
+            "BACKEND OFFLINE";
+
 
         document.getElementById(
             "apiIndicator"
-        ).innerText = "● OFFLINE";
+        ).innerText =
+            "● OFFLINE";
 
-        showNotification(
-            "Backend Error",
-            "Unable to connect to Flask backend.",
-            false
-        );
+
+        document.getElementById(
+            "apiIndicator"
+        ).style.color =
+            "#ff5964";
+
 
         return null;
+
     }
+
 }
 
 
-/* =========================
+/* =====================================================
    REFRESH NETWORK
-========================= */
+===================================================== */
 
 async function refreshNetwork() {
 
     const button =
-        document.querySelector(".refresh");
+        document.querySelector(
+            ".refresh"
+        );
 
-    button.classList.add("loading");
+
+    button.classList.add(
+        "loading"
+    );
+
 
     button.innerText =
         "⏳ Updating Network...";
 
+
     const data =
         await checkBackend();
 
-    button.classList.remove("loading");
+
+    button.classList.remove(
+        "loading"
+    );
+
 
     button.innerText =
         "🔄 Refresh Network";
+
 
     if (data) {
 
@@ -675,13 +1470,12 @@ async function refreshNetwork() {
         );
 
     }
-
 }
 
 
-/* =========================
+/* =====================================================
    SECURITY
-========================= */
+===================================================== */
 
 function openSecurity() {
 
@@ -691,9 +1485,9 @@ function openSecurity() {
 }
 
 
-/* =========================
+/* =====================================================
    TOPOLOGY
-========================= */
+===================================================== */
 
 function openTopology() {
 
@@ -703,9 +1497,9 @@ function openTopology() {
 }
 
 
-/* =========================
+/* =====================================================
    MONITORING
-========================= */
+===================================================== */
 
 function openMonitoring() {
 
@@ -715,9 +1509,9 @@ function openMonitoring() {
 }
 
 
-/* =========================
+/* =====================================================
    QOS
-========================= */
+===================================================== */
 
 function openQoS() {
 
@@ -727,21 +1521,9 @@ function openQoS() {
 }
 
 
-/* =========================
-   HOME
-========================= */
-
-function goHome() {
-
-    window.location.href =
-        "index.html";
-
-}
-
-
-/* =========================
+/* =====================================================
    TEST ALERT
-========================= */
+===================================================== */
 
 function testAlert() {
 
@@ -754,25 +1536,25 @@ function testAlert() {
 }
 
 
-/* =========================
-   AUTO CHECK
-========================= */
+/* =====================================================
+   INITIAL CHECK
+===================================================== */
 
 checkBackend();
 
 
-/*
-   Automatically check the
-   Flask API every 3 seconds.
-*/
+/* =====================================================
+   AUTO CHECK
+===================================================== */
 
-setInterval(() => {
-
-    checkBackend();
-
-}, 3000);
+setInterval(
+    checkBackend,
+    3000
+);
 
 </script>
 
+
 </body>
+
 </html>

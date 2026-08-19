@@ -3,588 +3,593 @@
 
 <head>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>SDN Campus Network Dashboard</title>
+<title>SDN Campus Network Dashboard</title>
 
-    <style>
+<style>
 
-        * {
-            box-sizing: border-box;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        body {
-            margin: 0;
-            font-family: "Segoe UI", Arial, sans-serif;
-            color: #e5e7eb;
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    color: #e5e7eb;
 
-            background:
-                radial-gradient(circle at 15% 20%, #082f49, transparent 30%),
-                radial-gradient(circle at 85% 80%, #052e16, transparent 30%),
-                #020617;
+    background:
+        radial-gradient(circle at 15% 20%, #082f49, transparent 30%),
+        radial-gradient(circle at 85% 80%, #052e16, transparent 30%),
+        #020617;
 
-            min-height: 100vh;
-        }
+    min-height: 100vh;
+}
 
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
 
-            background-image:
-                linear-gradient(rgba(34,211,238,.025) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34,211,238,.025) 1px, transparent 1px);
+    background-image:
+        linear-gradient(rgba(34,211,238,.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(34,211,238,.025) 1px, transparent 1px);
 
-            background-size: 45px 45px;
-            pointer-events: none;
-            z-index: -1;
-        }
+    background-size: 45px 45px;
+    pointer-events: none;
+    z-index: -1;
+}
 
 
-        /* MENU */
+/* =====================================================
+   MENU BUTTON
+===================================================== */
 
-        .menu-btn {
-            position: fixed;
-            top: 20px;
-            left: 20px;
+.menu-btn {
+    position: absolute;
 
-            width: 48px;
-            height: 48px;
+    top: 20px;
+    left: 20px;
 
-            border-radius: 12px;
-            border: 1px solid #0e7490;
+    width: 48px;
+    height: 48px;
 
-            background: #07141d;
-            color: #22d3ee;
+    border-radius: 12px;
 
-            font-size: 22px;
-            cursor: pointer;
+    border: 1px solid #0e7490;
 
-            z-index: 1001;
-            transition: .3s;
-        }
+    background: #07141d;
+    color: #22d3ee;
 
-        .menu-btn:hover {
-            background: #0c2633;
-            transform: scale(1.05);
-        }
+    font-size: 22px;
+    cursor: pointer;
 
+    z-index: 1001;
 
-        /* SIDEBAR */
+    transition: .3s;
+}
 
-        .sidebar {
-            position: fixed;
+.menu-btn:hover {
+    background: #0c2633;
+    transform: scale(1.05);
+}
 
-            top: 0;
-            left: -280px;
 
-            width: 280px;
-            height: 100vh;
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
-            background:
-                linear-gradient(
-                    180deg,
-                    #07141d,
-                    #020617
-                );
+.sidebar {
+    position: absolute;
 
-            border-right: 1px solid #164e63;
+    top: 0;
+    left: -280px;
 
-            padding-top: 90px;
+    width: 280px;
+    min-height: 100vh;
 
-            z-index: 1000;
+    background:
+        linear-gradient(
+            180deg,
+            #07141d,
+            #020617
+        );
 
-            transition: .35s;
+    border-right: 1px solid #164e63;
 
-            box-shadow:
-                8px 0 30px rgba(0,0,0,.6);
-        }
+    padding:
+        90px 20px 25px;
 
-        .sidebar.open {
-            left: 0;
-        }
+    z-index: 1000;
 
-        .sidebar-title {
-            text-align: center;
+    transition: .35s;
 
-            color: #22d3ee;
+    box-shadow:
+        8px 0 30px rgba(0,0,0,.6);
+}
 
-            font-weight: bold;
+.sidebar.open {
+    left: 0;
+}
 
-            letter-spacing: 1px;
+.sidebar-title {
+    text-align: center;
 
-            margin-bottom: 30px;
-        }
+    color: #22d3ee;
 
-        .sidebar a {
-            display: block;
+    font-weight: bold;
 
-            padding: 17px 25px;
+    letter-spacing: 1px;
 
-            text-decoration: none;
+    margin-bottom: 30px;
+}
 
-            color: #94a3b8;
+.sidebar a {
+    display: block;
 
-            border-left: 3px solid transparent;
+    padding: 14px 15px;
 
-            transition: .25s;
-        }
+    margin-bottom: 7px;
 
-        .sidebar a:hover {
-            color: #67e8f9;
+    text-decoration: none;
 
-            background:
-                rgba(34,211,238,.07);
+    color: #94a3b8;
 
-            border-left-color: #22d3ee;
+    border-left: 3px solid transparent;
 
-            padding-left: 32px;
-        }
+    border-radius: 9px;
 
+    transition: .25s;
+}
 
-        /* MAIN */
+.sidebar a:hover,
+.sidebar a.active {
+    color: #67e8f9;
 
-        .container {
-            width: 94%;
-            max-width: 1450px;
+    background:
+        rgba(34,211,238,.07);
 
-            margin: auto;
+    border-left-color: #22d3ee;
 
-            padding:
-                30px 0 50px;
-        }
+    padding-left: 22px;
+}
 
 
-        /* HEADER */
+/* =====================================================
+   MAIN
+===================================================== */
 
-        .header {
-            padding: 30px;
+.container {
+    width: 94%;
+    max-width: 1450px;
 
-            border-radius: 18px;
+    margin: auto;
 
-            background:
-                linear-gradient(
-                    135deg,
-                    rgba(7,47,65,.96),
-                    rgba(3,7,18,.97)
-                );
+    padding:
+        30px 0 50px;
+}
 
-            border: 1px solid #155e75;
 
-            animation:
-                fadeDown .7s ease;
-        }
+/* =====================================================
+   HEADER
+===================================================== */
 
-        @keyframes fadeDown {
+.header {
+    padding: 30px;
 
-            from {
-                opacity: 0;
-                transform: translateY(-15px);
-            }
+    border-radius: 18px;
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+    background:
+        linear-gradient(
+            135deg,
+            rgba(7,47,65,.96),
+            rgba(3,7,18,.97)
+        );
 
-        }
+    border: 1px solid #155e75;
+}
 
-        .header-top {
-            display: flex;
+.header-top {
+    display: flex;
 
-            justify-content: space-between;
+    justify-content: space-between;
 
-            align-items: center;
+    align-items: center;
 
-            flex-wrap: wrap;
+    flex-wrap: wrap;
 
-            gap: 20px;
-        }
+    gap: 20px;
+}
 
-        .header h1 {
-            margin: 0;
+.header h1 {
+    margin: 0;
 
-            font-size: 32px;
-        }
+    font-size: 32px;
+}
 
-        .header h1 span {
-            color: #22d3ee;
-        }
+.header h1 span {
+    color: #22d3ee;
+}
 
-        .header p {
-            color: #64748b;
+.header p {
+    color: #64748b;
 
-            margin-bottom: 0;
-        }
+    margin-bottom: 0;
 
+    line-height: 1.6;
+}
 
-        /* LIVE STATUS */
 
-        .live-status {
-            display: flex;
+/* =====================================================
+   LIVE STATUS
+===================================================== */
 
-            align-items: center;
+.live-status {
+    display: flex;
 
-            gap: 9px;
+    align-items: center;
 
-            padding: 10px 16px;
+    gap: 9px;
 
-            border-radius: 25px;
+    padding: 10px 16px;
 
-            background: #052e16;
+    border-radius: 25px;
 
-            border: 1px solid #166534;
+    background: #052e16;
 
-            color: #4ade80;
+    border: 1px solid #166534;
 
-            font-weight: bold;
+    color: #4ade80;
 
-            font-size: 13px;
-        }
+    font-weight: bold;
 
-        .live-dot {
-            width: 9px;
-            height: 9px;
+    font-size: 13px;
+}
 
-            background: #22c55e;
+.live-dot {
+    width: 9px;
+    height: 9px;
 
-            border-radius: 50%;
+    background: #22c55e;
 
-            animation:
-                pulse 1.5s infinite;
-        }
+    border-radius: 50%;
 
-        @keyframes pulse {
+    animation: pulse 1.5s infinite;
+}
 
-            0% {
-                box-shadow:
-                    0 0 0 0
-                    rgba(34,197,94,.7);
-            }
+@keyframes pulse {
 
-            70% {
-                box-shadow:
-                    0 0 0 10px
-                    rgba(34,197,94,0);
-            }
+    0% {
+        box-shadow:
+            0 0 0 0
+            rgba(34,197,94,.7);
+    }
 
-            100% {
-                box-shadow:
-                    0 0 0 0
-                    rgba(34,197,94,0);
-            }
+    70% {
+        box-shadow:
+            0 0 0 10px
+            rgba(34,197,94,0);
+    }
 
-        }
+    100% {
+        box-shadow:
+            0 0 0 0
+            rgba(34,197,94,0);
+    }
 
+}
 
-        /* CARDS */
 
-        .cards {
-            display: grid;
+/* =====================================================
+   CARDS
+===================================================== */
 
-            grid-template-columns:
-                repeat(4, 1fr);
+.cards {
+    display: grid;
 
-            gap: 16px;
+    grid-template-columns:
+        repeat(4, 1fr);
 
-            margin-top: 20px;
-        }
+    gap: 16px;
 
-        .card {
-            background: #07111c;
+    margin-top: 20px;
+}
 
-            border: 1px solid #164e63;
+.card {
+    background: #07111c;
 
-            border-radius: 15px;
+    border: 1px solid #164e63;
 
-            padding: 22px;
+    border-radius: 15px;
 
-            transition: .3s;
+    padding: 22px;
 
-            animation:
-                cardIn .7s ease;
-        }
+    transition: .3s;
+}
 
-        @keyframes cardIn {
+.card:hover {
+    transform: translateY(-5px);
 
-            from {
-                opacity: 0;
-                transform: translateY(15px);
-            }
+    border-color: #22d3ee;
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+    box-shadow:
+        0 10px 30px
+        rgba(34,211,238,.12);
+}
 
-        }
+.card-title {
+    color: #64748b;
 
-        .card:hover {
-            transform: translateY(-5px);
+    text-transform: uppercase;
 
-            border-color: #22d3ee;
+    font-size: 11px;
 
-            box-shadow:
-                0 10px 30px
-                rgba(34,211,238,.12);
-        }
+    letter-spacing: 1px;
+}
 
-        .card-title {
-            color: #64748b;
+.value {
+    font-size: 28px;
 
-            text-transform: uppercase;
+    font-weight: bold;
 
-            font-size: 11px;
+    color: #22d3ee;
 
-            letter-spacing: 1px;
-        }
+    margin-top: 10px;
 
-        .value {
-            font-size: 31px;
+    word-break: break-word;
+}
 
-            font-weight: bold;
 
-            color: #22d3ee;
+/* =====================================================
+   SECTIONS
+===================================================== */
 
-            margin-top: 10px;
-        }
+.section {
+    margin-top: 20px;
 
+    padding: 25px;
 
-        /* SECTIONS */
+    background:
+        rgba(5,10,20,.97);
 
-        .section {
-            margin-top: 20px;
+    border: 1px solid #1e293b;
 
-            padding: 25px;
+    border-radius: 16px;
+}
 
-            background:
-                rgba(5,10,20,.97);
+.section h2 {
+    margin-top: 0;
 
-            border: 1px solid #1e293b;
+    color: #f1f5f9;
+}
 
-            border-radius: 16px;
+.subtitle {
+    color: #64748b;
 
-            animation:
-                fadeUp .8s ease;
-        }
+    font-size: 13px;
 
-        @keyframes fadeUp {
+    margin-bottom: 20px;
 
-            from {
-                opacity: 0;
-                transform: translateY(18px);
-            }
+    line-height: 1.6;
+}
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
 
-        }
+/* =====================================================
+   DETAILS
+===================================================== */
 
-        .section h2 {
-            margin-top: 0;
+.details {
+    display: grid;
 
-            color: #f1f5f9;
-        }
+    grid-template-columns:
+        repeat(2, 1fr);
 
-        .subtitle {
-            color: #64748b;
+    gap: 15px;
+}
 
-            font-size: 13px;
+.detail-card {
+    padding: 20px;
 
-            margin-bottom: 20px;
-        }
+    background: #08131f;
 
+    border: 1px solid #1e3a4a;
 
-        /* NETWORK LINKS */
+    border-radius: 12px;
+}
 
-        .links {
-            display: grid;
+.detail-name {
+    color: #94a3b8;
 
-            grid-template-columns:
-                repeat(3, 1fr);
+    font-size: 13px;
+}
 
-            gap: 15px;
-        }
+.detail-value {
+    color: #22d3ee;
 
-        .link-card {
-            padding: 20px;
+    font-size: 21px;
 
-            background: #08131f;
+    font-weight: bold;
 
-            border: 1px solid #1e3a4a;
+    margin-top: 8px;
 
-            border-radius: 12px;
+    word-break: break-word;
+}
 
-            transition: .3s;
-        }
+.normal {
+    color: #4ade80;
+}
 
-        .link-card:hover {
-            transform: translateY(-3px);
+.warning {
+    color: #fbbf24;
+}
 
-            border-color: #22d3ee;
-        }
+.danger {
+    color: #f87171;
+}
 
-        .link-name {
-            color: #94a3b8;
 
-            font-size: 13px;
-        }
+/* =====================================================
+   SDN SIMULATION
+===================================================== */
 
-        .link-value {
-            font-size: 27px;
+.path-box {
+    display: flex;
 
-            font-weight: bold;
+    align-items: center;
 
-            margin-top: 8px;
-        }
+    justify-content: center;
 
-        .normal {
-            color: #4ade80;
-        }
+    gap: 18px;
 
-        .warning {
-            color: #fbbf24;
-        }
+    flex-wrap: wrap;
 
-        .danger {
-            color: #f87171;
-        }
+    margin-top: 20px;
+}
 
+.node {
+    padding: 16px 28px;
 
-        /* LOAD BALANCING */
+    background: #071c27;
 
-        .path-box {
-            display: flex;
+    border: 1px solid #0e7490;
 
-            align-items: center;
+    border-radius: 10px;
 
-            justify-content: center;
+    color: #67e8f9;
 
-            gap: 18px;
+    font-weight: bold;
+}
 
-            flex-wrap: wrap;
+.arrow {
+    color: #22d3ee;
 
-            margin-top: 20px;
-        }
+    font-size: 24px;
+}
 
-        .node {
-            padding: 16px 28px;
+.reason {
+    margin-top: 20px;
 
-            background: #071c27;
+    padding: 15px;
 
-            border: 1px solid #0e7490;
+    border-radius: 10px;
 
-            border-radius: 10px;
+    background: #071c27;
 
-            color: #67e8f9;
+    border: 1px solid #164e63;
 
-            font-weight: bold;
-        }
+    color: #94a3b8;
 
-        .arrow {
-            color: #22d3ee;
+    line-height: 1.6;
+}
 
-            font-size: 24px;
-        }
 
-        .reason {
-            margin-top: 20px;
+/* =====================================================
+   CONTROL
+===================================================== */
 
-            padding: 15px;
+.controls {
+    display: flex;
 
-            border-radius: 10px;
+    gap: 12px;
 
-            background: #071c27;
+    flex-wrap: wrap;
+}
 
-            border: 1px solid #164e63;
+.control-btn {
+    padding: 13px 18px;
 
-            color: #94a3b8;
-        }
+    border-radius: 9px;
 
+    border: 1px solid #0e7490;
 
-        /* CONTROL */
+    background: #071c27;
 
-        .controls {
-            display: flex;
+    color: #67e8f9;
 
-            gap: 12px;
+    font-weight: bold;
 
-            flex-wrap: wrap;
-        }
+    cursor: pointer;
 
-        .control-btn {
-            padding: 13px 18px;
+    transition: .25s;
+}
 
-            border-radius: 9px;
+.control-btn:hover {
+    background: #155e75;
 
-            border: 1px solid #0e7490;
+    color: white;
 
-            background: #071c27;
+    transform: translateY(-2px);
+}
 
-            color: #67e8f9;
+.control-btn:disabled {
+    opacity: .65;
 
-            font-weight: bold;
+    cursor: not-allowed;
 
-            cursor: pointer;
+    transform: none;
+}
 
-            transition: .25s;
-        }
 
-        .control-btn:hover {
-            background: #155e75;
+/* =====================================================
+   UPDATE
+===================================================== */
 
-            color: white;
+.update {
+    margin-top: 15px;
 
-            transform: translateY(-2px);
-        }
+    color: #64748b;
 
+    font-size: 12px;
+}
 
-        /* UPDATE */
 
-        .update {
-            margin-top: 15px;
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
-            color: #64748b;
+@media(max-width:1000px) {
 
-            font-size: 12px;
-        }
+    .cards {
+        grid-template-columns:
+            repeat(2, 1fr);
+    }
 
+    .details {
+        grid-template-columns: 1fr;
+    }
 
-        /* RESPONSIVE */
+}
 
-        @media(max-width:1000px) {
+@media(max-width:600px) {
 
-            .cards {
-                grid-template-columns:
-                    repeat(2, 1fr);
-            }
+    .cards {
+        grid-template-columns: 1fr;
+    }
 
-            .links {
-                grid-template-columns: 1fr;
-            }
+    .container {
+        width: 92%;
+    }
 
-        }
+    .header h1 {
+        font-size: 25px;
+    }
 
-        @media(max-width:600px) {
+    .header {
+        padding: 25px 20px;
+    }
 
-            .cards {
-                grid-template-columns: 1fr;
-            }
+    .value {
+        font-size: 25px;
+    }
 
-            .container {
-                width: 92%;
-            }
+    .sidebar {
+        width: 270px;
+    }
 
-            .header h1 {
-                font-size: 25px;
-            }
+}
 
-        }
-
-    </style>
+</style>
 
 </head>
 
@@ -592,455 +597,536 @@
 <body>
 
 
-    <!-- MENU BUTTON -->
+<!-- =====================================================
+     MENU
+===================================================== -->
 
-    <button
-        class="menu-btn"
-        onclick="toggleMenu()">
+<button
+    class="menu-btn"
+    onclick="toggleMenu()">
 
-        ☰
+    ☰
 
-    </button>
+</button>
 
 
-    <!-- SIDEBAR -->
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
+<div
+    class="sidebar"
+    id="sidebar">
+
+    <div class="sidebar-title">
+
+        🛡️ SDN CAMPUS NETWORK
+
+    </div>
+
+
+    <a
+        href="index.html"
+        class="active">
+
+        🏠 Dashboard
+
+    </a>
+
+
+    <a href="topology.html">
+
+        🌐 Network Topology
+
+    </a>
+
+
+    <a href="monitoring.html">
+
+        📊 Live Monitoring
+
+    </a>
+
+
+    <a href="qos.html">
+
+        ⚡ QoS & Load Balancing
+
+    </a>
+
+
+    <a href="security.html">
+
+        🛡️ Security Center
+
+    </a>
+
+
+    <a href="reports.html">
+
+        📄 Reports
+
+    </a>
+
+
+    <a href="admin.html">
+
+        ⚙️ Admin Control Center
+
+    </a>
+
+</div>
+
+
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
+<div class="container">
+
+
+<!-- HEADER -->
+
+<div class="header">
+
+    <div class="header-top">
+
+        <div>
+
+            <h1>
+
+                🛡️ SDN Campus
+                <span>Network Dashboard</span>
+
+            </h1>
+
+            <p>
+
+                Real-time monitoring of the active network
+                interface with SDN traffic-management
+                demonstration.
+
+            </p>
+
+        </div>
+
+
+        <div
+            class="live-status"
+            id="liveStatus">
+
+            <div class="live-dot"></div>
+
+            <span id="liveStatusText">
+                DETECTING NETWORK
+            </span>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- REAL METRICS -->
+
+<div class="cards">
+
+
+    <div class="card">
+
+        <div class="card-title">
+            Real Throughput
+        </div>
+
+        <div
+            class="value"
+            id="throughput">
+
+            0 Mbps
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-title">
+            Received Bytes
+        </div>
+
+        <div
+            class="value"
+            id="receivedBytes">
+
+            0 MB
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-title">
+            Sent Bytes
+        </div>
+
+        <div
+            class="value"
+            id="sentBytes">
+
+            0 MB
+
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <div class="card-title">
+            Packet Errors
+        </div>
+
+        <div
+            class="value"
+            id="packetErrors">
+
+            0
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- ACTIVE NETWORK -->
+
+<div class="section">
+
+    <h2>
+        📡 Active Network Connection
+    </h2>
+
+    <div class="subtitle">
+
+        The system automatically detects the currently
+        active Internet-connected network adapter.
+
+    </div>
+
+
+    <div class="details">
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Active Interface
+            </div>
+
+            <div
+                class="detail-value"
+                id="interface">
+
+                Detecting...
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Network Status
+            </div>
+
+            <div
+                class="detail-value normal"
+                id="status">
+
+                CHECKING
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Received Packets
+            </div>
+
+            <div
+                class="detail-value"
+                id="receivedPackets">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Sent Packets
+            </div>
+
+            <div
+                class="detail-value"
+                id="sentPackets">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Received Discards
+            </div>
+
+            <div
+                class="detail-value"
+                id="receivedDiscards">
+
+                0
+
+            </div>
+
+        </div>
+
+
+        <div class="detail-card">
+
+            <div class="detail-name">
+                Sent Discards
+            </div>
+
+            <div
+                class="detail-value"
+                id="sentDiscards">
+
+                0
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- SDN TOPOLOGY -->
+
+<div class="section">
+
+    <h2>
+        🌐 SDN Demonstration Layer
+    </h2>
+
+    <div class="subtitle">
+
+        The following topology is a controlled SDN
+        simulation used to demonstrate QoS and
+        dynamic routing concepts.
+
+    </div>
+
+
+    <div class="path-box">
+
+        <div class="node">
+            S1
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="node">
+            S2
+        </div>
+
+        <div class="arrow">
+            →
+        </div>
+
+        <div class="node">
+            S3
+        </div>
+
+    </div>
+
 
     <div
-        class="sidebar"
-        id="sidebar">
+        class="reason"
+        id="sdnReason">
 
-        <div class="sidebar-title">
+        Real network monitoring is shown above.
+        S1/S2/S3 routing belongs to the SDN
+        demonstration layer.
 
-            🛡️ SDN COMMAND CENTER
+    </div>
 
-        </div>
-
-
-        <a href="index.html">
-            🏠 Dashboard
-        </a>
+</div>
 
 
-        <a href="topology.html">
-            🌐 Network Topology
-        </a>
+<!-- NETWORK INTELLIGENCE -->
 
+<div class="section">
 
-        <a href="monitoring.html">
-            📊 Live Monitoring
-        </a>
+    <h2>
+        🧠 Network Intelligence
+    </h2>
 
+    <div
+        id="statusText"
+        style="
+            font-size:24px;
+            font-weight:bold;
+            color:#4ade80;
+        ">
 
-        <a href="qos.html">
-            ⚡ QoS & Load Balancing
-        </a>
-
-
-        <a href="reports.html">
-            📄 Security Reports
-        </a>
-
-
-        <!-- NEW ABOUT PAGE -->
-
-        <a href="about.html">
-            ℹ️ About Project
-        </a>
+        Detecting active network...
 
     </div>
 
 
-    <!-- MAIN -->
+    <div
+        class="update"
+        id="updateTime">
 
-    <div class="container">
+        Waiting for network data...
 
+    </div>
 
-        <!-- HEADER -->
+</div>
 
-        <div class="header">
 
-            <div class="header-top">
+<!-- CONTROL -->
 
-                <div>
+<div class="section">
 
-                    <h1>
+    <h2>
+        🎛️ Network Control
+    </h2>
 
-                        🛡️ SDN Campus
-                        <span>Network Dashboard</span>
+    <div class="subtitle">
 
-                    </h1>
-
-
-                    <p>
-
-                        Intelligent network monitoring,
-                        traffic engineering and
-                        automated load balancing.
-
-                    </p>
-
-                </div>
-
-
-                <div class="live-status">
-
-                    <div class="live-dot"></div>
-
-                    LIVE BACKEND
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- METRICS -->
-
-        <div class="cards">
-
-
-            <div class="card">
-
-                <div class="card-title">
-                    Throughput
-                </div>
-
-                <div
-                    class="value"
-                    id="throughput">
-
-                    -- Mbps
-
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-title">
-                    Latency
-                </div>
-
-                <div
-                    class="value"
-                    id="latency">
-
-                    -- ms
-
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-title">
-                    Packet Loss
-                </div>
-
-                <div
-                    class="value"
-                    id="packetLoss">
-
-                    -- %
-
-                </div>
-
-            </div>
-
-
-            <div class="card">
-
-                <div class="card-title">
-                    Active Connections
-                </div>
-
-                <div
-                    class="value"
-                    id="connections">
-
-                    --
-
-                </div>
-
-            </div>
-
-        </div>
-
-
-        <!-- LINK UTILIZATION -->
-
-        <div class="section">
-
-            <h2>
-                🔗 Live Link Utilization
-            </h2>
-
-            <div class="subtitle">
-
-                Current traffic distribution across
-                campus switches.
-
-            </div>
-
-
-            <div class="links">
-
-
-                <div class="link-card">
-
-                    <div class="link-name">
-                        S1 → S2
-                    </div>
-
-                    <div
-                        class="link-value"
-                        id="link12">
-
-                        --%
-
-                    </div>
-
-                </div>
-
-
-                <div class="link-card">
-
-                    <div class="link-name">
-                        S1 → S3
-                    </div>
-
-                    <div
-                        class="link-value"
-                        id="link13">
-
-                        --%
-
-                    </div>
-
-                </div>
-
-
-                <div class="link-card">
-
-                    <div class="link-name">
-                        S2 → S3
-                    </div>
-
-                    <div
-                        class="link-value"
-                        id="link23">
-
-                        --%
-
-                    </div>
-
-                </div>
-
-
-            </div>
-
-        </div>
-
-
-        <!-- LOAD BALANCING -->
-
-        <div class="section">
-
-            <h2>
-                ⚡ Dynamic Load Balancing
-            </h2>
-
-            <div class="subtitle">
-
-                The SDN controller automatically selects
-                a less congested network path.
-
-            </div>
-
-
-            <div class="path-box">
-
-                <div class="node">
-                    S1
-                </div>
-
-                <div class="arrow">
-                    →
-                </div>
-
-                <div
-                    class="node"
-                    id="pathNode">
-
-                    S2
-
-                </div>
-
-            </div>
-
-
-            <div
-                class="reason"
-                id="reason">
-
-                Waiting for network analysis...
-
-            </div>
-
-        </div>
-
-
-        <!-- NETWORK STATUS -->
-
-        <div class="section">
-
-            <h2>
-                🧠 Network Intelligence
-            </h2>
-
-            <div
-                id="status"
-                style="
-                    font-size:24px;
-                    font-weight:bold;
-                    color:#4ade80;
-                ">
-
-                Connecting to backend...
-
-            </div>
-
-
-            <div
-                class="update"
-                id="updateTime">
-
-                Waiting for live data...
-
-            </div>
-
-        </div>
-
-
-        <!-- CONTROLS -->
-
-        <div class="section">
-
-            <h2>
-                🎛️ Network Control
-            </h2>
-
-            <div class="subtitle">
-
-                Control the dashboard simulation.
-
-            </div>
-
-
-            <div class="controls">
-
-                <button
-                    class="control-btn"
-                    onclick="getNetworkData()">
-
-                    🔄 Refresh Data
-
-                </button>
-
-
-                <button
-                    class="control-btn"
-                    onclick="simulateCongestion()">
-
-                    🔴 Simulate Congestion
-
-                </button>
-
-            </div>
-
-        </div>
-
+        Refresh the statistics from the currently
+        active network interface.
 
     </div>
 
 
- <script>
+    <div class="controls">
 
-/* =========================
+        <button
+            class="control-btn"
+            id="refreshBtn"
+            onclick="manualRefresh()">
+
+            🔄 Refresh Network Data
+
+        </button>
+
+    </div>
+
+</div>
+
+
+</div>
+
+
+<script>
+
+
+/* =====================================================
    SIDEBAR
-========================= */
+===================================================== */
 
 function toggleMenu() {
-    document.getElementById("sidebar").classList.toggle("open");
+
+    document
+        .getElementById("sidebar")
+        .classList
+        .toggle("open");
+
 }
 
 
-/* =========================
-   LINK COLORS
-========================= */
+/* =====================================================
+   FORMAT BYTES
+===================================================== */
 
-function setLinkColor(element, value) {
+function formatBytes(bytes) {
 
-    element.classList.remove(
-        "normal",
-        "warning",
-        "danger"
+    if (!bytes || bytes < 0) {
+        return "0 B";
+    }
+
+    if (bytes < 1024) {
+        return bytes + " B";
+    }
+
+    if (bytes < 1024 * 1024) {
+
+        return (
+            (bytes / 1024).toFixed(2)
+            + " KB"
+        );
+
+    }
+
+    if (bytes < 1024 * 1024 * 1024) {
+
+        return (
+            (bytes / (1024 * 1024)).toFixed(2)
+            + " MB"
+        );
+
+    }
+
+    return (
+        (bytes / (1024 * 1024 * 1024)).toFixed(2)
+        + " GB"
     );
 
-    if (value >= 80) {
-        element.classList.add("danger");
-    }
-    else if (value >= 50) {
-        element.classList.add("warning");
-    }
-    else {
-        element.classList.add("normal");
-    }
 }
 
 
-/* =========================
+/* =====================================================
    GET NETWORK DATA
-========================= */
+===================================================== */
 
 async function getNetworkData() {
 
     try {
 
-        /*
-         * Use the same Render domain
-         * where the dashboard is running.
-         */
         const apiURL =
-            window.location.origin + "/api/network";
-
-        console.log("Connecting to:", apiURL);
-
-
-        /* Timeout after 10 seconds */
-
-        const controller =
-            new AbortController();
-
-        const timeout =
-            setTimeout(
-                () => controller.abort(),
-                10000
-            );
+            "http://127.0.0.1:5000/api/network";
 
 
         const response =
-            await fetch(apiURL, {
-                method: "GET",
-                cache: "no-cache",
-                signal: controller.signal
-            });
-
-
-        clearTimeout(timeout);
+            await fetch(
+                apiURL,
+                {
+                    method: "GET",
+                    cache: "no-cache"
+                }
+            );
 
 
         if (!response.ok) {
@@ -1057,187 +1143,290 @@ async function getNetworkData() {
             await response.json();
 
 
-        console.log("Network data:", data);
-
-
-        /* =========================
-           METRICS
-        ========================= */
-
-        document.getElementById("throughput").innerText =
-            data.throughput + " Mbps";
-
-
-        document.getElementById("latency").innerText =
-            data.latency + " ms";
-
-
-        document.getElementById("packetLoss").innerText =
-            data.packet_loss + " %";
-
-
-        document.getElementById("connections").innerText =
-            data.connections;
-
-
-        /* =========================
-           LINKS
-        ========================= */
-
-        const l12 =
-            document.getElementById("link12");
-
-        const l13 =
-            document.getElementById("link13");
-
-        const l23 =
-            document.getElementById("link23");
-
-
-        l12.innerText =
-            data.link12 + "%";
-
-        l13.innerText =
-            data.link13 + "%";
-
-        l23.innerText =
-            data.link23 + "%";
-
-
-        setLinkColor(
-            l12,
-            data.link12
-        );
-
-        setLinkColor(
-            l13,
-            data.link13
-        );
-
-        setLinkColor(
-            l23,
-            data.link23
+        console.log(
+            "Active network data:",
+            data
         );
 
 
-        /* =========================
-           PATH
-        ========================= */
+        /* ACTIVE INTERFACE */
 
-        const pathNode =
-            document.getElementById("pathNode");
-
-        const reason =
-            document.getElementById("reason");
+        const interfaceName =
+            data.interface ||
+            "Unknown";
 
 
-        if (
-            data.path &&
-            data.path.includes("S3")
-        ) {
-
-            pathNode.innerText =
-                "S3";
-
-            reason.innerText =
-                "⚠️ S1 → S2 is congested. Traffic redirected to S1 → S3.";
-
-        }
-        else {
-
-            pathNode.innerText =
-                "S2";
-
-            reason.innerText =
-                "🟢 S1 → S2 is currently operating within normal limits.";
-
-        }
+        document.getElementById(
+            "interface"
+        ).innerText =
+            interfaceName;
 
 
-        /* =========================
-           STATUS
-        ========================= */
+        document.getElementById(
+            "liveStatusText"
+        ).innerText =
+            "ACTIVE: " +
+            interfaceName;
+
+
+        /* REAL METRICS */
+
+        document.getElementById(
+            "throughput"
+        ).innerText =
+            (data.throughput || 0) +
+            " Mbps";
+
+
+        document.getElementById(
+            "receivedBytes"
+        ).innerText =
+            formatBytes(
+                data.received_bytes
+            );
+
+
+        document.getElementById(
+            "sentBytes"
+        ).innerText =
+            formatBytes(
+                data.sent_bytes
+            );
+
+
+        document.getElementById(
+            "packetErrors"
+        ).innerText =
+            (
+                (data.receive_errors || 0) +
+                (data.send_errors || 0)
+            );
+
+
+        /* PACKETS */
+
+        document.getElementById(
+            "receivedPackets"
+        ).innerText =
+            data.received_packets || 0;
+
+
+        document.getElementById(
+            "sentPackets"
+        ).innerText =
+            data.sent_packets || 0;
+
+
+        document.getElementById(
+            "receivedDiscards"
+        ).innerText =
+            data.received_discards || 0;
+
+
+        document.getElementById(
+            "sentDiscards"
+        ).innerText =
+            data.sent_discards || 0;
+
+
+        /* STATUS */
 
         const status =
-            document.getElementById("status");
+            document.getElementById(
+                "status"
+            );
+
+
+        const statusText =
+            document.getElementById(
+                "statusText"
+            );
+
+
+        const networkStatus =
+            data.status ||
+            "UNKNOWN";
 
 
         status.innerText =
-            data.status;
+            networkStatus;
+
+
+        status.classList.remove(
+            "normal",
+            "warning",
+            "danger"
+        );
+
+
+        statusText.innerText =
+            networkStatus;
 
 
         if (
-            data.status ===
-            "CONGESTION DETECTED"
+            networkStatus ===
+            "ATTENTION REQUIRED"
         ) {
 
-            status.style.color =
+            status.classList.add(
+                "danger"
+            );
+
+            statusText.style.color =
                 "#f87171";
 
         }
+
+        else if (
+            networkStatus ===
+            "HIGH ACTIVITY"
+        ) {
+
+            status.classList.add(
+                "warning"
+            );
+
+            statusText.style.color =
+                "#fbbf24";
+
+        }
+
         else {
 
-            status.style.color =
+            status.classList.add(
+                "normal"
+            );
+
+            statusText.style.color =
                 "#4ade80";
 
         }
 
 
-        /* =========================
-           TIME
-        ========================= */
+        /* LAST UPDATE */
 
-        document.getElementById("updateTime").innerText =
-            "Last backend update: " +
+        document.getElementById(
+            "updateTime"
+        ).innerText =
+            "Last real network update: " +
             new Date().toLocaleTimeString();
 
 
+        return true;
+
     }
-    catch (error) {
+
+    catch(error) {
 
         console.error(
-            "API CONNECTION ERROR:",
+            "REAL NETWORK ERROR:",
             error
         );
 
 
-        document.getElementById("status").innerText =
-            "⚠️ BACKEND OFFLINE";
+        document.getElementById(
+            "liveStatusText"
+        ).innerText =
+            "LOCAL FLASK OFFLINE";
 
 
-        document.getElementById("status").style.color =
+        document.getElementById(
+            "statusText"
+        ).innerText =
+            "⚠️ LOCAL FLASK OFFLINE";
+
+
+        document.getElementById(
+            "statusText"
+        ).style.color =
             "#f87171";
 
 
-        document.getElementById("updateTime").innerText =
-            "Cannot connect to Python backend.";
+        document.getElementById(
+            "updateTime"
+        ).innerText =
+            "Start the local Flask backend.";
+
+
+        return false;
 
     }
 
 }
 
 
-/* =========================
-   SIMULATE CONGESTION
-========================= */
+/* =====================================================
+   MANUAL REFRESH
+===================================================== */
 
-async function simulateCongestion() {
+async function manualRefresh() {
 
-    await getNetworkData();
+    const button =
+        document.getElementById(
+            "refreshBtn"
+        );
+
+
+    button.innerText =
+        "⏳ Detecting Network...";
+
+
+    button.disabled =
+        true;
+
+
+    try {
+
+        const success =
+            await getNetworkData();
+
+
+        if (success) {
+
+            button.innerText =
+                "✅ Network Updated";
+
+        }
+
+        else {
+
+            button.innerText =
+                "⚠️ Update Failed";
+
+        }
+
+    }
+
+    finally {
+
+        setTimeout(
+            () => {
+
+                button.innerText =
+                    "🔄 Refresh Network Data";
+
+                button.disabled =
+                    false;
+
+            },
+            1200
+        );
+
+    }
 
 }
 
 
-/* =========================
-   FIRST LOAD
-========================= */
+/* =====================================================
+   INITIAL LOAD
+===================================================== */
 
 getNetworkData();
 
 
-/* =========================
+/* =====================================================
    AUTO UPDATE
-========================= */
+===================================================== */
 
 setInterval(
     getNetworkData,

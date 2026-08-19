@@ -6,386 +6,439 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Reports | SDN Campus Network</title>
+<title>SDN Network Reports</title>
 
 <style>
 
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
 }
 
 body {
-    font-family: Arial, sans-serif;
-    background: #050914;
-    color: #f5f7fb;
+    margin: 0;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    color: #e5e7eb;
+
+    background:
+        radial-gradient(
+            circle at 15% 15%,
+            #082f49,
+            transparent 30%
+        ),
+        radial-gradient(
+            circle at 85% 80%,
+            #052e16,
+            transparent 30%
+        ),
+        #020617;
+
     min-height: 100vh;
 }
 
-header {
-    height: 90px;
-    background: #080f1e;
-    border-bottom: 1px solid #26344b;
-    display: flex;
-    align-items: center;
-    padding: 0 42px;
-}
 
-.logo {
-    color: #36d7ff;
-    font-size: 27px;
-    font-weight: bold;
-}
-
-.logo span {
-    color: white;
-    font-size: 15px;
-    margin-left: 18px;
-}
+/* =====================================================
+   MENU
+===================================================== */
 
 .menu-btn {
-    position: fixed;
-    top: 115px;
-    left: 18px;
-    width: 55px;
-    height: 55px;
-    border-radius: 13px;
-    border: 1px solid #33445e;
-    background: #101a2d;
-    color: #36d7ff;
-    font-size: 27px;
+    position: absolute;
+
+    top: 20px;
+    left: 20px;
+
+    width: 48px;
+    height: 48px;
+
+    border-radius: 12px;
+
+    border: 1px solid #155e75;
+
+    background: #07141d;
+
+    color: #22d3ee;
+
+    font-size: 23px;
+
     cursor: pointer;
-    z-index: 20;
+
+    z-index: 1001;
 }
 
 .menu-btn:hover {
-    background: #14304b;
+    background: #0c2633;
+
+    transform: scale(1.05);
 }
 
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
+
 .sidebar {
-    position: fixed;
+    position: absolute;
+
     top: 0;
-    left: -265px;
-    width: 265px;
-    height: 100vh;
-    background: #080f1e;
-    border-right: 1px solid #25344b;
-    padding: 100px 20px 20px;
-    transition: .3s;
-    z-index: 30;
+    left: -280px;
+
+    width: 280px;
+
+    min-height: 100vh;
+
+    background:
+        linear-gradient(
+            180deg,
+            #07141d,
+            #020617
+        );
+
+    border-right:
+        1px solid #164e63;
+
+    padding:
+        90px 20px 25px;
+
+    z-index: 1000;
+
+    transition:
+        .35s;
+
+    box-shadow:
+        8px 0 30px rgba(0,0,0,.6);
 }
 
 .sidebar.open {
     left: 0;
 }
 
-.sidebar h3 {
-    color: #36d7ff;
-    margin-bottom: 25px;
+.sidebar-title {
+    text-align: center;
+
+    color: #22d3ee;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 30px;
 }
 
 .sidebar a {
     display: block;
-    text-decoration: none;
-    color: #b7c7dc;
-    padding: 13px 15px;
+
+    padding: 14px 15px;
+
     margin-bottom: 7px;
+
+    text-decoration: none;
+
+    color: #94a3b8;
+
+    border-left:
+        3px solid transparent;
+
     border-radius: 9px;
-    transition: .2s;
+
+    transition: .25s;
 }
 
 .sidebar a:hover,
 .sidebar a.active {
-    color: #36d7ff;
-    background: #102b44;
-}
-
-.container {
-    width: calc(100% - 60px);
-    max-width: 1450px;
-    margin: 55px auto;
-}
-
-.hero {
-    padding: 43px;
-    border-radius: 0 25px 25px 25px;
+    color: #67e8f9;
 
     background:
-        radial-gradient(
-            circle at 88% 20%,
-            #123c58,
-            transparent 32%
-        ),
+        rgba(34,211,238,.07);
+
+    border-left-color:
+        #22d3ee;
+
+    padding-left: 22px;
+}
+
+
+/* =====================================================
+   HEADER
+===================================================== */
+
+.header {
+    padding:
+        30px 30px 25px 90px;
+
+    border-bottom:
+        1px solid #164e63;
+
+    background:
         linear-gradient(
             135deg,
-            #0b1324,
-            #111d31
+            #071c2c,
+            #030914
         );
-
-    border: 1px solid #293c55;
 }
 
-.hero h1 {
-    font-size: 42px;
-    margin-bottom: 12px;
+.header h1 {
+    margin: 0;
+
+    font-size: 30px;
 }
 
-.hero p {
-    color: #a4b3c9;
-    font-size: 18px;
+.header h1 span {
+    color: #22d3ee;
 }
 
-.report-badge {
-    display: inline-block;
-    margin-top: 22px;
-    padding: 10px 18px;
-    border-radius: 25px;
-    background: #092d43;
-    border: 1px solid #17688d;
-    color: #36d7ff;
-    font-weight: bold;
+.header p {
+    color: #64748b;
+
+    margin-top: 8px;
 }
+
+
+/* =====================================================
+   CONTAINER
+===================================================== */
+
+.container {
+    width: 94%;
+
+    max-width: 1200px;
+
+    margin: 25px auto 50px;
+}
+
+
+/* =====================================================
+   PANEL
+===================================================== */
 
 .panel {
-    margin-top: 25px;
-    padding: 28px;
-    background: #091121;
-    border: 1px solid #25344b;
-    border-radius: 17px;
+    margin-bottom: 20px;
+
+    padding: 22px;
+
+    background:
+        rgba(5,10,20,.97);
+
+    border:
+        1px solid #1e293b;
+
+    border-radius: 15px;
 }
 
 .panel h2 {
-    margin-bottom: 22px;
-    font-size: 21px;
+    margin-top: 0;
+
+    color: #f1f5f9;
 }
 
-.metrics {
+.subtitle {
+    margin-top: 6px;
+
+    margin-bottom: 18px;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* =====================================================
+   REPORT CARDS
+===================================================== */
+
+.cards {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 18px;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap: 12px;
 }
 
-.metric {
-    background: #101a2b;
-    border: 1px solid #263851;
-    border-radius: 13px;
-    padding: 22px;
-    transition: .25s;
+.card {
+    padding: 18px;
+
+    border:
+        1px solid #164e63;
+
+    border-radius: 12px;
+
+    background: #07111c;
 }
 
-.metric:hover {
-    transform: translateY(-4px);
-    border-color: #287b9e;
-}
+.card-title {
+    color: #64748b;
 
-.metric-title {
-    color: #8195b1;
-    font-size: 13px;
+    font-size: 10px;
+
     text-transform: uppercase;
 }
 
-.metric-value {
-    margin-top: 10px;
-    font-size: 29px;
-    font-weight: bold;
-    color: #36d7ff;
-}
-
-.metric-unit {
-    color: #7f91aa;
-    font-size: 13px;
-}
-
-.status {
-    display: inline-block;
+.card-value {
     margin-top: 8px;
-    padding: 7px 13px;
+
+    color: #22d3ee;
+
+    font-size: 24px;
+
+    font-weight: bold;
+}
+
+
+/* =====================================================
+   LINK TABLE
+===================================================== */
+
+.link-table {
+    width: 100%;
+
+    border-collapse:
+        collapse;
+}
+
+.link-table th,
+.link-table td {
+    padding: 13px;
+
+    border:
+        1px solid #263850;
+
+    text-align: left;
+}
+
+.link-table th {
+    background:
+        #0b3b58;
+
+    color: white;
+}
+
+.link-table td {
+    background:
+        #08131f;
+}
+
+.utilization {
+    font-weight: bold;
+}
+
+.green {
+    color: #4ade80;
+}
+
+.yellow {
+    color: #fbbf24;
+}
+
+.red {
+    color: #f87171;
+}
+
+
+/* =====================================================
+   BARS
+===================================================== */
+
+.bar-background {
+    width: 100%;
+
+    height: 9px;
+
+    background: #142033;
+
     border-radius: 20px;
-    background: #07331f;
-    color: #42e77e;
-    font-size: 12px;
-    font-weight: bold;
-}
 
-.status.warning {
-    background: #3b2d08;
-    color: #f4c842;
-}
-
-.status.danger {
-    background: #430e15;
-    color: #ff5965;
-}
-
-.links {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-}
-
-.link-card {
-    background: #101a2b;
-    border: 1px solid #263851;
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.link-card h3 {
-    color: #91a6c4;
-    font-size: 14px;
-    margin-bottom: 10px;
-}
-
-.link-value {
-    font-size: 28px;
-    color: #36d7ff;
-    font-weight: bold;
-}
-
-.progress {
-    height: 7px;
-    background: #202d42;
-    border-radius: 10px;
-    margin-top: 12px;
     overflow: hidden;
 }
 
 .bar {
     height: 100%;
-    width: 0;
-    background: #36d7ff;
-    transition: width .5s;
+
+    width: 0%;
+
+    border-radius: 20px;
+
+    transition:
+        width .5s,
+        background .5s;
 }
 
-.bar.warning {
-    background: #f4c842;
+
+/* =====================================================
+   UPDATE
+===================================================== */
+
+.update {
+    margin-top: 12px;
+
+    color: #64748b;
+
+    font-size: 11px;
 }
 
-.bar.danger {
-    background: #ff5965;
+
+/* =====================================================
+   BUTTON
+===================================================== */
+
+.generate-btn {
+    margin-top: 12px;
+
+    padding:
+        12px 18px;
+
+    border:
+        1px solid #0e7490;
+
+    border-radius: 8px;
+
+    background:
+        #071c27;
+
+    color:
+        #67e8f9;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
 }
 
-.summary {
-    color: #9db0c9;
-    line-height: 1.8;
-}
+.generate-btn:hover {
+    background:
+        #155e75;
 
-.summary strong {
-    color: #36d7ff;
-}
-
-.actions {
-    display: flex;
-    gap: 14px;
-    flex-wrap: wrap;
-    margin-top: 25px;
-}
-
-button {
-    padding: 14px 25px;
-    border-radius: 10px;
-    border: 1px solid #087eaf;
-    background: #07577d;
     color: white;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: .25s;
 }
 
-button:hover {
-    background: #08709c;
-    transform: translateY(-2px);
-}
 
-.secondary {
-    background: #111d30;
-    border-color: #344962;
-}
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
-.secondary:hover {
-    background: #172941;
-}
+@media(max-width:900px) {
 
-.notification {
-    position: fixed;
-    right: 25px;
-    bottom: 25px;
-    width: 350px;
-    padding: 19px;
-    border-radius: 14px;
-    background: #101b2d;
-    border: 1px solid #304763;
-    box-shadow: 0 15px 40px rgba(0,0,0,.4);
-    transform: translateX(420px);
-    transition: .4s;
-    z-index: 100;
-}
-
-.notification.show {
-    transform: translateX(0);
-}
-
-.notification strong {
-    color: #36d7ff;
-}
-
-.notification p {
-    margin-top: 7px;
-    color: #9db0c9;
-}
-
-@keyframes fadeUp {
-
-    from {
-        opacity: 0;
-        transform: translateY(18px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
+    .cards {
+        grid-template-columns:
+            repeat(2,1fr);
     }
 
 }
 
-@media(max-width: 1000px) {
+@media(max-width:600px) {
 
-    .metrics {
-        grid-template-columns: repeat(2, 1fr);
+    .cards {
+        grid-template-columns:
+            1fr;
     }
 
-    .links {
-        grid-template-columns: 1fr;
-    }
-
-}
-
-@media(max-width: 600px) {
-
-    .metrics {
-        grid-template-columns: 1fr;
-    }
-
-    .container {
-        width: calc(100% - 30px);
-    }
-
-    .hero {
-        padding: 30px;
-    }
-
-    .hero h1 {
-        font-size: 30px;
-    }
-
-    .actions {
-        flex-direction: column;
-    }
-
-    button {
-        width: 100%;
+    .header {
+        padding-left:
+            80px;
     }
 
 }
@@ -394,17 +447,13 @@ button:hover {
 
 </head>
 
+
 <body>
 
-<header>
 
-    <div class="logo">
-        📄 NETWORK REPORTS
-        <span>SDN Campus Network</span>
-    </div>
-
-</header>
-
+<!-- =====================================================
+     MENU
+===================================================== -->
 
 <button
     class="menu-btn"
@@ -415,33 +464,45 @@ button:hover {
 </button>
 
 
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
+
 <div
     class="sidebar"
     id="sidebar">
 
-    <h3>
-        SDN CAMPUS NETWORK
-    </h3>
+    <div class="sidebar-title">
+
+        🛡️ SDN CAMPUS NETWORK
+
+    </div>
+
 
     <a href="index.html">
         🏠 Dashboard
     </a>
 
+
     <a href="topology.html">
         🌐 Network Topology
     </a>
+
 
     <a href="monitoring.html">
         📊 Live Monitoring
     </a>
 
+
     <a href="qos.html">
         ⚡ QoS & Load Balancing
     </a>
 
+
     <a href="security.html">
         🛡️ Security Center
     </a>
+
 
     <a
         href="reports.html"
@@ -451,6 +512,7 @@ button:hover {
 
     </a>
 
+
     <a href="admin.html">
         ⚙️ Admin Control Center
     </a>
@@ -458,320 +520,362 @@ button:hover {
 </div>
 
 
+<!-- =====================================================
+     HEADER
+===================================================== -->
+
+<header class="header">
+
+    <h1>
+
+        📄 SDN Campus
+        <span>Network Reports</span>
+
+    </h1>
+
+    <p>
+        Real network statistics and current SDN
+        traffic-utilization information.
+    </p>
+
+</header>
+
+
 <main class="container">
 
-    <section class="hero">
 
-        <h1>
-            Network Performance Reports
-        </h1>
+<!-- =====================================================
+     NETWORK SUMMARY
+===================================================== -->
 
-        <p>
-            Generate a professional report containing the
-            current SDN campus network performance,
-            utilization and security status.
-        </p>
+<section class="panel">
 
-        <div class="report-badge">
-            ● LIVE REPORT DATA
-        </div>
+    <h2>
+        📡 Real Network Summary
+    </h2>
 
-    </section>
+    <div class="subtitle">
+        Latest physical network information.
+    </div>
 
 
-    <section class="panel">
+    <div class="cards">
 
-        <h2>
-            📊 Current Network Summary
-        </h2>
 
-        <div class="metrics">
+        <div class="card">
 
-            <div class="metric">
-
-                <div class="metric-title">
-                    Throughput
-                </div>
-
-                <div class="metric-value">
-
-                    <span id="throughput">
-                        --
-                    </span>
-
-                    <span class="metric-unit">
-                        Mbps
-                    </span>
-
-                </div>
-
+            <div class="card-title">
+                Interface
             </div>
 
+            <div
+                class="card-value"
+                id="interface">
 
-            <div class="metric">
-
-                <div class="metric-title">
-                    Latency
-                </div>
-
-                <div class="metric-value">
-
-                    <span id="latency">
-                        --
-                    </span>
-
-                    <span class="metric-unit">
-                        ms
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="metric">
-
-                <div class="metric-title">
-                    Packet Loss
-                </div>
-
-                <div class="metric-value">
-
-                    <span id="packetLoss">
-                        --
-                    </span>
-
-                    <span class="metric-unit">
-                        %
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="metric">
-
-                <div class="metric-title">
-                    Connections
-                </div>
-
-                <div class="metric-value">
-
-                    <span id="connections">
-                        --
-                    </span>
-
-                </div>
+                Detecting...
 
             </div>
 
         </div>
 
-    </section>
+
+        <div class="card">
+
+            <div class="card-title">
+                Throughput
+            </div>
+
+            <div
+                class="card-value"
+                id="throughput">
+
+                0 Mbps
+
+            </div>
+
+        </div>
 
 
-    <section class="panel">
+        <div class="card">
 
-        <h2>
-            🌐 Link Utilization
-        </h2>
+            <div class="card-title">
+                Latency
+            </div>
 
-        <div class="links">
+            <div
+                class="card-value"
+                id="latency">
+
+                0 ms
+
+            </div>
+
+        </div>
 
 
-            <div class="link-card">
+        <div class="card">
 
-                <h3>
+            <div class="card-title">
+                Packet Loss
+            </div>
+
+            <div
+                class="card-value"
+                id="packetLoss">
+
+                0 %
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =====================================================
+     SDN LINK UTILIZATION
+===================================================== -->
+
+<section class="panel">
+
+    <h2>
+        🔗 SDN Link Utilization
+    </h2>
+
+    <div class="subtitle">
+        Current logical SDN link utilization from the
+        QoS/load-balancing demonstration.
+    </div>
+
+
+    <table class="link-table">
+
+        <thead>
+
+            <tr>
+
+                <th>
+                    Link
+                </th>
+
+                <th>
+                    Utilization
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Visual
+                </th>
+
+            </tr>
+
+        </thead>
+
+
+        <tbody>
+
+
+            <tr>
+
+                <td>
                     S1 → S2
-                </h3>
+                </td>
 
-                <div class="link-value">
+                <td
+                    class="utilization"
+                    id="link12">
 
-                    <span id="link12">
-                        --
-                    </span>%
+                    35%
 
-                </div>
+                </td>
 
-                <div class="progress">
+                <td
+                    id="status12"
+                    class="green">
+
+                    NORMAL
+
+                </td>
+
+                <td>
 
                     <div
-                        class="bar"
-                        id="bar12">
+                        class="bar-background">
+
+                        <div
+                            class="bar"
+                            id="bar12">
+
+                        </div>
+
                     </div>
 
-                </div>
+                </td>
 
-            </div>
+            </tr>
 
 
-            <div class="link-card">
+            <tr>
 
-                <h3>
+                <td>
                     S1 → S3
-                </h3>
+                </td>
 
-                <div class="link-value">
+                <td
+                    class="utilization"
+                    id="link13">
 
-                    <span id="link13">
-                        --
-                    </span>%
+                    25%
 
-                </div>
+                </td>
 
-                <div class="progress">
+                <td
+                    id="status13"
+                    class="green">
+
+                    NORMAL
+
+                </td>
+
+                <td>
 
                     <div
-                        class="bar"
-                        id="bar13">
+                        class="bar-background">
+
+                        <div
+                            class="bar"
+                            id="bar13">
+
+                        </div>
+
                     </div>
 
-                </div>
+                </td>
 
-            </div>
+            </tr>
 
 
-            <div class="link-card">
+            <tr>
 
-                <h3>
+                <td>
                     S2 → S3
-                </h3>
+                </td>
 
-                <div class="link-value">
+                <td
+                    class="utilization"
+                    id="link23">
 
-                    <span id="link23">
-                        --
-                    </span>%
+                    45%
 
-                </div>
+                </td>
 
-                <div class="progress">
+                <td
+                    id="status23"
+                    class="green">
+
+                    NORMAL
+
+                </td>
+
+                <td>
 
                     <div
-                        class="bar"
-                        id="bar23">
+                        class="bar-background">
+
+                        <div
+                            class="bar"
+                            id="bar23">
+
+                        </div>
+
                     </div>
 
-                </div>
+                </td>
 
-            </div>
-
-        </div>
-
-    </section>
+            </tr>
 
 
-    <section class="panel">
+        </tbody>
 
-        <h2>
-            🛡️ Network Health Assessment
-        </h2>
-
-        <p class="summary">
-
-            Current Network Status:
-
-            <strong id="networkStatus">
-                CHECKING
-            </strong>
-
-            <br>
-
-            Recommended Path:
-
-            <strong id="path">
-                CHECKING
-            </strong>
-
-            <br>
-
-            Report Status:
-
-            <span
-                class="status"
-                id="reportStatus">
-
-                ANALYZING
-
-            </span>
-
-        </p>
-
-    </section>
+    </table>
 
 
-    <section class="panel">
+    <div
+        class="update"
+        id="sdnUpdate">
 
-        <h2>
-            📑 Report Generation
-        </h2>
+        Waiting for QoS data...
 
-        <p class="summary">
+    </div>
 
-            The generated PDF contains the latest network
-            performance values, link utilization, network
-            status, recommended routing path and report
-            generation timestamp.
-
-        </p>
-
-        <div class="actions">
-
-            <button
-                onclick="downloadReport()">
-
-                ⬇️ Download PDF Report
-
-            </button>
+</section>
 
 
-            <button
-                class="secondary"
-                onclick="refreshData()">
+<!-- =====================================================
+     REPORT
+===================================================== -->
 
-                🔄 Refresh Data
+<section class="panel">
 
-            </button>
+    <h2>
+        📊 Report Information
+    </h2>
 
-        </div>
+    <div class="subtitle">
 
-    </section>
+        The report separates the physical network
+        measurements from the logical SDN demonstration.
+
+    </div>
+
+
+    <p style="color:#94a3b8;line-height:1.7;">
+
+        <strong style="color:#22d3ee;">
+            Physical network:
+        </strong>
+
+        Interface, throughput, latency, packet loss,
+        packet errors and discards.
+
+        <br><br>
+
+        <strong style="color:#22d3ee;">
+            SDN layer:
+        </strong>
+
+        S1 → S2, S1 → S3 and S2 → S3
+        utilization values used for QoS and
+        dynamic load balancing.
+
+    </p>
+
+
+    <button
+        class="generate-btn"
+        onclick="generatePDF()">
+
+        📥 Generate PDF Report
+
+    </button>
+
+</section>
+
 
 </main>
 
 
-<div
-    class="notification"
-    id="notification">
-
-    <strong id="notificationTitle">
-        Report System
-    </strong>
-
-    <p id="notificationMessage">
-        Ready.
-    </p>
-
-</div>
-
-
 <script>
 
-/* =========================
-   API URL
-========================= */
 
-const API_URL =
-    window.location.origin + "/api/network";
-
-const REPORT_URL =
-    window.location.origin + "/api/report";
-
-
-/* =========================
+/* =====================================================
    SIDEBAR
-========================= */
+===================================================== */
 
 function toggleMenu() {
 
@@ -783,89 +887,17 @@ function toggleMenu() {
 }
 
 
-/* =========================
-   NOTIFICATION
-========================= */
+/* =====================================================
+   REAL NETWORK
+===================================================== */
 
-function showNotification(
-    title,
-    message
-) {
-
-    document.getElementById(
-        "notificationTitle"
-    ).innerText = title;
-
-    document.getElementById(
-        "notificationMessage"
-    ).innerText = message;
-
-    document
-        .getElementById("notification")
-        .classList
-        .add("show");
-
-    setTimeout(() => {
-
-        document
-            .getElementById("notification")
-            .classList
-            .remove("show");
-
-    }, 3000);
-
-}
-
-
-/* =========================
-   UPDATE BAR
-========================= */
-
-function updateBar(
-    id,
-    value
-) {
-
-    const bar =
-        document.getElementById(id);
-
-    bar.style.width =
-        value + "%";
-
-    bar.classList.remove(
-        "warning",
-        "danger"
-    );
-
-    if (value >= 85) {
-
-        bar.classList.add(
-            "danger"
-        );
-
-    }
-    else if (value >= 60) {
-
-        bar.classList.add(
-            "warning"
-        );
-
-    }
-
-}
-
-
-/* =========================
-   LOAD NETWORK DATA
-========================= */
-
-async function loadData() {
+async function loadRealNetwork() {
 
     try {
 
         const response =
             await fetch(
-                API_URL,
+                "http://127.0.0.1:5000/api/network",
                 {
                     method: "GET",
                     cache: "no-cache"
@@ -876,8 +908,7 @@ async function loadData() {
         if (!response.ok) {
 
             throw new Error(
-                "Backend error: " +
-                response.status
+                "API Error"
             );
 
         }
@@ -887,143 +918,39 @@ async function loadData() {
             await response.json();
 
 
-        /* METRICS */
+        document.getElementById(
+            "interface"
+        ).innerText =
+            data.interface || "Unknown";
+
 
         document.getElementById(
             "throughput"
         ).innerText =
-            data.throughput;
+            (data.throughput || 0) +
+            " Mbps";
 
 
         document.getElementById(
             "latency"
         ).innerText =
-            data.latency;
+            (data.latency || 0) +
+            " ms";
 
 
         document.getElementById(
             "packetLoss"
         ).innerText =
-            data.packet_loss;
-
-
-        document.getElementById(
-            "connections"
-        ).innerText =
-            data.connections;
-
-
-        /* LINKS */
-
-        document.getElementById(
-            "link12"
-        ).innerText =
-            data.link12;
-
-
-        document.getElementById(
-            "link13"
-        ).innerText =
-            data.link13;
-
-
-        document.getElementById(
-            "link23"
-        ).innerText =
-            data.link23;
-
-
-        /* PROGRESS BARS */
-
-        updateBar(
-            "bar12",
-            data.link12
-        );
-
-
-        updateBar(
-            "bar13",
-            data.link13
-        );
-
-
-        updateBar(
-            "bar23",
-            data.link23
-        );
-
-
-        /* STATUS */
-
-        document.getElementById(
-            "networkStatus"
-        ).innerText =
-            data.status;
-
-
-        /* PATH */
-
-        document.getElementById(
-            "path"
-        ).innerText =
-            data.path;
-
-
-        /* REPORT STATUS */
-
-        const reportStatus =
-            document.getElementById(
-                "reportStatus"
-            );
-
-
-        if (
-            data.status ===
-            "CONGESTION DETECTED"
-        ) {
-
-            reportStatus.innerText =
-                "ATTENTION REQUIRED";
-
-            reportStatus.className =
-                "status danger";
-
-        }
-
-        else if (
-            data.packet_loss >= 4.5
-        ) {
-
-            reportStatus.innerText =
-                "MONITOR";
-
-            reportStatus.className =
-                "status warning";
-
-        }
-
-        else {
-
-            reportStatus.innerText =
-                "HEALTHY";
-
-            reportStatus.className =
-                "status";
-
-        }
+            (data.packet_loss || 0) +
+            " %";
 
     }
 
     catch(error) {
 
         console.error(
-            "Report API error:",
+            "Report network error:",
             error
-        );
-
-        showNotification(
-            "Backend Offline",
-            "Unable to retrieve network data."
         );
 
     }
@@ -1031,62 +958,214 @@ async function loadData() {
 }
 
 
-/* =========================
-   REFRESH DATA
-========================= */
+/* =====================================================
+   SDN STATE
+===================================================== */
 
-async function refreshData() {
+function loadSDNLinks() {
 
-    await loadData();
+    let saved =
+        localStorage.getItem(
+            "sdnLinkUtilization"
+        );
 
-    showNotification(
-        "Data Updated",
-        "Latest network information loaded."
+
+    let data;
+
+
+    if (saved) {
+
+        try {
+
+            data =
+                JSON.parse(
+                    saved
+                );
+
+        }
+
+        catch(error) {
+
+            data = {
+                link12: 35,
+                link13: 25,
+                link23: 45,
+                updated: "Default"
+            };
+
+        }
+
+    }
+
+    else {
+
+        data = {
+            link12: 35,
+            link13: 25,
+            link23: 45,
+            updated: "Default"
+        };
+
+    }
+
+
+    updateSDNLink(
+        "12",
+        data.link12
+    );
+
+
+    updateSDNLink(
+        "13",
+        data.link13
+    );
+
+
+    updateSDNLink(
+        "23",
+        data.link23
+    );
+
+
+    document.getElementById(
+        "sdnUpdate"
+    ).innerText =
+        "Last QoS demonstration update: " +
+        (data.updated || "Not available");
+
+}
+
+
+/* =====================================================
+   UPDATE SDN LINK
+===================================================== */
+
+function updateSDNLink(
+    number,
+    value
+) {
+
+    value =
+        Number(value) || 0;
+
+
+    document.getElementById(
+        "link" + number
+    ).innerText =
+        value + "%";
+
+
+    const bar =
+        document.getElementById(
+            "bar" + number
+        );
+
+
+    const status =
+        document.getElementById(
+            "status" + number
+        );
+
+
+    bar.style.width =
+        value + "%";
+
+
+    bar.classList.remove(
+        "green",
+        "yellow",
+        "red"
+    );
+
+
+    status.classList.remove(
+        "green",
+        "yellow",
+        "red"
+    );
+
+
+    if (value >= 85) {
+
+        bar.style.background =
+            "#ef4444";
+
+        status.innerText =
+            "CONGESTED";
+
+        status.className =
+            "red";
+
+    }
+
+    else if (value >= 60) {
+
+        bar.style.background =
+            "#f59e0b";
+
+        status.innerText =
+            "WARNING";
+
+        status.className =
+            "yellow";
+
+    }
+
+    else {
+
+        bar.style.background =
+            "#22c55e";
+
+        status.innerText =
+            "NORMAL";
+
+        status.className =
+            "green";
+
+    }
+
+}
+
+
+/* =====================================================
+   PDF
+===================================================== */
+
+function generatePDF() {
+
+    window.open(
+        "http://127.0.0.1:5000/api/report",
+        "_blank"
     );
 
 }
 
 
-/* =========================
-   DOWNLOAD PDF
-========================= */
-
-function downloadReport() {
-
-    showNotification(
-        "Generating Report",
-        "Creating your PDF report..."
-    );
-
-
-    /*
-     * Open the deployed Flask
-     * report endpoint.
-     */
-
-    window.location.href =
-        REPORT_URL;
-
-}
-
-
-/* =========================
+/* =====================================================
    INITIAL LOAD
-========================= */
+===================================================== */
 
-loadData();
+loadRealNetwork();
+
+loadSDNLinks();
 
 
-/* =========================
-   AUTO REFRESH
-========================= */
+/* =====================================================
+   AUTO UPDATE
+===================================================== */
 
 setInterval(
-    loadData,
-    5000
+    loadRealNetwork,
+    3000
+);
+
+setInterval(
+    loadSDNLinks,
+    1000
 );
 
 </script>
+
 
 </body>
 

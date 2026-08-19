@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
 
 <meta charset="UTF-8">
@@ -9,17 +10,17 @@
 
 <style>
 
-/* =========================
-   GLOBAL
-========================= */
-
 * {
     box-sizing: border-box;
 }
 
 body {
     margin: 0;
-    font-family: "Segoe UI", Arial, sans-serif;
+
+    font-family:
+        "Segoe UI",
+        Arial,
+        sans-serif;
 
     color: #dbeafe;
 
@@ -29,20 +30,22 @@ body {
             #0b2942,
             transparent 35%
         ),
+
         radial-gradient(
             circle at 80% 80%,
             #08243b,
             transparent 35%
         ),
+
         #030914;
 
     min-height: 100vh;
 }
 
 
-/* =========================
-   GRID BACKGROUND
-========================= */
+/* =====================================================
+   BACKGROUND GRID
+===================================================== */
 
 body::before {
 
@@ -54,12 +57,13 @@ body::before {
 
     background-image:
         linear-gradient(
-            rgba(56,189,248,0.035) 1px,
+            rgba(56,189,248,.035) 1px,
             transparent 1px
         ),
+
         linear-gradient(
             90deg,
-            rgba(56,189,248,0.035) 1px,
+            rgba(56,189,248,.035) 1px,
             transparent 1px
         );
 
@@ -71,13 +75,13 @@ body::before {
 }
 
 
-/* =========================
-   MENU
-========================= */
+/* =====================================================
+   MENU BUTTON
+===================================================== */
 
 .menu-btn {
 
-    position: fixed;
+    position: absolute;
 
     top: 20px;
     left: 20px;
@@ -106,27 +110,24 @@ body::before {
 
     background: #0b2942;
 
-    box-shadow:
-        0 0 18px rgba(56,189,248,.25);
-
     transform: scale(1.05);
 }
 
 
-/* =========================
+/* =====================================================
    SIDEBAR
-========================= */
+===================================================== */
 
 .sidebar {
 
-    position: fixed;
+    position: absolute;
 
     top: 0;
     left: -280px;
 
     width: 280px;
 
-    height: 100vh;
+    min-height: 100vh;
 
     background:
         linear-gradient(
@@ -137,7 +138,8 @@ body::before {
 
     border-right: 1px solid #164e63;
 
-    padding-top: 90px;
+    padding:
+        90px 20px 25px;
 
     z-index: 1000;
 
@@ -148,6 +150,7 @@ body::before {
 }
 
 .sidebar.open {
+
     left: 0;
 }
 
@@ -168,7 +171,9 @@ body::before {
 
     display: block;
 
-    padding: 17px 25px;
+    padding: 14px 15px;
+
+    margin-bottom: 7px;
 
     text-decoration: none;
 
@@ -176,24 +181,28 @@ body::before {
 
     border-left: 3px solid transparent;
 
+    border-radius: 9px;
+
     transition: .25s;
 }
 
-.sidebar a:hover {
+.sidebar a:hover,
+.sidebar a.active {
 
     color: #38bdf8;
 
-    background: rgba(56,189,248,.07);
+    background:
+        rgba(56,189,248,.07);
 
     border-left-color: #38bdf8;
 
-    padding-left: 32px;
+    padding-left: 22px;
 }
 
 
-/* =========================
+/* =====================================================
    MAIN
-========================= */
+===================================================== */
 
 .container {
 
@@ -203,19 +212,21 @@ body::before {
 
     margin: auto;
 
-    padding: 30px 0 50px;
+    padding:
+        30px 0 50px;
 }
 
 
-/* =========================
+/* =====================================================
    HEADER
-========================= */
+===================================================== */
 
 .header {
 
     padding: 32px;
 
-    border-radius: 18px;
+    border-radius:
+        18px;
 
     background:
         linear-gradient(
@@ -224,22 +235,8 @@ body::before {
             rgba(4,13,24,.96)
         );
 
-    border: 1px solid #164e63;
-
-    animation: fadeDown .7s ease;
-}
-
-@keyframes fadeDown {
-
-    from {
-        opacity: 0;
-        transform: translateY(-15px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    border:
+        1px solid #164e63;
 }
 
 .header h1 {
@@ -247,8 +244,6 @@ body::before {
     margin: 0;
 
     font-size: 32px;
-
-    color: #f0f9ff;
 }
 
 .header h1 span {
@@ -261,12 +256,14 @@ body::before {
     color: #64748b;
 
     margin-bottom: 0;
+
+    line-height: 1.6;
 }
 
 
-/* =========================
+/* =====================================================
    PAGE GRID
-========================= */
+===================================================== */
 
 .page-grid {
 
@@ -281,35 +278,23 @@ body::before {
 }
 
 
-/* =========================
+/* =====================================================
    PANELS
-========================= */
+===================================================== */
 
 .panel {
 
     background:
         rgba(6,19,32,.96);
 
-    border: 1px solid #173b55;
+    border:
+        1px solid #173b55;
 
-    border-radius: 16px;
+    border-radius:
+        16px;
 
-    padding: 25px;
-
-    animation: fadeUp .8s ease;
-}
-
-@keyframes fadeUp {
-
-    from {
-        opacity: 0;
-        transform: translateY(18px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    padding:
+        25px;
 }
 
 .panel h2 {
@@ -326,12 +311,14 @@ body::before {
     font-size: 13px;
 
     margin-bottom: 20px;
+
+    line-height: 1.6;
 }
 
 
-/* =========================
-   TOPOLOGY AREA
-========================= */
+/* =====================================================
+   TOPOLOGY
+===================================================== */
 
 .topology {
 
@@ -339,30 +326,34 @@ body::before {
 
     height: 500px;
 
-    border-radius: 14px;
+    border-radius:
+        14px;
 
     background:
         radial-gradient(
-            circle at center,
+            circle,
             rgba(14,165,233,.08),
             transparent 60%
         );
 
-    border: 1px solid #102d43;
+    border:
+        1px solid #102d43;
 
     overflow: hidden;
 }
 
 
-/* =========================
-   RADAR RINGS
-========================= */
+/* =====================================================
+   RINGS
+===================================================== */
 
 .ring {
 
     position: absolute;
 
-    border: 1px solid rgba(56,189,248,.13);
+    border:
+        1px solid
+        rgba(56,189,248,.13);
 
     border-radius: 50%;
 
@@ -370,9 +361,8 @@ body::before {
 
     top: 50%;
 
-    transform: translate(-50%,-50%);
-
-    animation: ringPulse 4s infinite;
+    transform:
+        translate(-50%,-50%);
 }
 
 .ring1 {
@@ -385,40 +375,24 @@ body::before {
 
     width: 330px;
     height: 330px;
-
-    animation-delay: 1s;
 }
 
 .ring3 {
 
     width: 470px;
     height: 470px;
-
-    animation-delay: 2s;
-}
-
-@keyframes ringPulse {
-
-    0%,100% {
-        opacity: .2;
-    }
-
-    50% {
-        opacity: .7;
-    }
 }
 
 
-/* =========================
-   SWITCH
-========================= */
+/* =====================================================
+   SWITCHES
+===================================================== */
 
 .switch {
 
     position: absolute;
 
     width: 125px;
-
     height: 80px;
 
     border-radius: 14px;
@@ -438,7 +412,8 @@ body::before {
             #061827
         );
 
-    border: 1px solid #0ea5e9;
+    border:
+        1px solid #0ea5e9;
 
     color: #e0f2fe;
 
@@ -446,23 +421,7 @@ body::before {
 
     z-index: 5;
 
-    box-shadow:
-        0 0 18px rgba(14,165,233,.08);
-
-    animation: switchGlow 3s infinite;
-}
-
-@keyframes switchGlow {
-
-    0%,100% {
-        box-shadow:
-            0 0 10px rgba(14,165,233,.08);
-    }
-
-    50% {
-        box-shadow:
-            0 0 25px rgba(14,165,233,.25);
-    }
+    transition: .3s;
 }
 
 .switch small {
@@ -480,7 +439,8 @@ body::before {
 
     left: 50%;
 
-    transform: translateX(-50%);
+    transform:
+        translateX(-50%);
 }
 
 .s2 {
@@ -498,52 +458,25 @@ body::before {
 }
 
 
-/* =========================
-   CONNECTION LINES
-========================= */
+/* =====================================================
+   CONNECTIONS
+===================================================== */
 
 .connection {
 
     position: absolute;
 
-    height: 3px;
+    height: 5px;
 
-    background: #164e63;
+    background: #22c55e;
 
     transform-origin: left;
 
     z-index: 2;
-}
 
-.connection::after {
+    transition: .4s;
 
-    content: "";
-
-    position: absolute;
-
-    left: -30px;
-
-    width: 30px;
-
-    height: 100%;
-
-    background: #38bdf8;
-
-    box-shadow:
-        0 0 10px #38bdf8;
-
-    animation: dataFlow 2s linear infinite;
-}
-
-@keyframes dataFlow {
-
-    from {
-        left: -30px;
-    }
-
-    to {
-        left: 100%;
-    }
+    border-radius: 5px;
 }
 
 .connection12 {
@@ -554,7 +487,8 @@ body::before {
 
     left: 28%;
 
-    transform: rotate(43deg);
+    transform:
+        rotate(43deg);
 }
 
 .connection13 {
@@ -565,7 +499,8 @@ body::before {
 
     right: 28%;
 
-    transform: rotate(-43deg);
+    transform:
+        rotate(-43deg);
 }
 
 .connection23 {
@@ -578,9 +513,9 @@ body::before {
 }
 
 
-/* =========================
+/* =====================================================
    PACKETS
-========================= */
+===================================================== */
 
 .packet {
 
@@ -590,7 +525,8 @@ body::before {
 
     height: 9px;
 
-    background: #38bdf8;
+    background:
+        #38bdf8;
 
     border-radius: 50%;
 
@@ -602,353 +538,558 @@ body::before {
 
 .packet1 {
 
-    animation: packet12 3s linear infinite;
-}
-
-@keyframes packet12 {
-
-    0% {
-        left: 36%;
-        top: 165px;
-        opacity: 0;
-    }
-
-    20% {
-        opacity: 1;
-    }
-
-    100% {
-        left: 18%;
-        top: 400px;
-        opacity: 0;
-    }
+    animation:
+        move1 3s linear infinite;
 }
 
 .packet2 {
 
-    animation: packet13 3.5s linear infinite;
+    animation:
+        move2 3.5s linear infinite;
 }
 
-@keyframes packet13 {
+@keyframes move1 {
 
     0% {
-        right: 36%;
+
+        left: 36%;
         top: 165px;
         opacity: 0;
+
     }
 
     20% {
+
         opacity: 1;
+
     }
 
     100% {
+
+        left: 18%;
+        top: 400px;
+        opacity: 0;
+
+    }
+}
+
+@keyframes move2 {
+
+    0% {
+
+        right: 36%;
+        top: 165px;
+        opacity: 0;
+
+    }
+
+    20% {
+
+        opacity: 1;
+
+    }
+
+    100% {
+
         right: 18%;
         top: 400px;
         opacity: 0;
+
     }
 }
 
 
-/* =========================
+/* =====================================================
    LINK LABELS
-========================= */
+===================================================== */
 
 .link-label {
 
     position: absolute;
 
-    padding: 7px 12px;
+    padding:
+        7px 12px;
 
-    border-radius: 20px;
+    border-radius:
+        20px;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
-    z-index: 10;
+    background:
+        #061321;
 
-    background: #061321;
-
-    border: 1px solid;
+    z-index:
+        10;
 }
 
 .label12 {
 
-    top: 265px;
+    top:
+        265px;
 
-    left: 20%;
-
-    color: #ef4444;
-
-    border-color: #7f1d1d;
+    left:
+        20%;
 }
 
 .label13 {
 
-    top: 265px;
+    top:
+        265px;
 
-    right: 20%;
-
-    color: #22c55e;
-
-    border-color: #14532d;
+    right:
+        20%;
 }
 
 .label23 {
 
-    bottom: 150px;
+    bottom:
+        150px;
 
-    left: 45%;
-
-    color: #f59e0b;
-
-    border-color: #78350f;
+    left:
+        45%;
 }
 
 
-/* =========================
-   RIGHT SIDE
-========================= */
+/* =====================================================
+   RIGHT METRICS
+===================================================== */
 
 .metric {
 
-    padding: 18px 0;
+    padding:
+        18px 0;
 
-    border-bottom: 1px solid #122335;
-}
-
-.metric:last-child {
-    border-bottom: none;
+    border-bottom:
+        1px solid #122335;
 }
 
 .metric-top {
 
-    display: flex;
+    display:
+        flex;
 
-    justify-content: space-between;
+    justify-content:
+        space-between;
 
-    margin-bottom: 10px;
+    margin-bottom:
+        10px;
 }
 
 .metric-name {
 
-    color: #cbd5e1;
+    color:
+        #cbd5e1;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 }
 
 .metric-value {
 
-    font-weight: bold;
+    font-weight:
+        bold;
 }
 
 .progress {
 
-    height: 8px;
+    height:
+        8px;
 
-    background: #0b2034;
+    background:
+        #0b2034;
 
-    border-radius: 20px;
+    border-radius:
+        20px;
 
-    overflow: hidden;
+    overflow:
+        hidden;
 }
 
 .progress-bar {
 
-    height: 100%;
+    height:
+        100%;
 
-    border-radius: 20px;
+    width:
+        0;
 
-    transition: width .6s;
-}
+    border-radius:
+        20px;
 
-.red-bar {
-
-    width: 87%;
-
-    background: #ef4444;
-
-    box-shadow:
-        0 0 10px rgba(239,68,68,.35);
-}
-
-.green-bar {
-
-    width: 34%;
-
-    background: #22c55e;
-
-    box-shadow:
-        0 0 10px rgba(34,197,94,.25);
-}
-
-.yellow-bar {
-
-    width: 52%;
-
-    background: #f59e0b;
-
-    box-shadow:
-        0 0 10px rgba(245,158,11,.25);
+    transition:
+        .5s;
 }
 
 
-/* =========================
-   NODE INFORMATION
-========================= */
+/* =====================================================
+   NODE
+===================================================== */
 
 .node {
 
-    margin-top: 20px;
+    margin-top:
+        18px;
 
-    padding: 15px;
+    padding:
+        15px;
 
-    border-radius: 10px;
+    border-radius:
+        10px;
 
-    background: #071827;
+    background:
+        #071827;
 
-    border: 1px solid #173b55;
+    border:
+        1px solid #173b55;
 }
 
 .node-title {
 
-    color: #38bdf8;
+    color:
+        #38bdf8;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
-    margin-bottom: 6px;
+    margin-bottom:
+        6px;
 }
 
 .node-info {
 
-    color: #64748b;
+    color:
+        #64748b;
 
-    font-size: 13px;
+    font-size:
+        13px;
 
-    line-height: 1.7;
+    line-height:
+        1.7;
 }
 
 
-/* =========================
+/* =====================================================
+   CONTROLLER
+===================================================== */
+
+.controller-box {
+
+    margin-top:
+        20px;
+
+    padding:
+        16px;
+
+    border-radius:
+        10px;
+
+    background:
+        #071827;
+
+    border:
+        1px solid #0ea5e9;
+}
+
+.controller-title {
+
+    color:
+        #38bdf8;
+
+    font-weight:
+        bold;
+}
+
+.controller-status {
+
+    margin-top:
+        6px;
+
+    color:
+        #4ade80;
+
+    font-size:
+        13px;
+}
+
+
+/* =====================================================
+   STATUS
+===================================================== */
+
+.status-box {
+
+    margin-top:
+        18px;
+
+    padding:
+        16px;
+
+    border-radius:
+        10px;
+
+    background:
+        #071827;
+
+    border:
+        1px solid #173b55;
+
+    color:
+        #94a3b8;
+
+    line-height:
+        1.7;
+}
+
+.status-box strong {
+
+    color:
+        #38bdf8;
+}
+
+
+/* =====================================================
+   DEMO BUTTONS
+===================================================== */
+
+.demo-controls {
+
+    margin-top:
+        20px;
+
+    display:
+        flex;
+
+    gap:
+        10px;
+
+    flex-wrap:
+        wrap;
+}
+
+.demo-btn {
+
+    padding:
+        12px 16px;
+
+    border-radius:
+        9px;
+
+    color:
+        white;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+
+    border:
+        1px solid;
+
+    transition:
+        .25s;
+}
+
+.demo-btn:hover {
+
+    transform:
+        translateY(-2px);
+}
+
+.normal-btn {
+
+    background:
+        #14532d;
+
+    border-color:
+        #22c55e;
+}
+
+.warning-btn {
+
+    background:
+        #78350f;
+
+    border-color:
+        #f59e0b;
+}
+
+.congested-btn {
+
+    background:
+        #7f1d1d;
+
+    border-color:
+        #ef4444;
+}
+
+
+/* =====================================================
    LEGEND
-========================= */
+===================================================== */
 
 .legend {
 
-    display: flex;
+    display:
+        flex;
 
-    gap: 20px;
+    gap:
+        20px;
 
-    flex-wrap: wrap;
+    flex-wrap:
+        wrap;
 
-    margin-top: 20px;
+    margin-top:
+        20px;
 }
 
 .legend-item {
 
-    display: flex;
+    display:
+        flex;
 
-    align-items: center;
+    align-items:
+        center;
 
-    gap: 7px;
+    gap:
+        7px;
 
-    color: #94a3b8;
+    color:
+        #94a3b8;
 
-    font-size: 13px;
+    font-size:
+        13px;
 }
 
 .legend-dot {
 
-    width: 9px;
+    width:
+        9px;
 
-    height: 9px;
+    height:
+        9px;
 
-    border-radius: 50%;
+    border-radius:
+        50%;
 }
 
 .green-dot {
-    background: #22c55e;
+
+    background:
+        #22c55e;
 }
 
 .yellow-dot {
-    background: #f59e0b;
+
+    background:
+        #f59e0b;
 }
 
 .red-dot {
-    background: #ef4444;
+
+    background:
+        #ef4444;
 }
 
 
-/* =========================
+/* =====================================================
    FOOTER
-========================= */
+===================================================== */
 
 footer {
 
-    text-align: center;
+    text-align:
+        center;
 
-    color: #475569;
+    color:
+        #475569;
 
-    font-size: 12px;
+    font-size:
+        12px;
 
-    padding: 30px;
+    padding:
+        30px;
 }
 
 
-/* =========================
+/* =====================================================
    RESPONSIVE
-========================= */
+===================================================== */
 
 @media(max-width:1000px) {
 
     .page-grid {
 
-        grid-template-columns: 1fr;
+        grid-template-columns:
+            1fr;
     }
+
 }
 
 @media(max-width:650px) {
 
     .container {
 
-        width: 92%;
+        width:
+            92%;
     }
 
     .header h1 {
 
-        font-size: 25px;
+        font-size:
+            25px;
     }
 
     .topology {
 
-        height: 420px;
+        height:
+            420px;
     }
 
     .switch {
 
-        width: 100px;
+        width:
+            100px;
 
-        height: 65px;
+        height:
+            65px;
     }
 
     .s2 {
-        left: 5%;
+
+        left:
+            5%;
     }
 
     .s3 {
-        right: 5%;
+
+        right:
+            5%;
     }
 
     .connection12,
     .connection13 {
 
-        width: 220px;
+        width:
+            220px;
     }
 
     .connection23 {
 
-        width: 220px;
+        width:
+            220px;
     }
+
+    .demo-btn {
+
+        width:
+            100%;
+    }
+
 }
 
 </style>
@@ -959,9 +1100,9 @@ footer {
 <body>
 
 
-<!-- =========================
-     MENU
-========================= -->
+<!-- =====================================================
+     MENU BUTTON
+===================================================== -->
 
 <button
     class="menu-btn"
@@ -972,9 +1113,9 @@ footer {
 </button>
 
 
-<!-- =========================
+<!-- =====================================================
      SIDEBAR
-========================= -->
+===================================================== -->
 
 <div
     class="sidebar"
@@ -982,234 +1123,516 @@ footer {
 
     <div class="sidebar-title">
 
-        🛡️ SDN COMMAND CENTER
+        🛡️ SDN CAMPUS NETWORK
 
     </div>
 
+
     <a href="index.html">
+
         🏠 Dashboard
+
     </a>
 
-    <a href="topology.html">
+
+    <a
+        href="topology.html"
+        class="active">
+
         🌐 Network Topology
+
     </a>
+
 
     <a href="monitoring.html">
+
         📊 Live Monitoring
+
     </a>
+
 
     <a href="qos.html">
+
         ⚡ QoS & Load Balancing
+
     </a>
 
+
+    <a href="security.html">
+
+        🛡️ Security Center
+
+    </a>
+
+
     <a href="reports.html">
-        📄 Security Reports
+
+        📄 Reports
+
+    </a>
+
+
+    <a href="admin.html">
+
+        ⚙️ Admin Control Center
+
     </a>
 
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      MAIN
-========================= -->
+===================================================== -->
 
 <div class="container">
 
 
-<!-- HEADER -->
+    <!-- HEADER -->
 
-<div class="header">
+    <div class="header">
 
-    <h1>
-        🌐 Network
-        <span>Topology Monitor</span>
-    </h1>
+        <h1>
 
-    <p>
-        Real-time visualization of campus
-        SDN infrastructure and traffic paths.
-    </p>
+            🌐 Network
+            <span>Topology Monitor</span>
 
-</div>
+        </h1>
 
+        <p>
 
-<!-- =========================
-     PAGE GRID
-========================= -->
+            SDN logical topology with controlled
+            traffic-engineering demonstration.
 
-<div class="page-grid">
-
-
-<!-- =========================
-     TOPOLOGY
-========================= -->
-
-<div class="panel">
-
-    <h2>
-        🛰️ Live Network Topology
-    </h2>
-
-    <div class="subtitle">
-        Data packets and link utilization
-        are continuously monitored.
-    </div>
-
-
-    <div class="topology">
-
-
-        <div class="ring ring1"></div>
-
-        <div class="ring ring2"></div>
-
-        <div class="ring ring3"></div>
-
-
-        <!-- CONNECTIONS -->
-
-        <div class="connection connection12"></div>
-
-        <div class="connection connection13"></div>
-
-        <div class="connection connection23"></div>
-
-
-        <!-- PACKETS -->
-
-        <div class="packet packet1"></div>
-
-        <div class="packet packet2"></div>
-
-
-        <!-- SWITCHES -->
-
-        <div class="switch s1">
-
-            S1
-
-            <small>
-                CORE SWITCH
-            </small>
-
-        </div>
-
-
-        <div class="switch s2">
-
-            S2
-
-            <small>
-                ACCESS SWITCH
-            </small>
-
-        </div>
-
-
-        <div class="switch s3">
-
-            S3
-
-            <small>
-                ACCESS SWITCH
-            </small>
-
-        </div>
-
-
-        <!-- LINK LABELS -->
-
-        <div class="link-label label12">
-            87% 🔴
-        </div>
-
-        <div class="link-label label13">
-            34% 🟢
-        </div>
-
-        <div class="link-label label23">
-            52% 🟡
-        </div>
-
+        </p>
 
     </div>
 
 
-    <!-- LEGEND -->
-
-    <div class="legend">
-
-        <div class="legend-item">
-
-            <span class="legend-dot green-dot"></span>
-
-            Normal
-
-        </div>
+    <div class="page-grid">
 
 
-        <div class="legend-item">
+        <!-- =================================================
+             LEFT TOPOLOGY
+        ================================================== -->
 
-            <span class="legend-dot yellow-dot"></span>
+        <div class="panel">
 
-            Warning
+            <h2>
+                🛰️ SDN Network Topology
+            </h2>
 
-        </div>
+            <div class="subtitle">
 
+                Use the controls to demonstrate normal,
+                warning and congestion conditions.
 
-        <div class="legend-item">
-
-            <span class="legend-dot red-dot"></span>
-
-            Congested
-
-        </div>
-
-    </div>
-
-</div>
+            </div>
 
 
-<!-- =========================
-     LINK MONITOR
-========================= -->
-
-<div class="panel">
-
-    <h2>
-        📡 Link Monitoring
-    </h2>
-
-    <div class="subtitle">
-        Current utilization levels
-    </div>
+            <div class="topology">
 
 
-    <!-- S1 S2 -->
+                <div class="ring ring1"></div>
 
-    <div class="metric">
+                <div class="ring ring2"></div>
 
-        <div class="metric-top">
+                <div class="ring ring3"></div>
 
-            <span class="metric-name">
-                S1 → S2
-            </span>
 
-            <span
-                class="metric-value red"
-                id="value12">
+                <div
+                    class="connection connection12"
+                    id="connection12">
+                </div>
 
-                87%
 
-            </span>
+                <div
+                    class="connection connection13"
+                    id="connection13">
+                </div>
 
-        </div>
 
-        <div class="progress">
+                <div
+                    class="connection connection23"
+                    id="connection23">
+                </div>
+
+
+                <div class="packet packet1"></div>
+
+                <div class="packet packet2"></div>
+
+
+                <div class="switch s1">
+
+                    S1
+
+                    <small>
+                        CORE SWITCH
+                    </small>
+
+                </div>
+
+
+                <div class="switch s2">
+
+                    S2
+
+                    <small>
+                        ACCESS SWITCH
+                    </small>
+
+                </div>
+
+
+                <div class="switch s3">
+
+                    S3
+
+                    <small>
+                        ACCESS SWITCH
+                    </small>
+
+                </div>
+
+
+                <div
+                    class="link-label label12"
+                    id="label12">
+
+                    35%
+
+                </div>
+
+
+                <div
+                    class="link-label label13"
+                    id="label13">
+
+                    25%
+
+                </div>
+
+
+                <div
+                    class="link-label label23"
+                    id="label23">
+
+                    45%
+
+                </div>
+
+
+            </div>
+
+
+            <!-- LEGEND -->
+
+            <div class="legend">
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-dot green-dot">
+                    </span>
+
+                    Normal
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-dot yellow-dot">
+                    </span>
+
+                    Warning
+
+                </div>
+
+
+                <div class="legend-item">
+
+                    <span
+                        class="legend-dot red-dot">
+                    </span>
+
+                    Congested
+
+                </div>
+
+            </div>
+
 
             <div
-                class="progress-bar red-bar"
-                id="bar12">
+                class="status-box"
+                id="topologyStatus">
+
+                SDN Status:
+                <strong>NORMAL</strong>
+
+                <br>
+
+                Current condition:
+                Network operating normally.
+
+            </div>
+
+        </div>
+
+
+        <!-- =================================================
+             RIGHT PANEL
+        ================================================== -->
+
+        <div class="panel">
+
+            <h2>
+                📡 Link Monitoring
+            </h2>
+
+            <div class="subtitle">
+
+                SDN demonstration link utilization.
+
+            </div>
+
+
+            <!-- S1 S2 -->
+
+            <div class="metric">
+
+                <div class="metric-top">
+
+                    <span class="metric-name">
+                        S1 → S2
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="value12">
+
+                        35%
+
+                    </span>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar12">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- S1 S3 -->
+
+            <div class="metric">
+
+                <div class="metric-top">
+
+                    <span class="metric-name">
+                        S1 → S3
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="value13">
+
+                        25%
+
+                    </span>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar13">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- S2 S3 -->
+
+            <div class="metric">
+
+                <div class="metric-top">
+
+                    <span class="metric-name">
+                        S2 → S3
+                    </span>
+
+                    <span
+                        class="metric-value"
+                        id="value23">
+
+                        45%
+
+                    </span>
+
+                </div>
+
+
+                <div class="progress">
+
+                    <div
+                        class="progress-bar"
+                        id="bar23">
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- CONTROLLER -->
+
+            <div class="controller-box">
+
+                <div class="controller-title">
+
+                    🎛️ SDN Controller
+
+                </div>
+
+                <div
+                    class="controller-status"
+                    id="controllerStatus">
+
+                    ● Connected
+
+                </div>
+
+            </div>
+
+
+            <!-- S1 -->
+
+            <div class="node">
+
+                <div class="node-title">
+
+                    S1 — Core Switch
+
+                </div>
+
+                <div class="node-info">
+
+                    Status: 🟢 Online
+                    <br>
+
+                    Role: Central SDN Node
+                    <br>
+
+                    Controller: Connected
+
+                </div>
+
+            </div>
+
+
+            <!-- S2 -->
+
+            <div class="node">
+
+                <div class="node-title">
+
+                    S2 — Access Switch
+
+                </div>
+
+                <div class="node-info">
+
+                    Status: 🟢 Online
+                    <br>
+
+                    Role: Access Layer
+
+                </div>
+
+            </div>
+
+
+            <!-- S3 -->
+
+            <div class="node">
+
+                <div class="node-title">
+
+                    S3 — Access Switch
+
+                </div>
+
+                <div class="node-info">
+
+                    Status: 🟢 Online
+                    <br>
+
+                    Role: Access Layer
+
+                </div>
+
+            </div>
+
+
+            <!-- PATH -->
+
+            <div
+                class="status-box"
+                id="pathStatus">
+
+                Recommended Path:
+
+                <strong>
+                    S1 → S2
+                </strong>
+
+            </div>
+
+
+            <!-- CONTROLS -->
+
+            <div class="demo-controls">
+
+                <button
+                    class="demo-btn normal-btn"
+                    onclick="setDemoState('normal')">
+
+                    🟢 NORMAL
+
+                </button>
+
+
+                <button
+                    class="demo-btn warning-btn"
+                    onclick="setDemoState('warning')">
+
+                    🟡 WARNING
+
+                </button>
+
+
+                <button
+                    class="demo-btn congested-btn"
+                    onclick="setDemoState('congested')">
+
+                    🔴 CONGESTED
+
+                </button>
+
             </div>
 
         </div>
@@ -1217,152 +1640,18 @@ footer {
     </div>
 
 
-    <!-- S1 S3 -->
+    <footer>
 
-    <div class="metric">
+        SDN Campus Network Command Center
 
-        <div class="metric-top">
+        <br><br>
 
-            <span class="metric-name">
-                S1 → S3
-            </span>
+        Network Topology •
+        Traffic Engineering •
+        QoS •
+        Dynamic Routing
 
-            <span
-                class="metric-value green"
-                id="value13">
-
-                34%
-
-            </span>
-
-        </div>
-
-        <div class="progress">
-
-            <div
-                class="progress-bar green-bar"
-                id="bar13">
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- S2 S3 -->
-
-    <div class="metric">
-
-        <div class="metric-top">
-
-            <span class="metric-name">
-                S2 → S3
-            </span>
-
-            <span
-                class="metric-value yellow"
-                id="value23">
-
-                52%
-
-            </span>
-
-        </div>
-
-        <div class="progress">
-
-            <div
-                class="progress-bar yellow-bar"
-                id="bar23">
-            </div>
-
-        </div>
-
-    </div>
-
-
-    <!-- NODE INFO -->
-
-    <div class="node">
-
-        <div class="node-title">
-            S1 — Core Switch
-        </div>
-
-        <div class="node-info">
-
-            Status: 🟢 Online<br>
-
-            Role: Central SDN Node<br>
-
-            Connected Devices: 68<br>
-
-            Controller: Connected
-
-        </div>
-
-    </div>
-
-
-    <div class="node">
-
-        <div class="node-title">
-            S2 — Access Switch
-        </div>
-
-        <div class="node-info">
-
-            Status: 🟢 Online<br>
-
-            Role: Access Layer<br>
-
-            Connected Devices: 31<br>
-
-            Utilization: 87%
-
-        </div>
-
-    </div>
-
-
-    <div class="node">
-
-        <div class="node-title">
-            S3 — Access Switch
-        </div>
-
-        <div class="node-info">
-
-            Status: 🟢 Online<br>
-
-            Role: Access Layer<br>
-
-            Connected Devices: 21<br>
-
-            Utilization: 34%
-
-        </div>
-
-    </div>
-
-
-</div>
-
-
-</div>
-
-
-<footer>
-
-    SDN Campus Network Command Center
-
-    <br><br>
-
-    Network Topology •
-    Traffic Analysis •
-    Cybersecurity Monitoring
-
-</footer>
+    </footer>
 
 
 </div>
@@ -1370,76 +1659,417 @@ footer {
 
 <script>
 
-/* =========================
+
+/* =====================================================
    SIDEBAR
-========================= */
+===================================================== */
 
 function toggleMenu() {
 
     document
         .getElementById("sidebar")
-        .classList.toggle("open");
+        .classList
+        .toggle("open");
 
 }
 
 
-/* =========================
-   SIMPLE LIVE SIMULATION
-========================= */
+/* =====================================================
+   DEMO STATES
+===================================================== */
 
-setInterval(function() {
+const demoStates = {
+
+    normal: {
+
+        link12: 35,
+
+        link13: 25,
+
+        link23: 45,
+
+        status:
+            "NORMAL",
+
+        message:
+            "Network operating normally.",
+
+        path:
+            "S1 → S2"
+
+    },
 
 
-    let value12 =
-        Math.floor(
-            82 + Math.random() * 10
+    warning: {
+
+        link12: 68,
+
+        link13: 42,
+
+        link23: 55,
+
+        status:
+            "WARNING",
+
+        message:
+            "Primary link approaching congestion threshold.",
+
+        path:
+            "S1 → S3"
+
+    },
+
+
+    congested: {
+
+        link12: 92,
+
+        link13: 34,
+
+        link23: 48,
+
+        status:
+            "CONGESTION DETECTED",
+
+        message:
+            "S1 → S2 is congested. Traffic redirected to S1 → S3.",
+
+        path:
+            "S1 → S3"
+
+    }
+
+};
+
+
+let normalTimer = null;
+
+
+/* =====================================================
+   APPLY STATE
+===================================================== */
+
+function setDemoState(stateName) {
+
+    const state =
+        demoStates[stateName];
+
+
+    if (
+        normalTimer !==
+        null
+    ) {
+
+        clearTimeout(
+            normalTimer
         );
 
-    let value13 =
-        Math.floor(
-            30 + Math.random() * 10
-        );
+        normalTimer =
+            null;
 
-    let value23 =
-        Math.floor(
-            47 + Math.random() * 10
-        );
+    }
 
+
+    /* VALUES */
 
     document.getElementById(
         "value12"
-    ).innerText = value12 + "%";
+    ).innerText =
+        state.link12 + "%";
 
 
     document.getElementById(
         "value13"
-    ).innerText = value13 + "%";
+    ).innerText =
+        state.link13 + "%";
 
 
     document.getElementById(
         "value23"
-    ).innerText = value23 + "%";
+    ).innerText =
+        state.link23 + "%";
+
+
+    /* LABELS */
+
+    document.getElementById(
+        "label12"
+    ).innerText =
+        state.link12 + "%";
 
 
     document.getElementById(
-        "bar12"
-    ).style.width = value12 + "%";
+        "label13"
+    ).innerText =
+        state.link13 + "%";
 
 
     document.getElementById(
-        "bar13"
-    ).style.width = value13 + "%";
+        "label23"
+    ).innerText =
+        state.link23 + "%";
 
+
+    /* PROGRESS BARS */
+
+    updateBar(
+        "bar12",
+        state.link12
+    );
+
+
+    updateBar(
+        "bar13",
+        state.link13
+    );
+
+
+    updateBar(
+        "bar23",
+        state.link23
+    );
+
+
+    /* CONNECTIONS */
+
+    updateConnection(
+        "connection12",
+        state.link12
+    );
+
+
+    updateConnection(
+        "connection13",
+        state.link13
+    );
+
+
+    updateConnection(
+        "connection23",
+        state.link23
+    );
+
+
+    /* STATUS */
 
     document.getElementById(
-        "bar23"
-    ).style.width = value23 + "%";
+        "topologyStatus"
+    ).innerHTML =
+
+        "SDN Status: <strong>" +
+        state.status +
+        "</strong>" +
+
+        "<br>" +
+
+        "Current condition: " +
+        state.message;
 
 
-}, 4000);
+    /* PATH */
+
+    document.getElementById(
+        "pathStatus"
+    ).innerHTML =
+
+        "Recommended Path: " +
+
+        "<strong>" +
+        state.path +
+        "</strong>";
+
+
+    /* CONTROLLER */
+
+    if (
+        stateName ===
+        "congested"
+    ) {
+
+        document.getElementById(
+            "controllerStatus"
+        ).innerText =
+            "● Congestion detected";
+
+
+        document.getElementById(
+            "controllerStatus"
+        ).style.color =
+            "#f87171";
+
+    }
+
+    else if (
+        stateName ===
+        "warning"
+    ) {
+
+        document.getElementById(
+            "controllerStatus"
+        ).innerText =
+            "● Warning";
+
+
+        document.getElementById(
+            "controllerStatus"
+        ).style.color =
+            "#fbbf24";
+
+    }
+
+    else {
+
+        document.getElementById(
+            "controllerStatus"
+        ).innerText =
+            "● Connected";
+
+
+        document.getElementById(
+            "controllerStatus"
+        ).style.color =
+            "#4ade80";
+
+    }
+
+
+    /* AUTO RECOVERY */
+
+    if (
+        stateName ===
+        "congested"
+    ) {
+
+        normalTimer =
+            setTimeout(
+                function() {
+
+                    setDemoState(
+                        "normal"
+                    );
+
+                },
+                5000
+            );
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE PROGRESS BAR
+===================================================== */
+
+function updateBar(
+    id,
+    value
+) {
+
+    const bar =
+        document.getElementById(
+            id
+        );
+
+
+    bar.style.width =
+        value + "%";
+
+
+    if (
+        value >= 85
+    ) {
+
+        bar.style.background =
+            "#ef4444";
+
+    }
+
+    else if (
+        value >= 60
+    ) {
+
+        bar.style.background =
+            "#f59e0b";
+
+    }
+
+    else {
+
+        bar.style.background =
+            "#22c55e";
+
+    }
+
+}
+
+
+/* =====================================================
+   UPDATE CONNECTION
+===================================================== */
+
+function updateConnection(
+    id,
+    value
+) {
+
+    const line =
+        document.getElementById(
+            id
+        );
+
+
+    if (
+        value >= 85
+    ) {
+
+        line.style.background =
+            "#ef4444";
+
+
+        line.style.boxShadow =
+            "0 0 15px rgba(239,68,68,.6)";
+
+    }
+
+    else if (
+        value >= 60
+    ) {
+
+        line.style.background =
+            "#f59e0b";
+
+
+        line.style.boxShadow =
+            "0 0 15px rgba(245,158,11,.5)";
+
+    }
+
+    else {
+
+        line.style.background =
+            "#22c55e";
+
+
+        line.style.boxShadow =
+            "0 0 15px rgba(34,197,94,.4)";
+
+    }
+
+}
+
+
+/* =====================================================
+   INITIAL STATE
+===================================================== */
+
+setDemoState(
+    "normal"
+);
 
 </script>
 
 
 </body>
+
 </html>

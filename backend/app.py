@@ -1,15 +1,19 @@
 from flask import Flask, jsonify, send_from_directory, send_file
 from flask_cors import CORS
 
-import random
-import os
 import io
+import json
+import os
+import re
+import subprocess
+import threading
+import time
 from datetime import datetime
 
 from reportlab.lib import colors
-from reportlab.lib.pagesizes import A4
 from reportlab.lib.enums import TA_CENTER
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib.pagesizes import A4
+from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.lib.units import mm
 from reportlab.platypus import (
     SimpleDocTemplate,
@@ -21,54 +25,590 @@ from reportlab.platypus import (
 )
 
 
+# =========================================================
+# FLASK
+# =========================================================
+
 app = Flask(__name__)
 CORS(app)
 
 
 # =========================================================
-# FRONTEND LOCATION
+# FRONTEND FOLDER
 # =========================================================
 
 FRONTEND_FOLDER = os.path.join(
-    os.path.dirname(os.path.dirname(__file__)),
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "frontend"
 )
 
 
 # =========================================================
-# NETWORK STATE
+# NETWORK CACHE
 # =========================================================
 
-network = {
-    "throughput": 82,
-    "latency": 28,
-    "packet_loss": 4.7,
-    "connections": 120,
+network_cache = {
+    "connections": 0,
+    "interface": "Detecting...",
+    "gateway": "",
+    "latency": 0,
+    "link12": 0,
+    "link13": 0,
+    "link23": 0,
+    "packet_loss": 0.0,
+    "path": "Host Network",
+    "receive_errors": 0,
+    "received_bytes": 0,
+    "received_discards": 0,
+    "received_packets": 0,
+    "send_errors": 0,
+    "sent_bytes": 0,
+    "sent_discards": 0,
+    "sent_packets": 0,
+    "status": "STARTING",
+    "throughput": 0.0
+}
 
-    "link12": 87,
-    "link13": 34,
-    "link23": 52,
 
-    "status": "NORMAL",
-    "path": "S1 → S2"
+cache_lock = threading.Lock()
+
+
+# =========================================================
+# PREVIOUS VALUES FOR THROUGHPUT
+# =========================================================
+
+previous_stats = {
+    "interface": None,
+    "time": None,
+    "total_bytes": None
 }
 
 
 # =========================================================
-# HOME
+# ACTIVE CONNECTION CACHE
+# =========================================================
+
+active_connection = {
+    "interface": None,
+    "gateway": None,
+    "last_check": 0
+}
+
+
+# =========================================================
+# FIND ACTIVE INTERNET-CONNECTED INTERFACE
+# =========================================================
+
+def find_active_connection(force=False):
+    global active_connection
+
+    now = time.time()
+
+    # Reuse the detected adapter for 10 seconds.
+    # This avoids repeatedly starting PowerShell.
+    if (
+        not force
+        and active_connection["interface"]
+        and active_connection["gateway"]
+        and (now - active_connection["last_check"] < 10)
+    ):
+        return (
+            active_connection["interface"],
+            active_connection["gateway"]
+        )
+
+    powershell_script = r'''
+$config = Get-NetIPConfiguration |
+    Where-Object {
+        $_.NetAdapter.Status -eq "Up" -and
+        $_.IPv4DefaultGateway -ne $null
+    } |
+    Select-Object -First 1
+
+if ($null -eq $config) {
+    Write-Output '{"Error":"NO_ACTIVE_ADAPTER"}'
+    exit
+}
+
+$result = [PSCustomObject]@{
+    Interface = $config.InterfaceAlias
+    Gateway = $config.IPv4DefaultGateway.NextHop
+}
+
+$result | ConvertTo-Json -Compress
+'''
+
+    command = [
+        "powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        powershell_script
+    ]
+
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=20,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+
+        if result.returncode != 0:
+            raise RuntimeError(
+                result.stderr.strip()
+                or "Active adapter detection failed."
+            )
+
+        output = result.stdout.strip()
+
+        if not output:
+            raise RuntimeError(
+                "No active adapter information returned."
+            )
+
+        data = json.loads(output)
+
+        if data.get("Error"):
+            raise RuntimeError(data["Error"])
+
+        interface_name = data.get("Interface", "")
+        gateway = data.get("Gateway", "")
+
+        if not interface_name:
+            raise RuntimeError(
+                "Active interface name not found."
+            )
+
+        active_connection["interface"] = interface_name
+        active_connection["gateway"] = gateway
+        active_connection["last_check"] = now
+
+        return interface_name, gateway
+
+    except Exception as error:
+        print("Active adapter detection error:", error)
+
+        return (
+            active_connection["interface"],
+            active_connection["gateway"]
+        )
+
+
+# =========================================================
+# READ WINDOWS NETWORK STATISTICS
+# =========================================================
+
+def read_windows_network(interface_name):
+
+    # Escape double quotes just in case.
+    safe_interface = interface_name.replace('"', '""')
+
+    powershell_script = f'''
+$stats = Get-NetAdapterStatistics -Name "{safe_interface}" |
+    Select-Object `
+        Name,
+        ReceivedBytes,
+        SentBytes,
+        ReceivedUnicastPackets,
+        SentUnicastPackets,
+        ReceivedPacketErrors,
+        OutboundPacketErrors,
+        ReceivedDiscardedPackets,
+        OutboundDiscardedPackets
+
+$stats | ConvertTo-Json -Compress
+'''
+
+    command = [
+        "powershell.exe",
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        powershell_script
+    ]
+
+    result = subprocess.run(
+        command,
+        capture_output=True,
+        text=True,
+        timeout=20,
+        creationflags=subprocess.CREATE_NO_WINDOW
+    )
+
+    if result.returncode != 0:
+        raise RuntimeError(
+            result.stderr.strip()
+            or "Network statistics query failed."
+        )
+
+    output = result.stdout.strip()
+
+    if not output:
+        raise RuntimeError(
+            "No network statistics returned."
+        )
+
+    return json.loads(output)
+
+
+# =========================================================
+# REAL LATENCY
+# =========================================================
+
+def get_real_latency(gateway):
+
+    if not gateway:
+        return 0
+
+    try:
+        # Ping the active network gateway once.
+        result = subprocess.run(
+            [
+                "ping",
+                "-n",
+                "1",
+                "-w",
+                "1000",
+                gateway
+            ],
+            capture_output=True,
+            text=True,
+            timeout=3,
+            creationflags=subprocess.CREATE_NO_WINDOW
+        )
+
+        output = result.stdout
+
+        # Examples:
+        # time=3ms
+        # time<1ms
+        match = re.search(
+            r"time[=<]\s*(\d+)\s*ms",
+            output,
+            re.IGNORECASE
+        )
+
+        if match:
+            return int(match.group(1))
+
+        # Windows may show <1ms.
+        if re.search(
+            r"time<1ms",
+            output,
+            re.IGNORECASE
+        ):
+            return 1
+
+        return 0
+
+    except Exception as error:
+        print("Latency measurement error:", error)
+        return 0
+
+
+# =========================================================
+# UPDATE NETWORK CACHE
+# =========================================================
+
+def update_network_cache():
+
+    global previous_stats
+
+    try:
+
+        # -------------------------------------------------
+        # ACTIVE INTERFACE
+        # -------------------------------------------------
+
+        interface_name, gateway = find_active_connection()
+
+        if not interface_name:
+            raise RuntimeError(
+                "No active Internet-connected adapter."
+            )
+
+        # -------------------------------------------------
+        # WINDOWS COUNTERS
+        # -------------------------------------------------
+
+        stats = read_windows_network(interface_name)
+
+        now = time.time()
+
+        received_bytes = int(
+            stats.get("ReceivedBytes", 0)
+        )
+
+        sent_bytes = int(
+            stats.get("SentBytes", 0)
+        )
+
+        total_bytes = (
+            received_bytes +
+            sent_bytes
+        )
+
+        received_packets = int(
+            stats.get(
+                "ReceivedUnicastPackets",
+                0
+            )
+        )
+
+        sent_packets = int(
+            stats.get(
+                "SentUnicastPackets",
+                0
+            )
+        )
+
+        receive_errors = int(
+            stats.get(
+                "ReceivedPacketErrors",
+                0
+            )
+        )
+
+        send_errors = int(
+            stats.get(
+                "OutboundPacketErrors",
+                0
+            )
+        )
+
+        received_discards = int(
+            stats.get(
+                "ReceivedDiscardedPackets",
+                0
+            )
+        )
+
+        sent_discards = int(
+            stats.get(
+                "OutboundDiscardedPackets",
+                0
+            )
+        )
+
+        # -------------------------------------------------
+        # THROUGHPUT
+        # -------------------------------------------------
+
+        throughput = 0.0
+
+        # Adapter changed
+        if previous_stats["interface"] != interface_name:
+
+            previous_stats["interface"] = interface_name
+            previous_stats["time"] = now
+            previous_stats["total_bytes"] = total_bytes
+
+        else:
+
+            previous_time = previous_stats["time"]
+            previous_bytes = previous_stats["total_bytes"]
+
+            if (
+                previous_time is not None
+                and previous_bytes is not None
+            ):
+
+                elapsed = now - previous_time
+
+                byte_difference = (
+                    total_bytes -
+                    previous_bytes
+                )
+
+                if (
+                    elapsed > 0
+                    and byte_difference >= 0
+                ):
+
+                    throughput = (
+                        byte_difference * 8
+                    ) / elapsed / 1_000_000
+
+            previous_stats["time"] = now
+            previous_stats["total_bytes"] = total_bytes
+
+        # -------------------------------------------------
+        # REAL LATENCY
+        # -------------------------------------------------
+
+        latency = get_real_latency(gateway)
+
+        # -------------------------------------------------
+        # PACKET ERROR RATE
+        # -------------------------------------------------
+
+        total_packets = (
+            received_packets +
+            sent_packets
+        )
+
+        total_errors = (
+            receive_errors +
+            send_errors
+        )
+
+        packet_loss = 0.0
+
+        if total_packets > 0:
+            packet_loss = (
+                total_errors /
+                total_packets
+            ) * 100
+
+        packet_loss = round(
+            min(packet_loss, 100),
+            2
+        )
+
+        # -------------------------------------------------
+        # STATUS
+        # -------------------------------------------------
+
+        if packet_loss >= 5:
+            status = "ATTENTION REQUIRED"
+
+        elif latency > 100 and latency != 0:
+            status = "HIGH LATENCY"
+
+        elif throughput >= 50:
+            status = "HIGH ACTIVITY"
+
+        else:
+            status = "NORMAL"
+
+        # -------------------------------------------------
+        # DATA
+        # -------------------------------------------------
+
+        new_data = {
+
+            "connections": 0,
+
+            "interface": interface_name,
+
+            "gateway": gateway,
+
+            "latency": latency,
+
+            # Logical SDN links.
+            # These are controlled by the
+            # QoS/topology demonstration pages.
+            "link12": 0,
+            "link13": 0,
+            "link23": 0,
+
+            "packet_loss": packet_loss,
+
+            "path": "Host Network",
+
+            "receive_errors": receive_errors,
+
+            "received_bytes": received_bytes,
+
+            "received_discards": received_discards,
+
+            "received_packets": received_packets,
+
+            "send_errors": send_errors,
+
+            "sent_bytes": sent_bytes,
+
+            "sent_discards": sent_discards,
+
+            "sent_packets": sent_packets,
+
+            "status": status,
+
+            "throughput": round(
+                throughput,
+                2
+            )
+        }
+
+        # -------------------------------------------------
+        # CACHE
+        # -------------------------------------------------
+
+        with cache_lock:
+            network_cache.update(new_data)
+
+        print(
+            "Network updated:",
+            interface_name,
+            "| Gateway:",
+            gateway,
+            "| Latency:",
+            latency,
+            "ms",
+            "| Throughput:",
+            round(throughput, 2),
+            "Mbps"
+        )
+
+    except Exception as error:
+
+        print(
+            "Network monitor error:",
+            error
+        )
+
+        # Keep previous good values.
+        with cache_lock:
+
+            if network_cache["interface"] == "Detecting...":
+                network_cache["status"] = "MONITORING ERROR"
+
+
+# =========================================================
+# BACKGROUND MONITOR
+# =========================================================
+
+def network_monitor():
+
+    print(
+        "Background network monitor started."
+    )
+
+    while True:
+
+        start = time.time()
+
+        update_network_cache()
+
+        elapsed = time.time() - start
+
+        # Approximately every 2 seconds.
+        sleep_time = max(
+            0.5,
+            2.0 - elapsed
+        )
+
+        time.sleep(sleep_time)
+
+
+# =========================================================
+# FRONTEND ROUTES
 # =========================================================
 
 @app.route("/")
 def home():
+
     return send_from_directory(
         FRONTEND_FOLDER,
         "index.html"
     )
 
-
-# =========================================================
-# FRONTEND PAGES
-# =========================================================
 
 @app.route("/<path:filename>")
 def frontend_files(filename):
@@ -80,181 +620,19 @@ def frontend_files(filename):
 
 
 # =========================================================
-# NETWORK API
+# FAST NETWORK API
 # =========================================================
 
 @app.route("/api/network")
 def network_data():
 
-    network["throughput"] = random.randint(70, 95)
+    # The web page receives cached data immediately.
+    # No PowerShell or ping is started here.
 
-    network["latency"] = random.randint(20, 50)
+    with cache_lock:
+        data = network_cache.copy()
 
-    network["packet_loss"] = round(
-        random.uniform(1.5, 5.5),
-        1
-    )
-
-    network["connections"] = random.randint(
-        100,
-        150
-    )
-
-    network["link12"] = random.randint(
-        60,
-        95
-    )
-
-    network["link13"] = random.randint(
-        20,
-        60
-    )
-
-    network["link23"] = random.randint(
-        30,
-        70
-    )
-
-    if network["link12"] >= 85:
-
-        network["status"] = "CONGESTION DETECTED"
-        network["path"] = "S1 → S3"
-
-    else:
-
-        network["status"] = "NORMAL"
-        network["path"] = "S1 → S2"
-
-    return jsonify(network)
-
-
-# =========================================================
-# REPORT HELPERS
-# =========================================================
-
-def utilization_status(value):
-
-    if value >= 85:
-        return "HIGH"
-
-    elif value >= 60:
-        return "MODERATE"
-
-    return "NORMAL"
-
-
-def security_status():
-
-    if network["status"] == "CONGESTION DETECTED":
-        return "ATTENTION REQUIRED"
-
-    elif network["packet_loss"] >= 4.5:
-        return "MONITOR"
-
-    return "HEALTHY"
-
-
-def security_assessment():
-
-    if network["status"] == "CONGESTION DETECTED":
-
-        return (
-            "High link utilization has been detected on the "
-            "primary network path. Traffic has been redirected "
-            "to the alternate recommended route to maintain "
-            "network availability and reduce congestion."
-        )
-
-    elif network["packet_loss"] >= 4.5:
-
-        return (
-            "Packet loss is slightly elevated. Continuous "
-            "monitoring is recommended to identify abnormal "
-            "traffic conditions and maintain network quality."
-        )
-
-    return (
-        "The network is operating within the observed "
-        "normal range. Continuous monitoring remains "
-        "recommended for maintaining network reliability."
-    )
-
-
-# =========================================================
-# PAGE HEADER / FOOTER
-# =========================================================
-
-def add_page_header_footer(canvas, doc):
-
-    canvas.saveState()
-
-    width, height = A4
-
-    # Header line
-    canvas.setStrokeColor(
-        colors.HexColor("#087EA4")
-    )
-
-    canvas.setLineWidth(0.7)
-
-    canvas.line(
-        18 * mm,
-        height - 12 * mm,
-        width - 18 * mm,
-        height - 12 * mm
-    )
-
-    # Header
-    canvas.setFont(
-        "Helvetica-Bold",
-        7
-    )
-
-    canvas.setFillColor(
-        colors.HexColor("#087EA4")
-    )
-
-    canvas.drawString(
-        18 * mm,
-        height - 9 * mm,
-        "SDN CAMPUS NETWORK SECURITY MONITORING SYSTEM"
-    )
-
-    # Footer line
-    canvas.setStrokeColor(
-        colors.HexColor("#B5B5B5")
-    )
-
-    canvas.line(
-        18 * mm,
-        12 * mm,
-        width - 18 * mm,
-        12 * mm
-    )
-
-    # Footer
-    canvas.setFont(
-        "Helvetica",
-        7
-    )
-
-    canvas.setFillColor(
-        colors.HexColor("#555555")
-    )
-
-    canvas.drawString(
-        18 * mm,
-        7 * mm,
-        "Saveetha School of Engineering"
-    )
-
-    canvas.drawRightString(
-        width - 18 * mm,
-        7 * mm,
-        f"Page {doc.page}"
-    )
-
-    canvas.restoreState()
+    return jsonify(data)
 
 
 # =========================================================
@@ -264,68 +642,8 @@ def add_page_header_footer(canvas, doc):
 @app.route("/api/report")
 def generate_report():
 
-    # Get a fresh network state
-    network["throughput"] = random.randint(70, 95)
-
-    network["latency"] = random.randint(20, 50)
-
-    network["packet_loss"] = round(
-        random.uniform(1.5, 5.5),
-        1
-    )
-
-    network["connections"] = random.randint(
-        100,
-        150
-    )
-
-    network["link12"] = random.randint(
-        60,
-        95
-    )
-
-    network["link13"] = random.randint(
-        20,
-        60
-    )
-
-    network["link23"] = random.randint(
-        30,
-        70
-    )
-
-    if network["link12"] >= 85:
-
-        network["status"] = "CONGESTION DETECTED"
-        network["path"] = "S1 → S3"
-
-    else:
-
-        network["status"] = "NORMAL"
-        network["path"] = "S1 → S2"
-
-
-    # Current values
-    throughput = network["throughput"]
-    latency = network["latency"]
-    packet_loss = network["packet_loss"]
-    connections = network["connections"]
-
-    link12 = network["link12"]
-    link13 = network["link13"]
-    link23 = network["link23"]
-
-    status = network["status"]
-    path = network["path"]
-
-    generated = datetime.now().strftime(
-        "%d-%m-%Y %H:%M:%S"
-    )
-
-
-    # -----------------------------------------------------
-    # PDF
-    # -----------------------------------------------------
+    with cache_lock:
+        data = network_cache.copy()
 
     buffer = io.BytesIO()
 
@@ -338,9 +656,7 @@ def generate_report():
         bottomMargin=18 * mm
     )
 
-
     styles = getSampleStyleSheet()
-
 
     title_style = ParagraphStyle(
         "TitleStyle",
@@ -349,22 +665,8 @@ def generate_report():
         fontSize=19,
         leading=23,
         alignment=TA_CENTER,
-        textColor=colors.HexColor("#087EA4"),
-        spaceAfter=5
+        textColor=colors.HexColor("#087EA4")
     )
-
-
-    subtitle_style = ParagraphStyle(
-        "SubtitleStyle",
-        parent=styles["Normal"],
-        fontName="Helvetica-Bold",
-        fontSize=11,
-        leading=14,
-        alignment=TA_CENTER,
-        textColor=colors.HexColor("#222222"),
-        spaceAfter=12
-    )
-
 
     section_style = ParagraphStyle(
         "SectionStyle",
@@ -377,27 +679,21 @@ def generate_report():
         spaceAfter=8
     )
 
-
     body_style = ParagraphStyle(
         "BodyStyle",
         parent=styles["BodyText"],
-        fontName="Helvetica",
         fontSize=9.5,
         leading=14,
         textColor=colors.HexColor("#222222"),
         spaceAfter=9
     )
 
-
     small_style = ParagraphStyle(
         "SmallStyle",
         parent=styles["BodyText"],
-        fontName="Helvetica",
         fontSize=8,
-        leading=10,
-        textColor=colors.HexColor("#222222")
+        leading=10
     )
-
 
     center_style = ParagraphStyle(
         "CenterStyle",
@@ -405,33 +701,17 @@ def generate_report():
         alignment=TA_CENTER
     )
 
-
-    cover_label = ParagraphStyle(
-        "CoverLabel",
-        parent=small_style,
-        fontName="Helvetica-Bold",
-        fontSize=8,
-        textColor=colors.HexColor("#087EA4")
-    )
-
-
-    cover_value = ParagraphStyle(
-        "CoverValue",
-        parent=small_style,
-        fontSize=9,
-        leading=11
-    )
-
-
     story = []
 
-
-    # =====================================================
-    # PAGE 1 - COVER
-    # =====================================================
+    # -----------------------------------------------------
+    # REPORT TITLE
+    # -----------------------------------------------------
 
     story.append(
-        Spacer(1, 28 * mm)
+        Spacer(
+            1,
+            25 * mm
+        )
     )
 
     story.append(
@@ -443,1055 +723,85 @@ def generate_report():
 
     story.append(
         Paragraph(
-            "NETWORK MONITORING & SECURITY",
-            subtitle_style
-        )
-    )
-
-    story.append(
-        Spacer(1, 12 * mm)
-    )
-
-    story.append(
-        Paragraph(
-            "<b>Official Network Performance and "
-            "Security Assessment Report</b>",
+            "REAL NETWORK MONITORING REPORT",
             ParagraphStyle(
-                "CoverMain",
+                "SubTitle",
                 parent=body_style,
-                fontSize=13,
-                alignment=TA_CENTER
-            )
-        )
-    )
-
-    story.append(
-        Spacer(1, 15 * mm)
-    )
-
-
-    student_data = [
-
-        [
-            Paragraph("INSTITUTION", cover_label),
-            Paragraph(
-                "SAVEETHA SCHOOL OF ENGINEERING",
-                cover_value
-            )
-        ],
-
-        [
-            Paragraph("STUDENT NAME", cover_label),
-            Paragraph(
-                "POTHURAJU SAI CHARAN TEJ",
-                cover_value
-            )
-        ],
-
-        [
-            Paragraph("REGISTER NUMBER", cover_label),
-            Paragraph(
-                "192465048",
-                cover_value
-            )
-        ],
-
-        [
-            Paragraph("DEPARTMENT", cover_label),
-            Paragraph(
-                "BE.CSE.CYBER SECURITY",
-                cover_value
-            )
-        ],
-
-        [
-            Paragraph("YEAR OF STUDY", cover_label),
-            Paragraph(
-                "3RD",
-                cover_value
-            )
-        ],
-
-        [
-            Paragraph("REPORT DATE", cover_label),
-            Paragraph(
-                generated.split()[0],
-                cover_value
-            )
-        ]
-
-    ]
-
-
-    student_table = Table(
-        student_data,
-        colWidths=[
-            48 * mm,
-            102 * mm
-        ]
-    )
-
-
-    student_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#9AA8B5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (0, -1),
-                colors.HexColor("#EAF4F8")
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "LEFTPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "RIGHTPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            )
-
-        ])
-    )
-
-
-    story.append(student_table)
-
-    story.append(
-        Spacer(1, 20 * mm)
-    )
-
-    story.append(
-        Paragraph(
-            "SOFTWARE DEFINED NETWORKING  •  "
-            "NETWORK SECURITY  •  REAL-TIME MONITORING",
-            ParagraphStyle(
-                "CoverFooter",
-                parent=small_style,
                 alignment=TA_CENTER,
-                fontSize=8,
-                textColor=colors.HexColor("#087EA4")
+                fontSize=11
             )
         )
     )
 
-    story.append(PageBreak())
-
-
-    # =====================================================
-    # PAGE 2 - EXECUTIVE SUMMARY
-    # =====================================================
-
     story.append(
-        Paragraph(
-            "1. Executive Summary",
-            section_style
+        Spacer(
+            1,
+            12 * mm
         )
     )
 
+    # -----------------------------------------------------
+    # GENERAL INFO
+    # -----------------------------------------------------
 
-    story.append(
-        Paragraph(
-            "This report presents the current performance and "
-            "security condition of the Software Defined Networking "
-            "(SDN) campus network. The monitoring system "
-            "continuously observes network throughput, latency, "
-            "packet loss, active connections and individual link "
-            "utilization.",
-            body_style
-        )
-    )
+    info = [
 
-
-    story.append(
-        Paragraph(
-            "The system also performs congestion detection and "
-            "dynamically selects an alternative network path when "
-            "the primary link experiences high utilization. This "
-            "approach supports improved network availability, "
-            "traffic management and security visibility.",
-            body_style
-        )
-    )
-
-
-    current_status = (
-        "NETWORK OPERATING NORMALLY"
-        if status == "NORMAL"
-        else
-        "NETWORK UNDER CONGESTION"
-    )
-
-
-    status_color = (
-        colors.HexColor("#1BAA59")
-        if status == "NORMAL"
-        else
-        colors.HexColor("#D83A3A")
-    )
-
-
-    status_table = Table(
         [
-            [
-                Paragraph(
-                    "<b>CURRENT NETWORK STATUS</b>",
-                    center_style
-                )
-            ],
-            [
-                Paragraph(
-                    f"<b>{current_status}</b>",
-                    ParagraphStyle(
-                        "StatusText",
-                        parent=center_style,
-                        fontSize=15,
-                        textColor=status_color
-                    )
-                )
-            ]
-        ],
-        colWidths=[
-            150 * mm
-        ]
-    )
-
-
-    status_table.setStyle(
-        TableStyle([
-
-            (
-                "BOX",
-                (0, 0),
-                (-1, -1),
-                1,
-                status_color
+            Paragraph(
+                "<b>MONITORING MODE</b>",
+                small_style
             ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#EEF4F7")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 1),
-                (-1, 1),
-                colors.HexColor("#F8FAFB")
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                8
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                8
+            Paragraph(
+                "REAL HOST NETWORK",
+                small_style
             )
+        ],
 
-        ])
-    )
+        [
+            Paragraph(
+                "<b>ACTIVE INTERFACE</b>",
+                small_style
+            ),
+            Paragraph(
+                str(data["interface"]),
+                small_style
+            )
+        ],
 
+        [
+            Paragraph(
+                "<b>GATEWAY</b>",
+                small_style
+            ),
+            Paragraph(
+                str(data["gateway"]),
+                small_style
+            )
+        ],
 
-    story.append(status_table)
-
-    story.append(
-        Spacer(1, 12 * mm)
-    )
-
-
-    story.append(
-        Paragraph(
-            "Key Monitoring Findings",
-            section_style
-        )
-    )
-
-
-    findings = [
-
-        "Network throughput is continuously monitored.",
-
-        "Latency and packet loss are observed as quality indicators.",
-
-        "Active connections provide an indication of current network load.",
-
-        "Individual network links are monitored for congestion.",
-
-        "Alternative routing is selected when the primary path becomes congested."
-
+        [
+            Paragraph(
+                "<b>GENERATED</b>",
+                small_style
+            ),
+            Paragraph(
+                datetime.now().strftime(
+                    "%d-%m-%Y %H:%M:%S"
+                ),
+                small_style
+            )
+        ]
     ]
 
-
-    for item in findings:
-
-        story.append(
-            Paragraph(
-                "• " + item,
-                body_style
-            )
-        )
-
-
-    story.append(PageBreak())
-
-
-    # =====================================================
-    # PAGE 3 - PERFORMANCE + TOPOLOGY
-    # =====================================================
-
-    story.append(
-        Paragraph(
-            "2. Network Performance Metrics",
-            section_style
-        )
-    )
-
-
-    performance_data = [
-
-        [
-            Paragraph("<b>METRIC</b>", center_style),
-            Paragraph("<b>CURRENT VALUE</b>", center_style),
-            Paragraph("<b>STATUS</b>", center_style)
-        ],
-
-        [
-            Paragraph("Throughput", small_style),
-            Paragraph(
-                f"{throughput} Mbps",
-                small_style
-            ),
-            Paragraph("MONITORED", small_style)
-        ],
-
-        [
-            Paragraph("Latency", small_style),
-            Paragraph(
-                f"{latency} ms",
-                small_style
-            ),
-            Paragraph("MONITORED", small_style)
-        ],
-
-        [
-            Paragraph("Packet Loss", small_style),
-            Paragraph(
-                f"{packet_loss} %",
-                small_style
-            ),
-            Paragraph("MONITORED", small_style)
-        ],
-
-        [
-            Paragraph("Active Connections", small_style),
-            Paragraph(
-                str(connections),
-                small_style
-            ),
-            Paragraph("ACTIVE", small_style)
-        ]
-
-    ]
-
-
-    performance_table = Table(
-        performance_data,
+    info_table = Table(
+        info,
         colWidths=[
-            65 * mm,
-            42 * mm,
-            43 * mm
-        ]
-    )
-
-
-    performance_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#8999A5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.white
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            )
-
-        ])
-    )
-
-
-    story.append(performance_table)
-
-    story.append(
-        Spacer(1, 12 * mm)
-    )
-
-
-    story.append(
-        Paragraph(
-            "The above metrics represent the latest simulated "
-            "telemetry collected by the SDN campus monitoring "
-            "system. These measurements provide a real-time "
-            "view of network performance.",
-            body_style
-        )
-    )
-
-
-    story.append(
-        Paragraph(
-            "3. SDN Network Topology",
-            section_style
-        )
-    )
-
-
-    topology_data = [
-
-        [
-            Paragraph("<b>DEVICE</b>", center_style),
-            Paragraph("<b>ROLE</b>", center_style),
-            Paragraph("<b>CONNECTED PATH</b>", center_style)
-        ],
-
-        [
-            Paragraph("S1", center_style),
-            Paragraph("Core Switch", small_style),
-            Paragraph(
-                "S1 → S2 / S1 → S3",
-                small_style
-            )
-        ],
-
-        [
-            Paragraph("S2", center_style),
-            Paragraph("Access Switch", small_style),
-            Paragraph(
-                "S2 → S1 / S2 → S3",
-                small_style
-            )
-        ],
-
-        [
-            Paragraph("S3", center_style),
-            Paragraph("Access Switch", small_style),
-            Paragraph(
-                "S3 → S1 / S3 → S2",
-                small_style
-            )
-        ]
-
-    ]
-
-
-    topology_table = Table(
-        topology_data,
-        colWidths=[
-            30 * mm,
             50 * mm,
-            70 * mm
+            100 * mm
         ]
     )
 
-
-    topology_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#8999A5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.white
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            )
-
-        ])
-    )
-
-
-    story.append(topology_table)
-
-    story.append(
-        Spacer(1, 8 * mm)
-    )
-
-
-    story.append(
-        Paragraph(
-            "The network consists of a core switch and access "
-            "switches with multiple communication paths. The SDN "
-            "controller can dynamically manage traffic routing "
-            "according to current network conditions.",
-            body_style
-        )
-    )
-
-
-    story.append(PageBreak())
-
-
-    # =====================================================
-    # PAGE 4 - LINK + QOS
-    # =====================================================
-
-    story.append(
-        Paragraph(
-            "4. Link Utilization Analysis",
-            section_style
-        )
-    )
-
-
-    link_data = [
-
-        [
-            Paragraph(
-                "<b>NETWORK LINK</b>",
-                center_style
-            ),
-
-            Paragraph(
-                "<b>UTILIZATION</b>",
-                center_style
-            ),
-
-            Paragraph(
-                "<b>STATUS</b>",
-                center_style
-            )
-        ],
-
-        [
-            Paragraph("S1 → S2", small_style),
-            Paragraph(
-                f"{link12} %",
-                small_style
-            ),
-            Paragraph(
-                utilization_status(link12),
-                small_style
-            )
-        ],
-
-        [
-            Paragraph("S1 → S3", small_style),
-            Paragraph(
-                f"{link13} %",
-                small_style
-            ),
-            Paragraph(
-                utilization_status(link13),
-                small_style
-            )
-        ],
-
-        [
-            Paragraph("S2 → S3", small_style),
-            Paragraph(
-                f"{link23} %",
-                small_style
-            ),
-            Paragraph(
-                utilization_status(link23),
-                small_style
-            )
-        ]
-
-    ]
-
-
-    link_table = Table(
-        link_data,
-        colWidths=[
-            60 * mm,
-            45 * mm,
-            45 * mm
-        ]
-    )
-
-
-    link_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#8999A5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.white
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                7
-            )
-
-        ])
-    )
-
-
-    story.append(link_table)
-
-    story.append(
-        Spacer(1, 12 * mm)
-    )
-
-
-    story.append(
-        Paragraph(
-            "5. QoS & Dynamic Load Balancing",
-            section_style
-        )
-    )
-
-
-    qos_data = [
-
-        [
-            Paragraph(
-                "<b>TRAFFIC TYPE</b>",
-                center_style
-            ),
-            Paragraph(
-                "<b>PRIORITY</b>",
-                center_style
-            )
-        ],
-
-        [
-            Paragraph("VoIP", small_style),
-            Paragraph("HIGH", small_style)
-        ],
-
-        [
-            Paragraph("Video", small_style),
-            Paragraph("HIGH", small_style)
-        ],
-
-        [
-            Paragraph("Web", small_style),
-            Paragraph("NORMAL", small_style)
-        ],
-
-        [
-            Paragraph("Download", small_style),
-            Paragraph("LOW", small_style)
-        ]
-
-    ]
-
-
-    qos_table = Table(
-        qos_data,
-        colWidths=[
-            75 * mm,
-            75 * mm
-        ]
-    )
-
-
-    qos_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#8999A5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.white
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            )
-
-        ])
-    )
-
-
-    story.append(qos_table)
-
-    story.append(
-        Spacer(1, 8 * mm)
-    )
-
-
-    story.append(
-        Paragraph(
-            "The system assigns higher priority to delay-sensitive "
-            "traffic such as VoIP and video. When congestion is "
-            "detected on the primary route, the SDN system can "
-            "select a lower-congestion alternative path.",
-            body_style
-        )
-    )
-
-
-    routing_data = [
-
-        [
-            Paragraph(
-                "<b>ROUTING PARAMETER</b>",
-                center_style
-            ),
-
-            Paragraph(
-                "<b>CURRENT RESULT</b>",
-                center_style
-            )
-        ],
-
-        [
-            Paragraph(
-                "Current Network Status",
-                small_style
-            ),
-
-            Paragraph(
-                status,
-                small_style
-            )
-        ],
-
-        [
-            Paragraph(
-                "Recommended Traffic Path",
-                small_style
-            ),
-
-            Paragraph(
-                path,
-                small_style
-            )
-        ],
-
-        [
-            Paragraph(
-                "Primary Link Utilization",
-                small_style
-            ),
-
-            Paragraph(
-                f"{link12} %",
-                small_style
-            )
-        ]
-
-    ]
-
-
-    routing_table = Table(
-        routing_data,
-        colWidths=[
-            75 * mm,
-            75 * mm
-        ]
-    )
-
-
-    routing_table.setStyle(
-        TableStyle([
-
-            (
-                "GRID",
-                (0, 0),
-                (-1, -1),
-                0.6,
-                colors.HexColor("#8999A5")
-            ),
-
-            (
-                "BACKGROUND",
-                (0, 0),
-                (-1, 0),
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "TEXTCOLOR",
-                (0, 0),
-                (-1, 0),
-                colors.white
-            ),
-
-            (
-                "VALIGN",
-                (0, 0),
-                (-1, -1),
-                "MIDDLE"
-            ),
-
-            (
-                "TOPPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            ),
-
-            (
-                "BOTTOMPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            )
-
-        ])
-    )
-
-
-    story.append(routing_table)
-
-    story.append(PageBreak())
-
-
-    # =====================================================
-    # PAGE 5 - SECURITY
-    # =====================================================
-
-    story.append(
-        Paragraph(
-            "6. Cybersecurity Assessment",
-            section_style
-        )
-    )
-
-
-    security_points = [
-
-        "Continuous Monitoring: Network telemetry should be continuously monitored to identify abnormal traffic conditions.",
-
-        "Congestion Detection: High-utilization links should be identified early to prevent service degradation.",
-
-        "Traffic Prioritization: Critical traffic should receive appropriate QoS priority.",
-
-        "Dynamic Routing: Alternative paths should be used when the primary route becomes congested.",
-
-        "Security Visibility: SDN centralized control can improve network visibility and support security monitoring."
-
-    ]
-
-
-    for point in security_points:
-
-        story.append(
-            Paragraph(
-                "• " + point,
-                body_style
-            )
-        )
-
-
-    security_data = [
-
-        [
-            Paragraph(
-                "<b>SECURITY STATUS</b>",
-                small_style
-            ),
-
-            Paragraph(
-                f"<b>{security_status()}</b>",
-                small_style
-            )
-        ],
-
-        [
-            Paragraph(
-                "<b>ASSESSMENT</b>",
-                small_style
-            ),
-
-            Paragraph(
-                security_assessment(),
-                small_style
-            )
-        ]
-
-    ]
-
-
-    security_table = Table(
-        security_data,
-        colWidths=[
-            40 * mm,
-            110 * mm
-        ]
-    )
-
-
-    security_table.setStyle(
+    info_table.setStyle(
         TableStyle([
 
             (
@@ -1513,224 +823,214 @@ def generate_report():
                 "VALIGN",
                 (0, 0),
                 (-1, -1),
-                "TOP"
-            ),
-
-            (
-                "LEFTPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            ),
-
-            (
-                "RIGHTPADDING",
-                (0, 0),
-                (-1, -1),
-                6
+                "MIDDLE"
             ),
 
             (
                 "TOPPADDING",
                 (0, 0),
                 (-1, -1),
-                6
+                7
             ),
 
             (
                 "BOTTOMPADDING",
                 (0, 0),
                 (-1, -1),
-                6
+                7
             )
-
         ])
     )
 
+    story.append(info_table)
 
-    story.append(security_table)
+    story.append(PageBreak())
 
-    story.append(
-        Spacer(1, 8 * mm)
-    )
-
+    # -----------------------------------------------------
+    # REAL NETWORK STATISTICS
+    # -----------------------------------------------------
 
     story.append(
         Paragraph(
-            "7. Security & Network Recommendations",
+            "1. Real Network Statistics",
             section_style
         )
     )
 
-
-    recommendations = [
-
-        "Maintain continuous monitoring of network traffic.",
-
-        "Investigate links with utilization above 85%.",
-
-        "Use dynamic load balancing during congestion.",
-
-        "Maintain QoS priority for critical applications.",
-
-        "Monitor packet loss and latency trends.",
-
-        "Integrate intrusion detection and prevention mechanisms.",
-
-        "Maintain secure communication between SDN components.",
-
-        "Regularly review network logs and security events."
-
-    ]
-
-
-    for index, item in enumerate(
-        recommendations,
-        start=1
-    ):
-
-        story.append(
-            Paragraph(
-                f"{index}. {item}",
-                body_style
-            )
-        )
-
-
-    story.append(
-        Paragraph(
-            "8. Conclusion",
-            section_style
-        )
-    )
-
-
-    story.append(
-        Paragraph(
-            "The SDN Campus Network Monitoring System provides a "
-            "centralized approach for observing network performance, "
-            "detecting congestion and dynamically managing traffic. "
-            "The integration of real-time monitoring, QoS and load "
-            "balancing improves network visibility and supports "
-            "security-focused network administration.",
-            body_style
-        )
-    )
-
-
-    story.append(
-        Paragraph(
-            "The generated assessment demonstrates how SDN "
-            "technologies can be used to improve campus network "
-            "reliability, performance and cybersecurity awareness.",
-            body_style
-        )
-    )
-
-
-    story.append(
-        Spacer(1, 5 * mm)
-    )
-
-
-    generated_data = [
+    metrics = [
 
         [
             Paragraph(
-                "<b>REPORT GENERATED BY</b>",
+                "<b>METRIC</b>",
+                center_style
+            ),
+
+            Paragraph(
+                "<b>VALUE</b>",
+                center_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Active Interface",
                 small_style
             ),
 
             Paragraph(
-                "POTHURAJU SAI CHARAN TEJ",
+                str(data["interface"]),
                 small_style
             )
         ],
 
         [
             Paragraph(
-                "<b>REGISTER NUMBER</b>",
+                "Gateway",
                 small_style
             ),
 
             Paragraph(
-                "192465048",
+                str(data["gateway"]),
                 small_style
             )
         ],
 
         [
             Paragraph(
-                "<b>DEPARTMENT</b>",
+                "Latency",
                 small_style
             ),
 
             Paragraph(
-                "BE.CSE.CYBER SECURITY",
+                f"{data['latency']} ms",
                 small_style
             )
         ],
 
         [
             Paragraph(
-                "<b>INSTITUTION</b>",
+                "Throughput",
                 small_style
             ),
 
             Paragraph(
-                "SAVEETHA SCHOOL OF ENGINEERING",
+                f"{data['throughput']} Mbps",
                 small_style
             )
         ],
 
         [
             Paragraph(
-                "<b>GENERATED ON</b>",
+                "Packet Loss",
                 small_style
             ),
 
             Paragraph(
-                generated,
+                f"{data['packet_loss']} %",
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Received Packets",
+                small_style
+            ),
+
+            Paragraph(
+                f"{data['received_packets']:,}",
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Sent Packets",
+                small_style
+            ),
+
+            Paragraph(
+                f"{data['sent_packets']:,}",
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Packet Errors",
+                small_style
+            ),
+
+            Paragraph(
+                str(
+                    data["receive_errors"] +
+                    data["send_errors"]
+                ),
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Received Discards",
+                small_style
+            ),
+
+            Paragraph(
+                str(
+                    data["received_discards"]
+                ),
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Sent Discards",
+                small_style
+            ),
+
+            Paragraph(
+                str(
+                    data["sent_discards"]
+                ),
                 small_style
             )
         ]
 
     ]
 
-
-    generated_table = Table(
-        generated_data,
+    metrics_table = Table(
+        metrics,
         colWidths=[
-            45 * mm,
-            105 * mm
+            75 * mm,
+            75 * mm
         ]
     )
 
-
-    generated_table.setStyle(
+    metrics_table.setStyle(
         TableStyle([
 
             (
-                "BOX",
+                "GRID",
                 (0, 0),
                 (-1, -1),
-                0.7,
-                colors.HexColor("#087EA4")
-            ),
-
-            (
-                "INNERGRID",
-                (0, 0),
-                (-1, -1),
-                0.4,
-                colors.HexColor("#AAB8C2")
+                0.6,
+                colors.HexColor("#8999A5")
             ),
 
             (
                 "BACKGROUND",
                 (0, 0),
-                (0, -1),
-                colors.HexColor("#EAF4F8")
+                (-1, 0),
+                colors.HexColor("#087EA4")
+            ),
+
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                colors.white
             ),
 
             (
@@ -1741,97 +1041,217 @@ def generate_report():
             ),
 
             (
-                "LEFTPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            ),
-
-            (
-                "RIGHTPADDING",
-                (0, 0),
-                (-1, -1),
-                6
-            ),
-
-            (
                 "TOPPADDING",
                 (0, 0),
                 (-1, -1),
-                5
+                7
             ),
 
             (
                 "BOTTOMPADDING",
                 (0, 0),
                 (-1, -1),
-                5
+                7
             )
-
         ])
     )
 
+    story.append(metrics_table)
 
-    story.append(generated_table)
+    story.append(PageBreak())
 
-    story.append(
-        Spacer(1, 7 * mm)
-    )
-
+    # -----------------------------------------------------
+    # SDN DEMONSTRATION
+    # -----------------------------------------------------
 
     story.append(
         Paragraph(
-            "END OF REPORT",
-            ParagraphStyle(
-                "EndReport",
-                parent=center_style,
-                fontName="Helvetica-Bold",
-                fontSize=8,
-                textColor=colors.HexColor("#087EA4")
-            )
+            "2. SDN Demonstration Layer",
+            section_style
         )
     )
 
-
-    # =====================================================
-    # BUILD PDF
-    # =====================================================
-
-    document.build(
-        story,
-        onFirstPage=add_page_header_footer,
-        onLaterPages=add_page_header_footer
+    story.append(
+        Paragraph(
+            "S1, S2 and S3 represent the logical SDN "
+            "demonstration topology used for QoS, "
+            "congestion detection and dynamic load balancing.",
+            body_style
+        )
     )
 
+    sdn_table = [
+
+        [
+            Paragraph(
+                "<b>LINK</b>",
+                center_style
+            ),
+
+            Paragraph(
+                "<b>ROLE</b>",
+                center_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "S1 → S2",
+                small_style
+            ),
+
+            Paragraph(
+                "Primary SDN path",
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "S1 → S3",
+                small_style
+            ),
+
+            Paragraph(
+                "Alternate SDN path",
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "S2 → S3",
+                small_style
+            ),
+
+            Paragraph(
+                "Secondary link",
+                small_style
+            )
+        ]
+    ]
+
+    sdn_table_obj = Table(
+        sdn_table,
+        colWidths=[
+            75 * mm,
+            75 * mm
+        ]
+    )
+
+    sdn_table_obj.setStyle(
+        TableStyle([
+
+            (
+                "GRID",
+                (0, 0),
+                (-1, -1),
+                0.6,
+                colors.HexColor("#8999A5")
+            ),
+
+            (
+                "BACKGROUND",
+                (0, 0),
+                (-1, 0),
+                colors.HexColor("#087EA4")
+            ),
+
+            (
+                "TEXTCOLOR",
+                (0, 0),
+                (-1, 0),
+                colors.white
+            )
+        ])
+    )
+
+    story.append(sdn_table_obj)
+
+    story.append(PageBreak())
+
+    # -----------------------------------------------------
+    # CONCLUSION
+    # -----------------------------------------------------
+
+    story.append(
+        Paragraph(
+            "3. Conclusion",
+            section_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "The application monitors the physical network "
+            "connection used by the laptop and measures "
+            "real-time traffic statistics and latency to "
+            "the active network gateway. The logical S1/S2/S3 "
+            "layer is used separately to demonstrate QoS "
+            "and dynamic traffic management.",
+            body_style
+        )
+    )
+
+    story.append(
+        Paragraph(
+            "The latency value is the latest real round-trip "
+            "response time measured from the laptop to the "
+            "currently active network gateway.",
+            body_style
+        )
+    )
+
+    document.build(story)
 
     buffer.seek(0)
-
 
     return send_file(
         buffer,
         as_attachment=True,
-        download_name="SDN_Campus_Network_Security_Report.pdf",
+        download_name="SDN_Real_Network_Report.pdf",
         mimetype="application/pdf"
     )
 
 
 # =========================================================
-# START
+# START SERVER
 # =========================================================
 
 if __name__ == "__main__":
 
     print("--------------------------------------")
-    print(" SDN CAMPUS NETWORK BACKEND")
+    print(" SDN CAMPUS NETWORK MONITOR")
     print("--------------------------------------")
 
-    print("Server running on:")
-    print("http://127.0.0.1:5000")
+    print(
+        "Starting initial network detection..."
+    )
+
+    # First measurement before Flask starts.
+    update_network_cache()
+
+    # Start background monitor.
+    monitor_thread = threading.Thread(
+        target=network_monitor,
+        daemon=True
+    )
+
+    monitor_thread.start()
+
+    print(
+        "Dashboard:"
+    )
+
+    print(
+        "http://127.0.0.1:5000"
+    )
 
     print("--------------------------------------")
 
     app.run(
-        host="0.0.0.0",
-        port=int(os.environ.get("PORT", 5000)),
-        debug=True
+        host="127.0.0.1",
+        port=5000,
+        debug=True,
+        use_reloader=False
     )
