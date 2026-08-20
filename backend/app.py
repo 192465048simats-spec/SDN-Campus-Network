@@ -3,9 +3,12 @@ from flask_cors import CORS
 
 import io
 import os
+import platform
 import socket
+import subprocess
 import threading
 import time
+import urllib.request
 from datetime import datetime
 
 import psutil
@@ -49,32 +52,23 @@ FRONTEND_FOLDER = os.path.join(
 
 network_cache = {
     "connections": 0,
-
     "interface": "Detecting...",
-    "gateway": "Server Network",
-
+    "gateway": "Server Internet",
     "latency": 0,
-
     "link12": 0,
     "link13": 0,
     "link23": 0,
-
     "packet_loss": 0.0,
-
-    "path": "Render Server Network",
-
+    "path": "Server Network",
     "receive_errors": 0,
     "received_bytes": 0,
     "received_discards": 0,
     "received_packets": 0,
-
     "send_errors": 0,
     "sent_bytes": 0,
     "sent_discards": 0,
     "sent_packets": 0,
-
     "status": "STARTING",
-
     "throughput": 0.0
 }
 
@@ -93,47 +87,49 @@ previous_stats = {
 
 
 # =========================================================
-# LATENCY CACHE
+# FIND ACTIVE NETWORK INTERFACE
 # =========================================================
 
-latency_cache = {
-    "value": 0,
-    "time": 0
-}
-
-
-# =========================================================
-# GET ACTIVE SERVER INTERFACE
-# =========================================================
-
-def get_active_interface():
+def find_active_interface():
 
     try:
 
-        counters = psutil.net_io_counters(pernic=True)
+        # Create UDP socket.
+        # No actual data is sent.
+        sock = socket.socket(
+            socket.AF_INET,
+            socket.SOCK_DGRAM
+        )
 
-        if not counters:
-            return "Server Network"
+        sock.settimeout(2)
 
-        best_interface = None
-        best_total = 0
+        try:
+            sock.connect(("8.8.8.8", 80))
+            local_ip = sock.getsockname()[0]
 
-        for interface, stats in counters.items():
+        finally:
+            sock.close()
 
-            total = (
-                stats.bytes_sent +
-                stats.bytes_recv
-            )
+        interfaces = psutil.net_if_addrs()
+        interface_stats = psutil.net_if_stats()
 
-            if total > best_total:
+        for interface_name, addresses in interfaces.items():
 
-                best_total = total
-                best_interface = interface
+            if interface_name not in interface_stats:
+                continue
 
-        if best_interface:
-            return best_interface
+            if not interface_stats[interface_name].isup:
+                continue
 
-        return "Server Network"
+            for address in addresses:
+
+                if (
+                    address.family == socket.AF_INET
+                    and address.address == local_ip
+                ):
+                    return interface_name
+
+        return "Internet"
 
     except Exception as error:
 
@@ -142,82 +138,146 @@ def get_active_interface():
             error
         )
 
-        return "Server Network"
+        return "Internet"
 
 
 # =========================================================
 # GET NETWORK STATISTICS
 # =========================================================
 
-def read_network_statistics():
+def get_network_statistics(interface_name):
 
     counters = psutil.net_io_counters(
         pernic=True
     )
 
-    interface_name = get_active_interface()
-
-    stats = counters.get(
-        interface_name
-    )
+    stats = counters.get(interface_name)
 
     if stats is None:
 
+        # Fallback to all interfaces
         stats = psutil.net_io_counters()
 
-    return interface_name, stats
+    return {
+        "received_bytes": int(
+            stats.bytes_recv
+        ),
+
+        "sent_bytes": int(
+            stats.bytes_sent
+        ),
+
+        "received_packets": int(
+            stats.packets_recv
+        ),
+
+        "sent_packets": int(
+            stats.packets_sent
+        ),
+
+        "receive_errors": int(
+            stats.errin
+        ),
+
+        "send_errors": int(
+            stats.errout
+        ),
+
+        "received_discards": int(
+            stats.dropin
+        ),
+
+        "sent_discards": int(
+            stats.dropout
+        )
+    }
 
 
 # =========================================================
-# REAL SERVER LATENCY
+# INTERNET LATENCY
 # =========================================================
 
-def get_real_latency():
+def get_latency():
 
-    """
-    Measures real TCP connection time from the
-    Render server to a public Internet endpoint.
+    # Try ping first
+    try:
 
-    This does NOT depend on the user's laptop.
-    """
+        system = platform.system().lower()
 
-    targets = [
-        ("1.1.1.1", 443),
-        ("8.8.8.8", 443)
-    ]
+        if system == "windows":
 
-    for host, port in targets:
+            command = [
+                "ping",
+                "-n",
+                "1",
+                "-w",
+                "1500",
+                "1.1.1.1"
+            ]
 
-        try:
+        else:
 
-            start = time.perf_counter()
+            command = [
+                "ping",
+                "-c",
+                "1",
+                "-W",
+                "2",
+                "1.1.1.1"
+            ]
 
-            sock = socket.create_connection(
-                (host, port),
-                timeout=2
-            )
+        start = time.time()
 
-            sock.close()
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            timeout=5
+        )
 
-            elapsed = (
-                time.perf_counter() -
-                start
-            )
+        if result.returncode == 0:
+
+            latency = (
+                time.time() - start
+            ) * 1000
 
             return round(
-                elapsed * 1000,
+                latency,
                 2
             )
 
-        except Exception as error:
+    except Exception:
+        pass
 
-            print(
-                "Latency test failed:",
-                host,
-                error
-            )
 
-    return 0
+    # Fallback: HTTPS request
+    try:
+
+        start = time.time()
+
+        request = urllib.request.Request(
+            "https://www.cloudflare.com/cdn-cgi/trace",
+            method="GET"
+        )
+
+        with urllib.request.urlopen(
+            request,
+            timeout=5
+        ):
+            pass
+
+        latency = (
+            time.time() - start
+        ) * 1000
+
+        return round(
+            latency,
+            2
+        )
+
+    except Exception:
+
+        return 0
 
 
 # =========================================================
@@ -230,64 +290,59 @@ def update_network_cache():
 
     try:
 
-        interface_name, stats = (
-            read_network_statistics()
+        # -------------------------------------------------
+        # ACTIVE INTERFACE
+        # -------------------------------------------------
+
+        interface_name = find_active_interface()
+
+        # -------------------------------------------------
+        # NETWORK STATISTICS
+        # -------------------------------------------------
+
+        stats = get_network_statistics(
+            interface_name
         )
 
         now = time.time()
 
-        # -------------------------------------------------
-        # BYTE COUNTERS
-        # -------------------------------------------------
+        received_bytes = stats[
+            "received_bytes"
+        ]
 
-        received_bytes = int(
-            stats.bytes_recv
-        )
+        sent_bytes = stats[
+            "sent_bytes"
+        ]
 
-        sent_bytes = int(
-            stats.bytes_sent
-        )
+        received_packets = stats[
+            "received_packets"
+        ]
+
+        sent_packets = stats[
+            "sent_packets"
+        ]
+
+        receive_errors = stats[
+            "receive_errors"
+        ]
+
+        send_errors = stats[
+            "send_errors"
+        ]
+
+        received_discards = stats[
+            "received_discards"
+        ]
+
+        sent_discards = stats[
+            "sent_discards"
+        ]
 
         total_bytes = (
             received_bytes +
             sent_bytes
         )
 
-        # -------------------------------------------------
-        # PACKETS
-        # -------------------------------------------------
-
-        received_packets = int(
-            stats.packets_recv
-        )
-
-        sent_packets = int(
-            stats.packets_sent
-        )
-
-        # -------------------------------------------------
-        # ERRORS
-        # -------------------------------------------------
-
-        receive_errors = int(
-            stats.errin
-        )
-
-        send_errors = int(
-            stats.errout
-        )
-
-        # -------------------------------------------------
-        # DISCARDS
-        # -------------------------------------------------
-
-        received_discards = int(
-            stats.dropin
-        )
-
-        sent_discards = int(
-            stats.dropout
-        )
 
         # -------------------------------------------------
         # THROUGHPUT
@@ -295,19 +350,27 @@ def update_network_cache():
 
         throughput = 0.0
 
+        previous_time = previous_stats[
+            "time"
+        ]
+
+        previous_bytes = previous_stats[
+            "total_bytes"
+        ]
+
         if (
-            previous_stats["time"] is not None
-            and previous_stats["total_bytes"] is not None
+            previous_time is not None
+            and previous_bytes is not None
         ):
 
             elapsed = (
                 now -
-                previous_stats["time"]
+                previous_time
             )
 
             byte_difference = (
                 total_bytes -
-                previous_stats["total_bytes"]
+                previous_bytes
             )
 
             if (
@@ -322,27 +385,16 @@ def update_network_cache():
         previous_stats["time"] = now
         previous_stats["total_bytes"] = total_bytes
 
+
         # -------------------------------------------------
         # LATENCY
         # -------------------------------------------------
 
-        if (
-            now -
-            latency_cache["time"]
-            >= 5
-        ):
+        latency = get_latency()
 
-            latency = get_real_latency()
-
-            latency_cache["value"] = latency
-            latency_cache["time"] = now
-
-        else:
-
-            latency = latency_cache["value"]
 
         # -------------------------------------------------
-        # PACKET LOSS
+        # PACKET ERROR RATE
         # -------------------------------------------------
 
         total_packets = (
@@ -355,6 +407,8 @@ def update_network_cache():
             send_errors
         )
 
+        packet_loss = 0.0
+
         if total_packets > 0:
 
             packet_loss = (
@@ -362,42 +416,21 @@ def update_network_cache():
                 total_packets
             ) * 100
 
-        else:
-
-            packet_loss = 0.0
-
         packet_loss = round(
             min(packet_loss, 100),
             2
         )
 
-        # -------------------------------------------------
-        # CONNECTION COUNT
-        # -------------------------------------------------
-
-        try:
-
-            connections = len(
-                psutil.net_connections()
-            )
-
-        except Exception:
-
-            connections = 0
 
         # -------------------------------------------------
         # STATUS
         # -------------------------------------------------
 
-        if latency == 0:
-
-            status = "NETWORK LIMITED"
-
-        elif packet_loss >= 5:
+        if packet_loss >= 5:
 
             status = "ATTENTION REQUIRED"
 
-        elif latency > 150:
+        elif latency > 200:
 
             status = "HIGH LATENCY"
 
@@ -409,38 +442,6 @@ def update_network_cache():
 
             status = "NORMAL"
 
-        # -------------------------------------------------
-        # SDN LINK UTILIZATION
-        # -------------------------------------------------
-
-        # These represent the logical SDN
-        # demonstration topology.
-
-        utilization = min(
-            round(
-                throughput * 2,
-                2
-            ),
-            100
-        )
-
-        link12 = utilization
-
-        link13 = min(
-            round(
-                utilization * 0.75,
-                2
-            ),
-            100
-        )
-
-        link23 = min(
-            round(
-                utilization * 0.50,
-                2
-            ),
-            100
-        )
 
         # -------------------------------------------------
         # NEW DATA
@@ -448,47 +449,62 @@ def update_network_cache():
 
         new_data = {
 
-            "connections": connections,
+            "connections": 0,
 
-            "interface": interface_name,
+            "interface":
+                interface_name,
 
-            "gateway": "Render Internet Gateway",
+            "gateway":
+                "Server Internet",
 
-            "latency": latency,
+            "latency":
+                latency,
 
-            "link12": link12,
+            # Logical SDN demonstration links
+            "link12": 0,
+            "link13": 0,
+            "link23": 0,
 
-            "link13": link13,
+            "packet_loss":
+                packet_loss,
 
-            "link23": link23,
+            "path":
+                "Server Network",
 
-            "packet_loss": packet_loss,
+            "receive_errors":
+                receive_errors,
 
-            "path": "Render Server Network",
+            "received_bytes":
+                received_bytes,
 
-            "receive_errors": receive_errors,
+            "received_discards":
+                received_discards,
 
-            "received_bytes": received_bytes,
+            "received_packets":
+                received_packets,
 
-            "received_discards": received_discards,
+            "send_errors":
+                send_errors,
 
-            "received_packets": received_packets,
+            "sent_bytes":
+                sent_bytes,
 
-            "send_errors": send_errors,
+            "sent_discards":
+                sent_discards,
 
-            "sent_bytes": sent_bytes,
+            "sent_packets":
+                sent_packets,
 
-            "sent_discards": sent_discards,
+            "status":
+                status,
 
-            "sent_packets": sent_packets,
-
-            "status": status,
-
-            "throughput": round(
-                throughput,
-                2
-            )
+            "throughput":
+                round(
+                    throughput,
+                    2
+                )
         }
+
 
         # -------------------------------------------------
         # CACHE
@@ -500,9 +516,9 @@ def update_network_cache():
                 new_data
             )
 
+
         print(
-            "NETWORK UPDATE |",
-            "Interface:",
+            "Network updated:",
             interface_name,
             "| Latency:",
             latency,
@@ -512,10 +528,9 @@ def update_network_cache():
                 throughput,
                 2
             ),
-            "Mbps",
-            "| Connections:",
-            connections
+            "Mbps"
         )
+
 
     except Exception as error:
 
@@ -526,9 +541,9 @@ def update_network_cache():
 
         with cache_lock:
 
-            network_cache["status"] = (
-                "MONITORING ERROR"
-            )
+            network_cache[
+                "status"
+            ] = "MONITORING ERROR"
 
 
 # =========================================================
@@ -538,7 +553,7 @@ def update_network_cache():
 def network_monitor():
 
     print(
-        "Server network monitor started."
+        "Background network monitor started."
     )
 
     while True:
@@ -552,16 +567,18 @@ def network_monitor():
             start
         )
 
+        sleep_time = max(
+            1,
+            2.0 - elapsed
+        )
+
         time.sleep(
-            max(
-                1,
-                2 - elapsed
-            )
+            sleep_time
         )
 
 
 # =========================================================
-# FRONTEND ROUTES
+# HOME PAGE
 # =========================================================
 
 @app.route("/")
@@ -572,6 +589,10 @@ def home():
         "index.html"
     )
 
+
+# =========================================================
+# FRONTEND FILES
+# =========================================================
 
 @app.route("/<path:filename>")
 def frontend_files(filename):
@@ -600,13 +621,13 @@ def network_data():
 # HEALTH CHECK
 # =========================================================
 
-@app.route("/api/health")
+@app.route("/health")
 def health():
 
     return jsonify({
         "status": "online",
-        "service": "SDN Campus Network",
-        "server": "Render"
+        "service": "SDN Campus Network Backend",
+        "time": datetime.now().isoformat()
     })
 
 
@@ -624,66 +645,107 @@ def generate_report():
     buffer = io.BytesIO()
 
     document = SimpleDocTemplate(
+
         buffer,
+
         pagesize=A4,
+
         rightMargin=18 * mm,
+
         leftMargin=18 * mm,
+
         topMargin=18 * mm,
+
         bottomMargin=18 * mm
     )
 
     styles = getSampleStyleSheet()
 
+
     title_style = ParagraphStyle(
+
         "TitleStyle",
+
         parent=styles["Title"],
+
         fontName="Helvetica-Bold",
+
         fontSize=19,
+
         leading=23,
+
         alignment=TA_CENTER,
+
         textColor=colors.HexColor(
             "#087EA4"
         )
     )
 
+
     section_style = ParagraphStyle(
+
         "SectionStyle",
+
         parent=styles["Heading2"],
+
         fontName="Helvetica-Bold",
+
         fontSize=13,
+
         leading=16,
+
         textColor=colors.HexColor(
             "#087EA4"
         ),
+
         spaceBefore=3,
+
         spaceAfter=8
     )
 
+
     body_style = ParagraphStyle(
+
         "BodyStyle",
+
         parent=styles["BodyText"],
+
         fontSize=9.5,
+
         leading=14,
+
         textColor=colors.HexColor(
             "#222222"
         ),
+
         spaceAfter=9
     )
 
+
     small_style = ParagraphStyle(
+
         "SmallStyle",
+
         parent=styles["BodyText"],
+
         fontSize=8,
+
         leading=10
     )
 
+
     center_style = ParagraphStyle(
+
         "CenterStyle",
+
         parent=small_style,
+
         alignment=TA_CENTER
     )
 
+
     story = []
+
 
     # -----------------------------------------------------
     # TITLE
@@ -692,9 +754,10 @@ def generate_report():
     story.append(
         Spacer(
             1,
-            20 * mm
+            25 * mm
         )
     )
+
 
     story.append(
         Paragraph(
@@ -703,17 +766,23 @@ def generate_report():
         )
     )
 
+
     story.append(
         Paragraph(
-            "REAL-TIME NETWORK MONITORING REPORT",
+            "NETWORK MONITORING REPORT",
+
             ParagraphStyle(
-                "Subtitle",
+                "SubTitle",
+
                 parent=body_style,
+
                 alignment=TA_CENTER,
+
                 fontSize=11
             )
         )
     )
+
 
     story.append(
         Spacer(
@@ -722,8 +791,9 @@ def generate_report():
         )
     )
 
+
     # -----------------------------------------------------
-    # SERVER INFORMATION
+    # GENERAL INFORMATION
     # -----------------------------------------------------
 
     info = [
@@ -733,8 +803,9 @@ def generate_report():
                 "<b>MONITORING MODE</b>",
                 small_style
             ),
+
             Paragraph(
-                "RENDER SERVER NETWORK",
+                "SERVER NETWORK",
                 small_style
             )
         ],
@@ -744,19 +815,23 @@ def generate_report():
                 "<b>ACTIVE INTERFACE</b>",
                 small_style
             ),
+
             Paragraph(
-                str(data["interface"]),
+                str(
+                    data["interface"]
+                ),
                 small_style
             )
         ],
 
         [
             Paragraph(
-                "<b>NETWORK PATH</b>",
+                "<b>NETWORK</b>",
                 small_style
             ),
+
             Paragraph(
-                str(data["path"]),
+                "Render Server Internet",
                 small_style
             )
         ],
@@ -766,6 +841,7 @@ def generate_report():
                 "<b>GENERATED</b>",
                 small_style
             ),
+
             Paragraph(
                 datetime.now().strftime(
                     "%d-%m-%Y %H:%M:%S"
@@ -775,15 +851,20 @@ def generate_report():
         ]
     ]
 
+
     info_table = Table(
+
         info,
+
         colWidths=[
             50 * mm,
             100 * mm
         ]
     )
 
+
     info_table.setStyle(
+
         TableStyle([
 
             (
@@ -828,13 +909,16 @@ def generate_report():
         ])
     )
 
+
     story.append(
         info_table
     )
 
+
     story.append(
         PageBreak()
     )
+
 
     # -----------------------------------------------------
     # NETWORK STATISTICS
@@ -842,10 +926,11 @@ def generate_report():
 
     story.append(
         Paragraph(
-            "1. Real-Time Network Statistics",
+            "1. Network Statistics",
             section_style
         )
     )
+
 
     metrics = [
 
@@ -854,6 +939,7 @@ def generate_report():
                 "<b>METRIC</b>",
                 center_style
             ),
+
             Paragraph(
                 "<b>VALUE</b>",
                 center_style
@@ -865,8 +951,11 @@ def generate_report():
                 "Active Interface",
                 small_style
             ),
+
             Paragraph(
-                str(data["interface"]),
+                str(
+                    data["interface"]
+                ),
                 small_style
             )
         ],
@@ -876,6 +965,7 @@ def generate_report():
                 "Latency",
                 small_style
             ),
+
             Paragraph(
                 f"{data['latency']} ms",
                 small_style
@@ -887,6 +977,7 @@ def generate_report():
                 "Throughput",
                 small_style
             ),
+
             Paragraph(
                 f"{data['throughput']} Mbps",
                 small_style
@@ -898,19 +989,9 @@ def generate_report():
                 "Packet Loss",
                 small_style
             ),
+
             Paragraph(
                 f"{data['packet_loss']} %",
-                small_style
-            )
-        ],
-
-        [
-            Paragraph(
-                "Connections",
-                small_style
-            ),
-            Paragraph(
-                str(data["connections"]),
                 small_style
             )
         ],
@@ -920,6 +1001,7 @@ def generate_report():
                 "Received Packets",
                 small_style
             ),
+
             Paragraph(
                 f"{data['received_packets']:,}",
                 small_style
@@ -931,6 +1013,7 @@ def generate_report():
                 "Sent Packets",
                 small_style
             ),
+
             Paragraph(
                 f"{data['sent_packets']:,}",
                 small_style
@@ -942,6 +1025,7 @@ def generate_report():
                 "Packet Errors",
                 small_style
             ),
+
             Paragraph(
                 str(
                     data["receive_errors"]
@@ -950,18 +1034,55 @@ def generate_report():
                 ),
                 small_style
             )
+        ],
+
+        [
+            Paragraph(
+                "Received Discards",
+                small_style
+            ),
+
+            Paragraph(
+                str(
+                    data[
+                        "received_discards"
+                    ]
+                ),
+                small_style
+            )
+        ],
+
+        [
+            Paragraph(
+                "Sent Discards",
+                small_style
+            ),
+
+            Paragraph(
+                str(
+                    data[
+                        "sent_discards"
+                    ]
+                ),
+                small_style
+            )
         ]
     ]
 
+
     metrics_table = Table(
+
         metrics,
+
         colWidths=[
             75 * mm,
             75 * mm
         ]
     )
 
+
     metrics_table.setStyle(
+
         TableStyle([
 
             (
@@ -1013,16 +1134,19 @@ def generate_report():
         ])
     )
 
+
     story.append(
         metrics_table
     )
+
 
     story.append(
         PageBreak()
     )
 
+
     # -----------------------------------------------------
-    # SDN LINKS
+    # SDN DEMONSTRATION
     # -----------------------------------------------------
 
     story.append(
@@ -1032,14 +1156,18 @@ def generate_report():
         )
     )
 
+
     story.append(
         Paragraph(
-            "S1, S2 and S3 represent the logical SDN "
-            "topology used for QoS, congestion detection "
-            "and dynamic load balancing.",
+
+            "S1, S2 and S3 represent the logical "
+            "SDN topology used for QoS, congestion "
+            "detection and dynamic load balancing.",
+
             body_style
         )
     )
+
 
     sdn_table = [
 
@@ -1048,8 +1176,9 @@ def generate_report():
                 "<b>LINK</b>",
                 center_style
             ),
+
             Paragraph(
-                "<b>UTILIZATION</b>",
+                "<b>ROLE</b>",
                 center_style
             )
         ],
@@ -1059,8 +1188,9 @@ def generate_report():
                 "S1 → S2",
                 small_style
             ),
+
             Paragraph(
-                f"{data['link12']} %",
+                "Primary SDN path",
                 small_style
             )
         ],
@@ -1070,8 +1200,9 @@ def generate_report():
                 "S1 → S3",
                 small_style
             ),
+
             Paragraph(
-                f"{data['link13']} %",
+                "Alternate SDN path",
                 small_style
             )
         ],
@@ -1081,22 +1212,28 @@ def generate_report():
                 "S2 → S3",
                 small_style
             ),
+
             Paragraph(
-                f"{data['link23']} %",
+                "Secondary link",
                 small_style
             )
         ]
     ]
 
+
     sdn_table_obj = Table(
+
         sdn_table,
+
         colWidths=[
             75 * mm,
             75 * mm
         ]
     )
 
+
     sdn_table_obj.setStyle(
+
         TableStyle([
 
             (
@@ -1127,13 +1264,16 @@ def generate_report():
         ])
     )
 
+
     story.append(
         sdn_table_obj
     )
 
+
     story.append(
         PageBreak()
     )
+
 
     # -----------------------------------------------------
     # CONCLUSION
@@ -1146,58 +1286,58 @@ def generate_report():
         )
     )
 
+
     story.append(
         Paragraph(
-            "The deployed application measures network "
-            "statistics from the Render server itself. "
-            "It does not depend on the network adapter, "
-            "PowerShell, gateway or operating system of "
-            "the user's laptop.",
+
+            "The application monitors the network "
+            "environment of the server running the "
+            "SDN Campus Network application. The "
+            "network statistics are collected using "
+            "the cross-platform psutil library.",
+
             body_style
         )
     )
 
+
     story.append(
         Paragraph(
+
             "The S1/S2/S3 layer represents the logical "
-            "SDN demonstration topology used for QoS "
-            "and dynamic traffic management.",
+            "SDN demonstration topology used to "
+            "demonstrate QoS and dynamic traffic "
+            "management concepts.",
+
             body_style
         )
     )
+
 
     document.build(
         story
     )
 
+
     buffer.seek(0)
 
+
     return send_file(
+
         buffer,
+
         as_attachment=True,
+
         download_name=(
             "SDN_Real_Network_Report.pdf"
         ),
+
         mimetype="application/pdf"
     )
 
 
 # =========================================================
-# STARTUP
-# =========================================================
-
-def start_monitor():
-
-    thread = threading.Thread(
-        target=network_monitor,
-        daemon=True
-    )
-
-    thread.start()
-
-
-# =========================================================
-# MAIN
+# START SERVER
 # =========================================================
 
 if __name__ == "__main__":
@@ -1207,27 +1347,49 @@ if __name__ == "__main__":
     print("--------------------------------------")
 
     print(
-        "Starting server network monitoring..."
+        "Starting network detection..."
     )
 
+    # First measurement
     update_network_cache()
 
-    start_monitor()
 
-    port = int(
-        os.environ.get(
-            "PORT",
-            5000
-        )
+    # Background monitor
+    monitor_thread = threading.Thread(
+        target=network_monitor,
+        daemon=True
+    )
+
+    monitor_thread.start()
+
+
+    print(
+        "Dashboard server starting..."
     )
 
     print(
-        f"Starting Flask on port {port}"
+        "Port:",
+        os.environ.get(
+            "PORT",
+            "5000"
+        )
     )
 
+    print("--------------------------------------")
+
+
     app.run(
+
         host="0.0.0.0",
-        port=port,
+
+        port=int(
+            os.environ.get(
+                "PORT",
+                5000
+            )
+        ),
+
         debug=False,
+
         use_reloader=False
     )
