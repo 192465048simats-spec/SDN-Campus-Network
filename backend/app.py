@@ -1339,6 +1339,30 @@ def generate_report():
 # =========================================================
 # START SERVER
 # =========================================================
+# =========================================================
+# START BACKGROUND MONITOR FOR GUNICORN / RENDER
+# =========================================================
+
+monitor_started = False
+monitor_start_lock = threading.Lock()
+
+
+@app.before_request
+def start_monitor_if_needed():
+    global monitor_started
+
+    if not monitor_started:
+        with monitor_start_lock:
+            if not monitor_started:
+                print("Starting background network monitor...")
+                
+                monitor_thread = threading.Thread(
+                    target=network_monitor,
+                    daemon=True
+                )
+
+                monitor_thread.start()
+                monitor_started = True
 
 if __name__ == "__main__":
 
