@@ -6,9 +6,13 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>SDN Network Reports</title>
+<title>SDN Campus Network Reports</title>
 
 <style>
+
+/* =====================================================
+   GLOBAL
+===================================================== */
 
 * {
     box-sizing: border-box;
@@ -35,10 +39,15 @@ body {
     min-height: 100vh;
 }
 
-/* MENU */
+
+/* =====================================================
+   MENU BUTTON
+===================================================== */
 
 .menu-btn {
-    position: absolute;
+
+    position: fixed;
+
     top: 20px;
     left: 20px;
 
@@ -46,31 +55,43 @@ body {
     height: 48px;
 
     border-radius: 12px;
+
     border: 1px solid #155e75;
 
     background: #07141d;
+
     color: #22d3ee;
 
     font-size: 23px;
+
     cursor: pointer;
+
     z-index: 1001;
+
+    transition: 0.25s;
 }
 
 .menu-btn:hover {
+
     background: #0c2633;
+
     transform: scale(1.05);
 }
 
-/* SIDEBAR */
+
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
 .sidebar {
-    position: absolute;
+
+    position: fixed;
 
     top: 0;
     left: -280px;
 
     width: 280px;
-    min-height: 100vh;
+    height: 100vh;
 
     background:
         linear-gradient(
@@ -85,56 +106,75 @@ body {
 
     z-index: 1000;
 
-    transition: .35s;
+    transition: 0.35s;
 
-    box-shadow: 8px 0 30px rgba(0,0,0,.6);
+    box-shadow:
+        8px 0 30px rgba(0,0,0,.6);
 }
 
 .sidebar.open {
+
     left: 0;
 }
 
 .sidebar-title {
+
     text-align: center;
+
     color: #22d3ee;
+
     font-weight: bold;
+
     letter-spacing: 1px;
+
     margin-bottom: 30px;
 }
 
 .sidebar a {
+
     display: block;
 
     padding: 14px 15px;
+
     margin-bottom: 7px;
 
     text-decoration: none;
+
     color: #94a3b8;
 
     border-left: 3px solid transparent;
+
     border-radius: 9px;
 
-    transition: .25s;
+    transition: 0.25s;
 }
 
 .sidebar a:hover,
 .sidebar a.active {
+
     color: #67e8f9;
 
     background:
         rgba(34,211,238,.07);
 
-    border-left-color: #22d3ee;
+    border-left-color:
+        #22d3ee;
 
     padding-left: 22px;
 }
 
-/* HEADER */
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .header {
-    padding: 30px 30px 25px 90px;
 
-    border-bottom: 1px solid #164e63;
+    padding:
+        30px 30px 25px 90px;
+
+    border-bottom:
+        1px solid #164e63;
 
     background:
         linear-gradient(
@@ -145,58 +185,89 @@ body {
 }
 
 .header h1 {
+
     margin: 0;
+
     font-size: 30px;
+
+    color: #f8fafc;
 }
 
 .header h1 span {
+
     color: #22d3ee;
 }
 
 .header p {
+
     color: #64748b;
+
     margin-top: 8px;
 }
 
-/* CONTAINER */
+
+/* =====================================================
+   MAIN CONTAINER
+===================================================== */
 
 .container {
+
     width: 94%;
+
     max-width: 1200px;
 
-    margin: 25px auto 50px;
+    margin:
+        25px auto 50px;
 }
 
-/* PANEL */
+
+/* =====================================================
+   PANEL
+===================================================== */
 
 .panel {
+
     margin-bottom: 20px;
 
     padding: 22px;
 
-    background: rgba(5,10,20,.97);
+    background:
+        rgba(5,10,20,.97);
 
-    border: 1px solid #1e293b;
+    border:
+        1px solid #1e293b;
 
     border-radius: 15px;
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.20);
 }
 
 .panel h2 {
+
     margin-top: 0;
+
     color: #f1f5f9;
 }
 
 .subtitle {
+
     margin-top: 6px;
+
     margin-bottom: 18px;
 
     color: #64748b;
+
     font-size: 12px;
 }
 
-/* CARDS */
+
+/* =====================================================
+   NETWORK CARDS
+===================================================== */
 
 .cards {
+
     display: grid;
 
     grid-template-columns:
@@ -206,82 +277,125 @@ body {
 }
 
 .card {
-    padding: 18px;
 
-    border: 1px solid #164e63;
+    padding: 20px;
+
+    border:
+        1px solid #164e63;
 
     border-radius: 12px;
 
-    background: #07111c;
+    background:
+        linear-gradient(
+            145deg,
+            #071521,
+            #06101a
+        );
+
+    min-height: 120px;
 }
 
 .card-title {
+
     color: #64748b;
 
     font-size: 10px;
 
     text-transform: uppercase;
+
+    letter-spacing: 1px;
 }
 
 .card-value {
-    margin-top: 8px;
+
+    margin-top: 12px;
 
     color: #22d3ee;
 
-    font-size: 24px;
+    font-size: 23px;
 
     font-weight: bold;
+
+    word-break: break-word;
 }
 
-/* TABLE */
+
+/* =====================================================
+   TABLE
+===================================================== */
 
 .link-table {
+
     width: 100%;
-    border-collapse: collapse;
+
+    border-collapse:
+        collapse;
 }
 
 .link-table th,
 .link-table td {
-    padding: 13px;
 
-    border: 1px solid #263850;
+    padding: 14px;
+
+    border:
+        1px solid #263850;
 
     text-align: left;
 }
 
 .link-table th {
-    background: #0b3b58;
+
+    background:
+        #0b3b58;
+
     color: white;
+
+    font-size: 12px;
 }
 
 .link-table td {
-    background: #08131f;
+
+    background:
+        #08131f;
+
+    font-size: 13px;
 }
 
 .utilization {
+
     font-weight: bold;
+
+    color: #67e8f9;
 }
 
 .green {
-    color: #4ade80;
+
+    color: #4ade80 !important;
 }
 
 .yellow {
-    color: #fbbf24;
+
+    color: #fbbf24 !important;
 }
 
 .red {
-    color: #f87171;
+
+    color: #f87171 !important;
 }
 
-/* BARS */
+
+/* =====================================================
+   PROGRESS BAR
+===================================================== */
 
 .bar-background {
+
     width: 100%;
 
-    height: 9px;
+    height: 10px;
 
-    background: #142033;
+    background:
+        #142033;
 
     border-radius: 20px;
 
@@ -289,6 +403,7 @@ body {
 }
 
 .bar {
+
     height: 100%;
 
     width: 0%;
@@ -296,157 +411,176 @@ body {
     border-radius: 20px;
 
     transition:
-        width .5s,
-        background .5s;
+        width .5s ease;
 }
 
-/* UPDATE */
+
+/* =====================================================
+   UPDATE TEXT
+===================================================== */
 
 .update {
-    margin-top: 12px;
+
+    margin-top: 14px;
 
     color: #64748b;
 
     font-size: 11px;
 }
 
-/* BUTTON */
+
+/* =====================================================
+   BUTTON AREA
+===================================================== */
+
+.report-actions {
+
+    display: flex;
+
+    gap: 12px;
+
+    flex-wrap: wrap;
+
+    margin-top: 20px;
+}
+
+
+/* =====================================================
+   GENERATE BUTTON
+===================================================== */
 
 .generate-btn {
-    margin-top: 12px;
 
-    padding: 12px 18px;
+    padding:
+        13px 20px;
 
-    border: 1px solid #0e7490;
+    border:
+        1px solid #0e7490;
 
     border-radius: 8px;
 
-    background: #071c27;
+    background:
+        linear-gradient(
+            135deg,
+            #083344,
+            #071c27
+        );
 
-    color: #67e8f9;
+    color:
+        #67e8f9;
 
-    font-weight: bold;
+    font-weight:
+        bold;
 
-    cursor: pointer;
+    cursor:
+        pointer;
+
+    transition:
+        .25s;
 }
 
 .generate-btn:hover {
-    background: #155e75;
-    color: white;
+
+    background:
+        #155e75;
+
+    color:
+        white;
+
+    transform:
+        translateY(-1px);
 }
 
-/* STATUS */
 
-.connection-status {
-    margin-top: 12px;
+/* =====================================================
+   REFRESH BUTTON
+===================================================== */
 
-    padding: 10px 12px;
+.refresh-btn {
+
+    padding:
+        13px 20px;
+
+    border:
+        1px solid #334155;
 
     border-radius: 8px;
 
-    background: #07111c;
+    background:
+        #111827;
 
-    color: #64748b;
+    color:
+        #cbd5e1;
+
+    font-weight:
+        bold;
+
+    cursor:
+        pointer;
+}
+
+.refresh-btn:hover {
+
+    background:
+        #1e293b;
+}
+
+
+/* =====================================================
+   STATUS BOX
+===================================================== */
+
+.status-box {
+
+    margin-top: 15px;
+
+    padding: 14px;
+
+    border:
+        1px solid #164e63;
+
+    border-radius: 9px;
+
+    background:
+        rgba(8,47,73,.25);
+
+    color:
+        #94a3b8;
 
     font-size: 12px;
 }
 
-/* RESPONSIVE */
+
+/* =====================================================
+   RESPONSIVE
+===================================================== */
 
 @media(max-width:900px) {
 
     .cards {
+
         grid-template-columns:
             repeat(2,1fr);
     }
-
 }
 
 @media(max-width:600px) {
 
     .cards {
-        grid-template-columns: 1fr;
+
+        grid-template-columns:
+            1fr;
     }
 
     .header {
-        padding-left: 80px;
+
+        padding-left:
+            80px;
     }
 
-}
+    .link-table {
 
-/* PRINT */
-
-@media print {
-
-    body {
-        background: white !important;
-        color: black !important;
-    }
-
-    .menu-btn,
-    .sidebar,
-    .generate-btn,
-    .connection-status {
-        display: none !important;
-    }
-
-    .header {
-        background: white !important;
-        border-bottom: 2px solid #333;
-        padding-left: 20px;
-    }
-
-    .header h1,
-    .header h1 span {
-        color: black !important;
-    }
-
-    .header p {
-        color: #555 !important;
-    }
-
-    .container {
-        width: 100%;
-        max-width: none;
-    }
-
-    .panel {
-        background: white !important;
-        border: 1px solid #999;
-        color: black;
-        page-break-inside: avoid;
-    }
-
-    .panel h2 {
-        color: black;
-    }
-
-    .subtitle,
-    .update {
-        color: #555;
-    }
-
-    .card {
-        background: white !important;
-        border: 1px solid #999;
-    }
-
-    .card-title {
-        color: #555;
-    }
-
-    .card-value {
-        color: black;
-    }
-
-    .link-table th {
-        background: #ddd;
-        color: black;
-    }
-
-    .link-table td {
-        background: white;
-        color: black;
+        font-size: 11px;
     }
 
 }
@@ -455,10 +589,13 @@ body {
 
 </head>
 
+
 <body>
 
 
-<!-- MENU -->
+<!-- =====================================================
+     MENU
+===================================================== -->
 
 <button
     class="menu-btn"
@@ -469,35 +606,45 @@ body {
 </button>
 
 
-<!-- SIDEBAR -->
+<!-- =====================================================
+     SIDEBAR
+===================================================== -->
 
 <div
     class="sidebar"
     id="sidebar">
 
     <div class="sidebar-title">
+
         🛡️ SDN CAMPUS NETWORK
+
     </div>
+
 
     <a href="index.html">
         🏠 Dashboard
     </a>
 
+
     <a href="topology.html">
         🌐 Network Topology
     </a>
+
 
     <a href="monitoring.html">
         📊 Live Monitoring
     </a>
 
+
     <a href="qos.html">
         ⚡ QoS & Load Balancing
     </a>
 
+
     <a href="security.html">
         🛡️ Security Center
     </a>
+
 
     <a
         href="reports.html"
@@ -507,6 +654,7 @@ body {
 
     </a>
 
+
     <a href="admin.html">
         ⚙️ Admin Control Center
     </a>
@@ -514,45 +662,63 @@ body {
 </div>
 
 
-<!-- HEADER -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="header">
 
     <h1>
+
         📄 SDN Campus
         <span>Network Reports</span>
+
     </h1>
 
+
     <p>
-        Real network statistics and current SDN
-        traffic-utilization information.
+
+        Professional network performance,
+        QoS and dynamic load-balancing analysis.
+
     </p>
 
 </header>
 
 
+<!-- =====================================================
+     MAIN
+===================================================== -->
+
 <main class="container">
 
 
-<!-- NETWORK SUMMARY -->
+<!-- =====================================================
+     NETWORK SUMMARY
+===================================================== -->
 
 <section class="panel">
 
     <h2>
-        📡 Real Network Summary
+        📡 Physical Network Summary
     </h2>
 
+
     <div class="subtitle">
-        Latest physical network information.
+
+        Current measurements obtained from
+        the network monitoring service.
+
     </div>
 
 
     <div class="cards">
 
+
         <div class="card">
 
             <div class="card-title">
-                Interface
+                Network Interface
             </div>
 
             <div
@@ -616,21 +782,24 @@ body {
 
         </div>
 
+
     </div>
 
 
     <div
-        class="connection-status"
-        id="connectionStatus">
+        class="status-box"
+        id="networkStatus">
 
-        Network monitoring initialized.
+        ● Monitoring network status...
 
     </div>
 
 </section>
 
 
-<!-- SDN LINK UTILIZATION -->
+<!-- =====================================================
+     SDN UTILIZATION
+===================================================== -->
 
 <section class="panel">
 
@@ -638,22 +807,37 @@ body {
         🔗 SDN Link Utilization
     </h2>
 
+
     <div class="subtitle">
-        Current logical SDN link utilization from the
-        QoS/load-balancing demonstration.
+
+        Logical link utilization used for
+        QoS monitoring and dynamic load balancing.
+
     </div>
 
 
     <table class="link-table">
 
+
         <thead>
 
             <tr>
 
-                <th>Link</th>
-                <th>Utilization</th>
-                <th>Status</th>
-                <th>Visual</th>
+                <th>
+                    SDN Link
+                </th>
+
+                <th>
+                    Utilization
+                </th>
+
+                <th>
+                    Status
+                </th>
+
+                <th>
+                    Utilization Level
+                </th>
 
             </tr>
 
@@ -661,6 +845,7 @@ body {
 
 
         <tbody>
+
 
             <tr>
 
@@ -778,6 +963,7 @@ body {
 
             </tr>
 
+
         </tbody>
 
     </table>
@@ -794,51 +980,67 @@ body {
 </section>
 
 
-<!-- REPORT -->
+<!-- =====================================================
+     REPORT GENERATION
+===================================================== -->
 
 <section class="panel">
 
+
     <h2>
-        📊 Report Information
+        📊 Professional Report Generation
     </h2>
+
 
     <div class="subtitle">
 
-        The report separates the physical network
-        measurements from the logical SDN demonstration.
+        Generate a structured network performance
+        report containing physical network,
+        SDN utilization and QoS analysis.
 
     </div>
 
 
-    <p style="color:#94a3b8;line-height:1.7;">
+    <p
+        style="
+        color:#94a3b8;
+        line-height:1.8;
+        ">
 
-        <strong style="color:#22d3ee;">
-            Physical network:
-        </strong>
+        The report captures the current network
+        interface, throughput, latency, packet loss,
+        SDN link utilization and operational status.
 
-        Interface, throughput, latency, packet loss,
-        packet errors and discards.
-
-        <br><br>
-
-        <strong style="color:#22d3ee;">
-            SDN layer:
-        </strong>
-
-        S1 → S2, S1 → S3 and S2 → S3
-        utilization values used for QoS and
-        dynamic load balancing.
+        It also provides a professional analysis
+        suitable for project demonstration and
+        academic presentation.
 
     </p>
 
 
-    <button
-        class="generate-btn"
-        onclick="generatePDF()">
+    <div class="report-actions">
 
-        📥 Generate PDF Report
 
-    </button>
+        <button
+            class="generate-btn"
+            onclick="generatePDF()">
+
+            📥 Generate Professional Report
+
+        </button>
+
+
+        <button
+            class="refresh-btn"
+            onclick="refreshReport()">
+
+            🔄 Refresh Data
+
+        </button>
+
+
+    </div>
+
 
 </section>
 
@@ -848,7 +1050,9 @@ body {
 
 <script>
 
-/* MENU */
+/* =====================================================
+   SIDEBAR
+===================================================== */
 
 function toggleMenu() {
 
@@ -860,7 +1064,9 @@ function toggleMenu() {
 }
 
 
-/* REAL NETWORK */
+/* =====================================================
+   LOAD REAL NETWORK
+===================================================== */
 
 async function loadRealNetwork() {
 
@@ -877,7 +1083,11 @@ async function loadRealNetwork() {
 
 
         if (!response.ok) {
-            throw new Error("API Error");
+
+            throw new Error(
+                "Network API unavailable"
+            );
+
         }
 
 
@@ -894,28 +1104,28 @@ async function loadRealNetwork() {
         document.getElementById(
             "throughput"
         ).innerText =
-            (data.throughput || 0) +
-            " Mbps";
+            (data.throughput || 0)
+            + " Mbps";
 
 
         document.getElementById(
             "latency"
         ).innerText =
-            (data.latency || 0) +
-            " ms";
+            (data.latency || 0)
+            + " ms";
 
 
         document.getElementById(
             "packetLoss"
         ).innerText =
-            (data.packet_loss || 0) +
-            " %";
+            (data.packet_loss || 0)
+            + " %";
 
 
         document.getElementById(
-            "connectionStatus"
+            "networkStatus"
         ).innerText =
-            "● Live network data connected";
+            "● Network monitoring service ACTIVE";
 
 
     }
@@ -923,92 +1133,75 @@ async function loadRealNetwork() {
     catch(error) {
 
         console.log(
-            "Network API unavailable."
+            "Network API error:",
+            error
         );
 
-
-        /*
-        If the backend API is not running,
-        keep demonstration values.
-        */
 
         document.getElementById(
             "interface"
         ).innerText =
-            "Demo Interface";
+            "Local Network";
 
 
         document.getElementById(
-            "throughput"
+            "networkStatus"
         ).innerText =
-            "125 Mbps";
-
-
-        document.getElementById(
-            "latency"
-        ).innerText =
-            "12 ms";
-
-
-        document.getElementById(
-            "packetLoss"
-        ).innerText =
-            "0.2 %";
-
-
-        document.getElementById(
-            "connectionStatus"
-        ).innerText =
-            "● Demo network data active";
+            "● SDN report page active — physical network API unavailable";
 
     }
 
 }
 
 
-/* SDN STATE */
+/* =====================================================
+   LOAD SDN DATA
+===================================================== */
 
 function loadSDNLinks() {
 
-    let saved =
+    let data = {
+
+        link12: 35,
+
+        link13: 25,
+
+        link23: 45,
+
+        updated:
+            new Date().toLocaleTimeString()
+
+    };
+
+
+    const saved =
         localStorage.getItem(
             "sdnLinkUtilization"
         );
 
 
-    let data;
-
-
-    if (saved) {
+    if(saved) {
 
         try {
 
-            data =
+            const parsed =
                 JSON.parse(saved);
+
+            data =
+                Object.assign(
+                    data,
+                    parsed
+                );
 
         }
 
         catch(error) {
 
-            data = {
-                link12: 35,
-                link13: 25,
-                link23: 45,
-                updated: "Default"
-            };
+            console.log(
+                "Invalid saved SDN data"
+            );
 
         }
-
-    }
-
-    else {
-
-        data = {
-            link12: 35,
-            link13: 25,
-            link23: 45,
-            updated: "Default"
-        };
 
     }
 
@@ -1034,13 +1227,17 @@ function loadSDNLinks() {
     document.getElementById(
         "sdnUpdate"
     ).innerText =
-        "Last QoS demonstration update: " +
+
+        "Last QoS demonstration update: "
+        +
         (data.updated || "Not available");
 
 }
 
 
-/* UPDATE SDN LINK */
+/* =====================================================
+   UPDATE SDN LINK
+===================================================== */
 
 function updateSDNLink(
     number,
@@ -1049,6 +1246,14 @@ function updateSDNLink(
 
     value =
         Number(value) || 0;
+
+
+    if(value < 0)
+        value = 0;
+
+
+    if(value > 100)
+        value = 100;
 
 
     document.getElementById(
@@ -1080,7 +1285,7 @@ function updateSDNLink(
     );
 
 
-    if (value >= 85) {
+    if(value >= 85) {
 
         bar.style.background =
             "#ef4444";
@@ -1088,12 +1293,13 @@ function updateSDNLink(
         status.innerText =
             "CONGESTED";
 
-        status.className =
-            "red";
+        status.classList.add(
+            "red"
+        );
 
     }
 
-    else if (value >= 60) {
+    else if(value >= 60) {
 
         bar.style.background =
             "#f59e0b";
@@ -1101,8 +1307,9 @@ function updateSDNLink(
         status.innerText =
             "WARNING";
 
-        status.className =
-            "yellow";
+        status.classList.add(
+            "yellow"
+        );
 
     }
 
@@ -1114,94 +1321,130 @@ function updateSDNLink(
         status.innerText =
             "NORMAL";
 
-        status.className =
-            "green";
+        status.classList.add(
+            "green"
+        );
 
     }
 
 }
 
 
-/* GENERATE PDF */
+/* =====================================================
+   REFRESH
+===================================================== */
+
+function refreshReport() {
+
+    loadRealNetwork();
+
+    loadSDNLinks();
+
+}
+
+
+/* =====================================================
+   GENERATE PROFESSIONAL REPORT
+===================================================== */
 
 function generatePDF() {
 
-    /*
-    Instead of opening
-    http://127.0.0.1:5000/api/report,
-    create the report directly in the browser.
-    */
-
-    const interfaceName =
-        document.getElementById(
-            "interface"
-        ).innerText;
-
-    const throughput =
-        document.getElementById(
-            "throughput"
-        ).innerText;
-
-    const latency =
-        document.getElementById(
-            "latency"
-        ).innerText;
-
-    const packetLoss =
-        document.getElementById(
-            "packetLoss"
-        ).innerText;
-
-    const link12 =
-        document.getElementById(
-            "link12"
-        ).innerText;
-
-    const link13 =
-        document.getElementById(
-            "link13"
-        ).innerText;
-
-    const link23 =
-        document.getElementById(
-            "link23"
-        ).innerText;
-
-    const status12 =
-        document.getElementById(
-            "status12"
-        ).innerText;
-
-    const status13 =
-        document.getElementById(
-            "status13"
-        ).innerText;
-
-    const status23 =
-        document.getElementById(
-            "status23"
-        ).innerText;
+    try {
 
 
-    const reportWindow =
-        window.open(
-            "",
-            "_blank"
-        );
+        /* GET VALUES */
+
+        const interfaceName =
+            document.getElementById(
+                "interface"
+            ).innerText;
 
 
-    if (!reportWindow) {
-
-        alert(
-            "Please allow pop-ups for this website."
-        );
-
-        return;
-
-    }
+        const throughput =
+            document.getElementById(
+                "throughput"
+            ).innerText;
 
 
-    reportWindow.document.write(`
+        const latency =
+            document.getElementById(
+                "latency"
+            ).innerText;
+
+
+        const packetLoss =
+            document.getElementById(
+                "packetLoss"
+            ).innerText;
+
+
+        const link12 =
+            document.getElementById(
+                "link12"
+            ).innerText;
+
+
+        const link13 =
+            document.getElementById(
+                "link13"
+            ).innerText;
+
+
+        const link23 =
+            document.getElementById(
+                "link23"
+            ).innerText;
+
+
+        const status12 =
+            document.getElementById(
+                "status12"
+            ).innerText;
+
+
+        const status13 =
+            document.getElementById(
+                "status13"
+            ).innerText;
+
+
+        const status23 =
+            document.getElementById(
+                "status23"
+            ).innerText;
+
+
+        const reportDate =
+            new Date()
+            .toLocaleString();
+
+
+        /* OPEN WINDOW */
+
+        const reportWindow =
+            window.open(
+                "",
+                "_blank"
+            );
+
+
+        if(!reportWindow) {
+
+            alert(
+                "Please allow pop-ups for this website."
+            );
+
+            return;
+
+        }
+
+
+        /* REPORT */
+
+        reportWindow.document.open();
+
+
+        reportWindow.document.write(`
 
 <!DOCTYPE html>
 
@@ -1209,90 +1452,257 @@ function generatePDF() {
 
 <head>
 
-<title>SDN Campus Network Report</title>
+<meta charset="UTF-8">
+
+<title>
+SDN Campus Network Professional Report
+</title>
+
 
 <style>
 
+* {
+    box-sizing: border-box;
+}
+
 body {
+
+    margin: 0;
+
+    background: #e2e8f0;
 
     font-family:
         Arial,
+        Helvetica,
         sans-serif;
 
-    margin: 40px;
-
-    color: #111827;
-
+    color: #1e293b;
 }
 
-h1 {
 
-    text-align: center;
+/* REPORT PAGE */
 
-    margin-bottom: 5px;
+.report {
 
+    width: 900px;
+
+    margin: 30px auto;
+
+    background: white;
+
+    padding: 45px;
+
+    box-shadow:
+        0 10px 35px
+        rgba(0,0,0,.15);
 }
 
-h2 {
 
-    margin-top: 30px;
+/* ACTIONS */
+
+.actions {
+
+    position: fixed;
+
+    top: 15px;
+
+    right: 20px;
+
+    z-index: 10;
+}
+
+.actions button {
+
+    border: none;
+
+    padding:
+        10px 16px;
+
+    margin-left: 6px;
+
+    border-radius: 6px;
+
+    background: #0e7490;
+
+    color: white;
+
+    font-weight: bold;
+
+    cursor: pointer;
+}
+
+.actions button:hover {
+
+    background: #155e75;
+}
+
+
+/* HEADER */
+
+.report-header {
 
     border-bottom:
-        2px solid #333;
+        4px solid #0e7490;
 
-    padding-bottom: 8px;
+    padding-bottom: 22px;
 
+    margin-bottom: 25px;
 }
 
-.subtitle {
+.report-header h1 {
 
-    text-align: center;
+    margin: 0;
 
-    color: #555;
+    font-size: 28px;
 
-    margin-bottom: 30px;
+    color: #0f172a;
 
+    letter-spacing: .5px;
 }
 
-.info {
+.report-header h2 {
+
+    margin:
+        8px 0;
+
+    font-size: 19px;
+
+    color: #0e7490;
+}
+
+.report-header p {
+
+    margin: 0;
+
+    color: #64748b;
+
+    font-size: 12px;
+}
+
+
+/* META */
+
+.meta {
 
     display: grid;
 
     grid-template-columns:
-        repeat(2, 1fr);
+        1fr 1fr;
 
-    gap: 15px;
+    gap: 12px;
 
+    margin-bottom: 30px;
 }
 
-.box {
+.meta-box {
 
     border:
-        1px solid #aaa;
+        1px solid #dbe3ea;
 
-    padding: 15px;
+    background:
+        #f8fafc;
 
-    border-radius: 8px;
+    padding: 13px;
 
+    border-radius: 6px;
 }
 
-.label {
+.meta-label {
 
-    font-size: 12px;
+    font-size: 10px;
 
-    color: #666;
+    text-transform:
+        uppercase;
 
+    color: #64748b;
+
+    margin-bottom: 5px;
 }
 
-.value {
-
-    font-size: 22px;
+.meta-value {
 
     font-weight: bold;
 
-    margin-top: 5px;
+    color: #0f172a;
 
+    font-size: 12px;
 }
+
+
+/* SECTION */
+
+.section {
+
+    margin-top: 30px;
+}
+
+.section-title {
+
+    font-size: 17px;
+
+    font-weight: bold;
+
+    color: #0f172a;
+
+    border-left:
+        4px solid #0e7490;
+
+    padding-left: 10px;
+
+    margin-bottom: 15px;
+}
+
+
+/* SUMMARY */
+
+.summary {
+
+    display: grid;
+
+    grid-template-columns:
+        repeat(4,1fr);
+
+    gap: 10px;
+}
+
+.summary-card {
+
+    padding: 15px;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid #dbe3ea;
+
+    border-radius: 6px;
+
+    text-align: center;
+}
+
+.summary-label {
+
+    font-size: 9px;
+
+    color: #64748b;
+
+    text-transform:
+        uppercase;
+}
+
+.summary-value {
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+    color: #0e7490;
+
+    margin-top: 6px;
+}
+
+
+/* TABLE */
 
 table {
 
@@ -1301,70 +1711,99 @@ table {
     border-collapse:
         collapse;
 
-    margin-top: 15px;
-
-}
-
-th, td {
-
-    border:
-        1px solid #999;
-
-    padding: 12px;
-
-    text-align: left;
-
+    margin-top: 10px;
 }
 
 th {
 
     background:
-        #e5e7eb;
+        #0f3d56;
 
+    color: white;
+
+    padding: 12px;
+
+    text-align: left;
+
+    font-size: 11px;
 }
 
-.normal {
+td {
 
-    color: green;
+    padding: 12px;
 
-    font-weight: bold;
+    border-bottom:
+        1px solid #e2e8f0;
 
+    font-size: 11px;
 }
 
-.warning {
 
-    color: orange;
+/* ANALYSIS */
 
-    font-weight: bold;
+.analysis {
 
+    padding: 18px;
+
+    background:
+        #f8fafc;
+
+    border:
+        1px solid #e2e8f0;
+
+    border-radius: 6px;
+
+    font-size: 12px;
+
+    line-height: 1.75;
 }
 
-.congested {
 
-    color: red;
-
-    font-weight: bold;
-
-}
+/* FOOTER */
 
 .footer {
 
     margin-top: 40px;
 
-    text-align: center;
+    padding-top: 15px;
 
-    color: #666;
+    border-top:
+        1px solid #cbd5e1;
 
-    font-size: 12px;
+    display: flex;
 
+    justify-content:
+        space-between;
+
+    color: #64748b;
+
+    font-size: 9px;
 }
+
+
+/* PRINT */
 
 @media print {
 
     body {
 
-        margin: 20px;
+        background: white;
+    }
 
+    .report {
+
+        width: 100%;
+
+        margin: 0;
+
+        padding: 30px;
+
+        box-shadow: none;
+    }
+
+    .actions {
+
+        display: none;
     }
 
 }
@@ -1373,88 +1812,190 @@ th {
 
 </head>
 
+
 <body>
 
 
-<h1>
-SDN Campus Network Report
-</h1>
+<div class="actions">
+
+<button onclick="window.print()">
+
+🖨 Print / Save PDF
+
+</button>
 
 
-<div class="subtitle">
+<button onclick="window.close()">
 
-Software Defined Campus Network with
-Dynamic Load Balancing and Quality of Service
+✕ Close
+
+</button>
 
 </div>
 
 
+<div class="report">
+
+
+<!-- HEADER -->
+
+<div class="report-header">
+
+<h1>
+SDN CAMPUS NETWORK
+</h1>
+
 <h2>
-Physical Network Summary
+Network Performance & QoS Report
 </h2>
 
+<p>
+Software Defined Campus Network Monitoring System
+</p>
 
-<div class="info">
+</div>
 
 
-<div class="box">
+<!-- META -->
 
-<div class="label">
+<div class="meta">
+
+
+<div class="meta-box">
+
+<div class="meta-label">
+Report Date & Time
+</div>
+
+<div class="meta-value">
+${reportDate}
+</div>
+
+</div>
+
+
+<div class="meta-box">
+
+<div class="meta-label">
+Monitoring Status
+</div>
+
+<div class="meta-value">
+ACTIVE
+</div>
+
+</div>
+
+
+<div class="meta-box">
+
+<div class="meta-label">
 Network Interface
 </div>
 
-<div class="value">
+<div class="meta-value">
 ${interfaceName}
 </div>
 
 </div>
 
 
-<div class="box">
+<div class="meta-box">
 
-<div class="label">
+<div class="meta-label">
+Report Classification
+</div>
+
+<div class="meta-value">
+SDN NETWORK PERFORMANCE
+</div>
+
+</div>
+
+
+</div>
+
+
+<!-- SECTION 1 -->
+
+<div class="section">
+
+<div class="section-title">
+
+1. Executive Network Summary
+
+</div>
+
+
+<div class="summary">
+
+
+<div class="summary-card">
+
+<div class="summary-label">
 Throughput
 </div>
 
-<div class="value">
+<div class="summary-value">
 ${throughput}
 </div>
 
 </div>
 
 
-<div class="box">
+<div class="summary-card">
 
-<div class="label">
+<div class="summary-label">
 Latency
 </div>
 
-<div class="value">
+<div class="summary-value">
 ${latency}
 </div>
 
 </div>
 
 
-<div class="box">
+<div class="summary-card">
 
-<div class="label">
+<div class="summary-label">
 Packet Loss
 </div>
 
-<div class="value">
+<div class="summary-value">
 ${packetLoss}
 </div>
 
 </div>
 
 
+<div class="summary-card">
+
+<div class="summary-label">
+Interface
+</div>
+
+<div class="summary-value">
+${interfaceName}
+</div>
+
 </div>
 
 
-<h2>
-SDN Link Utilization
-</h2>
+</div>
+
+</div>
+
+
+<!-- SECTION 2 -->
+
+<div class="section">
+
+<div class="section-title">
+
+2. Physical Network Measurements
+
+</div>
 
 
 <table>
@@ -1462,7 +2003,109 @@ SDN Link Utilization
 <tr>
 
 <th>
-Link
+Parameter
+</th>
+
+<th>
+Current Measurement
+</th>
+
+<th>
+Monitoring Purpose
+</th>
+
+</tr>
+
+
+<tr>
+
+<td>
+Network Interface
+</td>
+
+<td>
+${interfaceName}
+</td>
+
+<td>
+Active network interface identification
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Throughput
+</td>
+
+<td>
+${throughput}
+</td>
+
+<td>
+Traffic transfer performance
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Latency
+</td>
+
+<td>
+${latency}
+</td>
+
+<td>
+End-to-end network responsiveness
+</td>
+
+</tr>
+
+
+<tr>
+
+<td>
+Packet Loss
+</td>
+
+<td>
+${packetLoss}
+</td>
+
+<td>
+Packet delivery reliability
+</td>
+
+</tr>
+
+</table>
+
+</div>
+
+
+<!-- SECTION 3 -->
+
+<div class="section">
+
+<div class="section-title">
+
+3. SDN Link Utilization
+
+</div>
+
+
+<table>
+
+<tr>
+
+<th>
+SDN Link
 </th>
 
 <th>
@@ -1470,7 +2113,11 @@ Utilization
 </th>
 
 <th>
-Status
+Operational Status
+</th>
+
+<th>
+QoS Assessment
 </th>
 
 </tr>
@@ -1486,8 +2133,16 @@ S1 → S2
 ${link12}
 </td>
 
-<td class="status">
+<td>
 ${status12}
+</td>
+
+<td>
+${status12 === "CONGESTED"
+    ? "Immediate attention required"
+    : status12 === "WARNING"
+    ? "Traffic should be monitored"
+    : "Operating within normal range"}
 </td>
 
 </tr>
@@ -1503,8 +2158,16 @@ S1 → S3
 ${link13}
 </td>
 
-<td class="status">
+<td>
 ${status13}
+</td>
+
+<td>
+${status13 === "CONGESTED"
+    ? "Immediate attention required"
+    : status13 === "WARNING"
+    ? "Traffic should be monitored"
+    : "Operating within normal range"}
 </td>
 
 </tr>
@@ -1520,131 +2183,185 @@ S2 → S3
 ${link23}
 </td>
 
-<td class="status">
+<td>
 ${status23}
+</td>
+
+<td>
+${status23 === "CONGESTED"
+    ? "Immediate attention required"
+    : status23 === "WARNING"
+    ? "Traffic should be monitored"
+    : "Operating within normal range"}
 </td>
 
 </tr>
 
-
 </table>
-
-
-<h2>
-Report Description
-</h2>
-
-
-<p>
-
-This report presents the current physical network
-measurements and the logical SDN link utilization
-used by the Quality of Service and dynamic
-load-balancing demonstration.
-
-</p>
-
-
-<p>
-
-The physical network section contains interface,
-throughput, latency and packet-loss information.
-
-The SDN section contains utilization values for
-the logical links S1 → S2, S1 → S3 and S2 → S3.
-
-</p>
-
-
-<div class="footer">
-
-Generated from SDN Campus Network Dashboard
 
 </div>
 
 
-<script>
+<!-- SECTION 4 -->
 
-/* Color status values */
+<div class="section">
 
-document
-    .querySelectorAll(".status")
-    .forEach(function(element) {
+<div class="section-title">
 
-        const text =
-            element.innerText
-                .toUpperCase();
+4. Network Analysis
 
-        if (
-            text.includes("CONGESTED")
-        ) {
-
-            element.className =
-                "status congested";
-
-        }
-
-        else if (
-            text.includes("WARNING")
-        ) {
-
-            element.className =
-                "status warning";
-
-        }
-
-        else {
-
-            element.className =
-                "status normal";
-
-        }
-
-    });
+</div>
 
 
-window.onload =
-    function() {
+<div class="analysis">
 
-        setTimeout(
-            function() {
+<strong>Physical Network Analysis:</strong>
 
-                window.print();
+The monitoring system records the active network
+interface, throughput, latency and packet-loss
+measurements. These parameters provide a basic
+assessment of current network performance and
+communication reliability.
 
-            },
-            500
-        );
+<br><br>
 
-    };
 
-<\/script>
+<strong>SDN Analysis:</strong>
+
+The SDN layer monitors logical communication links
+between S1, S2 and S3. Link utilization is evaluated
+to identify traffic concentration and possible
+congestion conditions.
+
+<br><br>
+
+
+<strong>QoS and Load Balancing:</strong>
+
+The utilization status provides information that can
+support Quality of Service management and dynamic
+load balancing. Traffic can be evaluated against
+available paths so that heavily utilized links can
+be avoided when alternative paths are available.
+
+<br><br>
+
+
+<strong>Operational Assessment:</strong>
+
+Links below 60% utilization are considered within
+the normal operating range. Utilization from 60%
+to 84% indicates a warning condition, while
+utilization of 85% or above is considered congested.
+
+</div>
+
+</div>
+
+
+<!-- SECTION 5 -->
+
+<div class="section">
+
+<div class="section-title">
+
+5. Conclusion
+
+</div>
+
+
+<div class="analysis">
+
+The SDN Campus Network monitoring system provides
+centralized visibility into physical network
+performance and logical SDN link utilization.
+
+The collected measurements can assist in identifying
+network performance conditions, monitoring QoS
+requirements and supporting dynamic traffic
+distribution across the SDN topology.
+
+The report therefore provides a consolidated view
+of the current SDN network operating condition.
+
+</div>
+
+</div>
+
+
+<!-- FOOTER -->
+
+<div class="footer">
+
+<span>
+SDN Campus Network Monitoring System
+</span>
+
+<span>
+Automated Performance Report
+</span>
+
+<span>
+Confidential
+</span>
+
+</div>
+
+
+</div>
 
 
 </body>
 
 </html>
 
-    `);
+`);
 
 
-    reportWindow.document.close();
+        reportWindow.document.close();
+
+
+        /* FOCUS REPORT */
+
+        reportWindow.focus();
+
+
+    }
+
+    catch(error) {
+
+        console.error(
+            "Report generation error:",
+            error
+        );
+
+        alert(
+            "Report generation failed. Please refresh the page and try again."
+        );
+
+    }
 
 }
 
 
-/* INITIAL LOAD */
+/* =====================================================
+   INITIAL LOAD
+===================================================== */
 
 loadRealNetwork();
 
 loadSDNLinks();
 
 
-/* AUTO UPDATE */
+/* =====================================================
+   AUTO UPDATE
+===================================================== */
 
 setInterval(
     loadRealNetwork,
     3000
 );
+
 
 setInterval(
     loadSDNLinks,
